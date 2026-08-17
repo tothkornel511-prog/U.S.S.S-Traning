@@ -1,8 +1,8 @@
-import { getPersonnel, ref, moduleState, moduleByCode, levelLabel } from "../store.js?v=12";
-import { hasRole } from "../auth.js?v=12";
-import { esc, initials } from "../utils.js?v=12";
-import { navigate } from "../router.js?v=12";
-import { openModuleDetail } from "./profile.js?v=12";
+import { getPersonnel, ref, moduleState, moduleByCode, levelLabel } from "../store.js?v=13";
+import { hasRole } from "../auth.js?v=13";
+import { esc, initials } from "../utils.js?v=13";
+import { navigate } from "../router.js?v=13";
+import { openModuleDetail } from "./profile.js?v=13";
 
 let filterLevel = "";
 let filterModule = "";
@@ -11,13 +11,13 @@ function buildGroups() {
   // Sorrend: 0. szint, majd a szinten kívüli szakirányok külön-külön
   // oszlopcsoportként, aztán I–V. Ez adja a fejléc-csoportosítást.
   const groups = [];
-  groups.push({ id: "0", label: `0. ${levelLabel("0")}`, codes: ref.LEVEL_MODULE_ORDER["0"] });
+  groups.push({ id: "0", label: levelLabel("0"), codes: ref.LEVEL_MODULE_ORDER["0"] });
   ref.LEVEL_MODULE_ORDER.SPEC.forEach((code) => {
     const def = moduleByCode(code);
-    groups.push({ id: code, label: `${code}. ${def.name}`, codes: [code] });
+    groups.push({ id: code, label: `${code} – ${def.name}`, codes: [code] });
   });
   ["I", "II", "III", "IV", "V"].forEach((lvl) => {
-    groups.push({ id: lvl, label: `${lvl}. ${levelLabel(lvl)}`, codes: ref.LEVEL_MODULE_ORDER[lvl] });
+    groups.push({ id: lvl, label: levelLabel(lvl), codes: ref.LEVEL_MODULE_ORDER[lvl] });
   });
   return groups;
 }
@@ -44,6 +44,8 @@ export function renderMatrix(container) {
   document.getElementById("mx-level").addEventListener("change", (e) => { filterLevel = e.target.value; draw(); });
   document.getElementById("mx-module").addEventListener("change", (e) => { filterModule = e.target.value; draw(); });
 
+  const GROUP_ACCENTS = ["#c6a664", "#5fb8c9", "#9b7fd4", "#4e9e6f", "#d9a53a", "#d1554a", "#7fa6d4", "#c98fd1"];
+
   function draw() {
     let groups = allGroups;
     if (filterLevel) groups = groups.filter((g) => g.id === filterLevel);
@@ -52,20 +54,23 @@ export function renderMatrix(container) {
       .filter((g) => g.codes.length);
 
     const seen = new Set();
-    groups = groups.map((g) => ({
+    groups = groups.map((g, i) => ({
       ...g,
+      accent: GROUP_ACCENTS[i % GROUP_ACCENTS.length],
       codes: g.codes.filter((c) => (seen.has(c) ? false : (seen.add(c), true))),
     })).filter((g) => g.codes.length);
+
+    const sep = (color) => `border-right: 2px solid ${color}; box-shadow: inset -6px 0 12px -6px ${color};`;
 
     const table = document.getElementById("matrix-table");
     table.innerHTML = `
       <thead>
         <tr>
           <th class="sticky-col" rowspan="2">Ügynök</th>
-          ${groups.map((g) => `<th colspan="${g.codes.length}" class="mx-group-head">${esc(g.label)}</th>`).join("")}
+          ${groups.map((g) => `<th colspan="${g.codes.length}" class="mx-group-head" style="${sep(g.accent)} color:${g.accent}; text-shadow:0 0 10px ${g.accent}66;">${esc(g.label)}</th>`).join("")}
         </tr>
         <tr>
-          ${groups.flatMap((g) => g.codes.map((c) => `<th title="${esc(moduleByCode(c).name)}">${esc(c)}</th>`)).join("")}
+          ${groups.flatMap((g) => g.codes.map((c, i) => `<th title="${esc(moduleByCode(c).name)}" style="${i === g.codes.length - 1 ? sep(g.accent) : ""}">${esc(c)}</th>`)).join("")}
         </tr>
       </thead>
       <tbody>
@@ -77,7 +82,7 @@ export function renderMatrix(container) {
                 <div><div class="person-name">${esc(p.name)}</div><div class="person-sub">${esc(p.usssId)}</div></div>
               </div>
             </td>
-            ${groups.flatMap((g) => g.codes.map((c) => cellHtml(p, c))).join("")}
+            ${groups.flatMap((g) => g.codes.map((c, i) => cellHtml(p, c, i === g.codes.length - 1 ? g.accent : null))).join("")}
           </tr>`).join("")}
       </tbody>
     `;
@@ -92,16 +97,17 @@ export function renderMatrix(container) {
     );
   }
 
-  function cellHtml(person, code) {
+  function cellHtml(person, code, sepColor) {
+    const sepStyle = sepColor ? `border-right: 2px solid ${sepColor}; box-shadow: inset -6px 0 12px -6px ${sepColor};` : "";
     const st = moduleState(person, code);
     const rec = (person.modules && person.modules[code]) || null;
     if (!rec || (rec.theory === null || rec.theory === undefined) && !rec.practical) {
-      return `<td class="matrix-cell mc-empty" data-cell="${esc(person.usssId)}::${esc(code)}"><span class="matrix-empty">—</span></td>`;
+      return `<td class="matrix-cell mc-empty" data-cell="${esc(person.usssId)}::${esc(code)}" style="${sepStyle}"><span class="matrix-empty">—</span></td>`;
     }
     const pct = st.theory !== null && st.theory !== undefined ? `E: ${st.theory}%` : "—";
     const attempts = (rec.history || []).length;
     const icon = st.color === "green" ? "✓" : st.color === "yellow" ? "⏳" : "✗";
-    return `<td class="matrix-cell mc-${st.color}" data-cell="${esc(person.usssId)}::${esc(code)}" title="Elméleti eredmény">
+    return `<td class="matrix-cell mc-${st.color}" data-cell="${esc(person.usssId)}::${esc(code)}" title="Elméleti eredmény" style="${sepStyle}">
       <span class="mc-icon">${icon}</span>
       <span class="mc-pct">${pct}</span>
       ${attempts > 1 ? `<span class="mc-attempts">×${attempts}</span>` : ""}
