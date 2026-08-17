@@ -117,7 +117,7 @@ export const PERSONNEL = [
 
 /* Kezdeti hozzáférési kódok (Admin később szerkesztheti / generálhatja / visszavonhatja) */
 export const ACCESS_CODES = [
-  { usssId: "USSS-118", code: "7QXN-4KRT", role: "ADMIN" },    // Dominic Hayes
+  { usssId: "USSS-118", code: "kornel08002", role: "ADMIN" },  // Dominic Hayes
   { usssId: "USSS-004", code: "3MVD-9GHC", role: "ADMIN" },    // Tyron Wolf
   { usssId: "USSS-98",  code: "5PLZ-8XWQ", role: "TRAINING" }, // Christoph Norbert Kleinemann
 ];
