@@ -6,7 +6,7 @@
    Hiányzó térképkép esetén sötét placeholderre esik vissza, hogy a
    pöttyök/címkék attól még szerkeszthetők/megtekinthetők maradjanak.
    ========================================================================== */
-import { esc } from "./utils.js?v=16";
+import { esc } from "./utils.js?v=17";
 
 const DEFAULT_STAGE_W = 1400;
 const DEFAULT_STAGE_H = 1900; // placeholder arány, amíg nincs kép betöltve

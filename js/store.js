@@ -9,7 +9,7 @@
 import {
   LEVELS, SERVICE_STATUSES, POSITIONS, MODULES, LEVEL_MODULE_ORDER,
   PERSONNEL, ACCESS_CODES, PROTECTED_LOCATIONS, AUDIT_LOG_SEED, MAPS, DISTRICTS,
-} from "./data.js?v=16";
+} from "./data.js?v=17";
 
 /* v7: Roxwood/Cayo Perico eltávolítva, csak Los Santos térkép maradt. */
 const NS = "usss_ets_v7_";
@@ -97,6 +97,7 @@ export function seedIfNeeded() {
   }
   applyPositionPatch();
   applyHijSplitPatch();
+  applyTheoryFillPatch();
 }
 
 /* Célzott, egyszeri pozíció-javítás — csak a felsorolt személyek "position"
@@ -146,6 +147,42 @@ function applyHijSplitPatch() {
   });
   if (changed) savePersonnel(list);
   write(HIJ_SPLIT_PATCH_KEY, true);
+}
+
+/* Célzott, egyszeri feltöltés: mindenkinek, akinek MÉG NINCS elméleti
+   eredménye a "0" (Belépés, betanulás és bázisrend) modulra — vagyis a
+   jelenlegi szintjükhöz tartozó modulra —, rögzít egy minta-eredményt.
+   Akinek már van bármilyen adata ezen a modulon, azt nem érinti. */
+const THEORY_FILL_PATCH_KEY = NS + "theory_fill_0_2026_08_17a";
+const THEORY_FILL_VALUES = {
+  "USSS-004": 92, "USSS-80": 88, "USSS-91": 76, "USSS-121": 95, "USSS-112": 65,
+  "USSS-119": 84, "USSS-8": 91, "USSS-120": 98, "USSS-111": 72, "USSS-124": 87,
+  "USSS-92": 60, "USSS-107": 90, "USSS-106": 55, "USSS-123": 93, "USSS-50": 89,
+  "USSS-98": 96, "USSS-118": 90, "USSS-96": 82, "USSS-109": 79,
+};
+function applyTheoryFillPatch() {
+  if (read(THEORY_FILL_PATCH_KEY, false)) return;
+  const list = getPersonnel();
+  let changed = false;
+  list.forEach((p) => {
+    const value = THEORY_FILL_VALUES[p.usssId];
+    if (value === undefined) return;
+    p.modules = p.modules || {};
+    const existing = p.modules["0"];
+    if (existing && existing.theory !== null && existing.theory !== undefined) return;
+    p.modules["0"] = existing || { theory: null, practical: undefined, history: [] };
+    p.modules["0"].theory = value;
+    p.modules["0"].theoryDate = "2026-08-17";
+    p.modules["0"].examiner = "A rendszer";
+    p.modules["0"].history = p.modules["0"].history || [];
+    p.modules["0"].history.push({
+      date: "2026-08-17T10:00:00.000Z", type: "theory", theory: value,
+      result: value >= THEORY_PASS_THRESHOLD ? "pass" : "fail", examiner: "A rendszer",
+    });
+    changed = true;
+  });
+  if (changed) savePersonnel(list);
+  write(THEORY_FILL_PATCH_KEY, true);
 }
 
 export function resetAllData() {
