@@ -2,10 +2,10 @@ import {
   getPerson, ref, moduleState, readinessPercent, levelProgress, probationInfo,
   setModuleTheory, setModulePractical, approveLevelUp, nextLevelId, liftProbation,
   levelLabel, moduleByCode, examStats, THEORY_PASS_THRESHOLD,
-} from "../store.js?v=5";
-import { hasRole, actorLabel } from "../auth.js?v=5";
-import { esc, initials, fmtDate, fmtDateTime, toast, openModal, closeModal } from "../utils.js?v=5";
-import { navigate } from "../router.js?v=5";
+} from "../store.js?v=6";
+import { hasRole, actorLabel } from "../auth.js?v=6";
+import { esc, initials, fmtDate, fmtDateTime, toast, openModal, closeModal } from "../utils.js?v=6";
+import { navigate } from "../router.js?v=6";
 
 let activeTab = "modules";
 

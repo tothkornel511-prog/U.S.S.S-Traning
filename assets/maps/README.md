@@ -1,13 +1,16 @@
 # Térképképek
 
-Ide kell feltölteni a nagyfelbontású térképeket, pontosan ezekkel a fájlnevekkel
-(a `js/data.js`-ben lévő `MAPS` tömb ezekre az útvonalakra mutat):
+| Fájl | Térkép | Állapot |
+|---|---|---|
+| `los-santos.webp` | Los Santos & Blaine County | ✅ feltöltve |
+| `roxwood.webp` | Roxwood | ✅ feltöltve |
+| `cayo-perico.jpg` | Cayo Perico | ⏳ hiányzik |
 
-| Fájl | Térkép |
-|---|---|
-| `los-santos.jpg` | Los Santos & Blaine County |
-| `roxwood.jpg` | Roxwood |
-| `cayo-perico.jpg` | Cayo Perico |
+A Cayo Perico képet szándékosan nem töltöttem fel — a kapott kép egy életlen,
+telefonnal lefotózott képernyőrészlet volt (kereszthajszál-overlay, kép szélén
+egy váll látszik), ez rontaná az összképet. Ha küldesz egy tiszta, éles
+felülnézeti térképet róla (pl. Discordon feltöltve, majd a kép linkjét
+kimásolva), ugyanígy behelyettesítem `cayo-perico.jpg` (vagy `.webp`) néven.
 
 Amíg egy fájl hiányzik, a Térkép oldal és a Védett helyszínek térkép-előnézete
 egy sötét placeholder felületen jeleníti meg a pöttyöket és körzet-feliratokat —

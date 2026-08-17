@@ -122,13 +122,12 @@ export const ACCESS_CODES = [
   { usssId: "USSS-98",  code: "5PLZ-8XWQ", role: "TRAINING" }, // Christoph Norbert Kleinemann
 ];
 
-/* Elérhető GTA térképek a Védett helyszínekhez / Térkép oldalhoz. Az "image"
-   útvonalra kell feltölteni a tényleges térképfájlt (jpg/png) — amíg az
-   nincs ott, a térkép-nézet erről tájékoztat, de a pöttyök/körzetek attól
-   még szerkeszthetők és megjelennek egy sötét placeholder felületen. */
+/* Elérhető GTA térképek a Védett helyszínekhez / Térkép oldalhoz. Amíg egy
+   "image" útvonalon nincs fájl, a térkép-nézet erről tájékoztat, de a
+   pöttyök/körzetek attól még szerkeszthetők egy sötét placeholder felületen. */
 export const MAPS = [
-  { id: "los-santos",  name: "Los Santos & Blaine County", image: "assets/maps/los-santos.jpg" },
-  { id: "roxwood",     name: "Roxwood",                    image: "assets/maps/roxwood.jpg" },
+  { id: "los-santos",  name: "Los Santos & Blaine County", image: "assets/maps/los-santos.webp" },
+  { id: "roxwood",     name: "Roxwood",                    image: "assets/maps/roxwood.webp" },
   { id: "cayo-perico", name: "Cayo Perico",                image: "assets/maps/cayo-perico.jpg" },
 ];
 

@@ -9,7 +9,7 @@
 import {
   LEVELS, SERVICE_STATUSES, POSITIONS, MODULES, LEVEL_MODULE_ORDER,
   PERSONNEL, ACCESS_CODES, PROTECTED_LOCATIONS, AUDIT_LOG_SEED, MAPS, DISTRICTS,
-} from "./data.js?v=5";
+} from "./data.js?v=6";
 
 /* v5: Dominic Hayes pozíciója Oktatásvezető + garantált újra-seedelés. */
 const NS = "usss_ets_v5_";
