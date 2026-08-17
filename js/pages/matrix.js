@@ -1,8 +1,8 @@
-import { getPersonnel, ref, moduleState, moduleByCode } from "../store.js";
-import { hasRole } from "../auth.js";
-import { esc, initials } from "../utils.js";
-import { navigate } from "../router.js";
-import { openModuleDetail } from "./profile.js";
+import { getPersonnel, ref, moduleState, moduleByCode } from "../store.js?v=4";
+import { hasRole } from "../auth.js?v=4";
+import { esc, initials } from "../utils.js?v=4";
+import { navigate } from "../router.js?v=4";
+import { openModuleDetail } from "./profile.js?v=4";
 
 let filterLevel = "";
 let filterModule = "";

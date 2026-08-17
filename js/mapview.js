@@ -6,7 +6,7 @@
    Hiányzó térképkép esetén sötét placeholderre esik vissza, hogy a
    pöttyök/címkék attól még szerkeszthetők/megtekinthetők maradjanak.
    ========================================================================== */
-import { esc } from "./utils.js";
+import { esc } from "./utils.js?v=4";
 
 const STAGE_W = 2000;
 const STAGE_H = 2700; // ~ a valós GTA V térkép portré-arányához közelítve
