@@ -9,7 +9,7 @@
 import {
   LEVELS, SERVICE_STATUSES, POSITIONS, MODULES, LEVEL_MODULE_ORDER,
   PERSONNEL, ACCESS_CODES, PROTECTED_LOCATIONS, AUDIT_LOG_SEED, MAPS, DISTRICTS,
-} from "./data.js?v=15";
+} from "./data.js?v=16";
 
 /* v7: Roxwood/Cayo Perico eltávolítva, csak Los Santos térkép maradt. */
 const NS = "usss_ets_v7_";
@@ -288,7 +288,7 @@ export function setModuleTheory(usssId, code, { theory, theoryDate, examiner }, 
   p.modules[code] = p.modules[code] || { theory: null, practical: undefined, history: [] };
   p.modules[code].theory = theory;
   p.modules[code].theoryDate = theoryDate || new Date().toISOString().slice(0, 10);
-  p.modules[code].examiner = examiner || "";
+  p.modules[code].examiner = examiner || "A rendszer";
   p.modules[code].history = p.modules[code].history || [];
   if (theory !== null && theory !== undefined) {
     p.modules[code].history.push({
@@ -296,6 +296,7 @@ export function setModuleTheory(usssId, code, { theory, theoryDate, examiner }, 
       type: "theory",
       theory,
       result: theory >= THEORY_PASS_THRESHOLD ? "pass" : "fail",
+      examiner: p.modules[code].examiner,
     });
   }
   savePersonnel(list);

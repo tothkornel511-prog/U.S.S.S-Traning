@@ -2,10 +2,10 @@ import {
   getPerson, ref, moduleState, readinessPercent, levelProgress, probationInfo,
   setModuleTheory, setModulePractical, approveLevelUp, nextLevelId, liftProbation,
   levelLabel, moduleByCode, examStats, THEORY_PASS_THRESHOLD, deleteHistoryEntry,
-} from "../store.js?v=15";
-import { hasRole, actorLabel } from "../auth.js?v=15";
-import { esc, initials, fmtDate, fmtDateTime, toast, openModal, closeModal } from "../utils.js?v=15";
-import { navigate } from "../router.js?v=15";
+} from "../store.js?v=16";
+import { hasRole, actorLabel } from "../auth.js?v=16";
+import { esc, initials, fmtDate, fmtDateTime, toast, openModal, closeModal } from "../utils.js?v=16";
+import { navigate } from "../router.js?v=16";
 
 let activeTab = "modules";
 
@@ -176,6 +176,7 @@ export function openModuleDetail(person, code, canEdit, onUpdate) {
         <div class="card-title">Elmélet</div>
         <div class="card-value" style="font-size:22px">${st.theory !== null && st.theory !== undefined ? st.theory + "%" : "—"}</div>
         ${st.theory !== null && st.theory !== undefined ? `<span class="badge ${st.theory >= THEORY_PASS_THRESHOLD ? "badge-green" : "badge-red"} mt-1">${st.theory >= THEORY_PASS_THRESHOLD ? "Sikeres" : `Sikertelen (<${THEORY_PASS_THRESHOLD}%)`}</span>` : ""}
+        ${rec.examiner ? `<div class="small text-low mt-1">Vizsgáztató: ${esc(rec.examiner)}</div>` : ""}
       </div>
       <div class="card" style="flex:1">
         <div class="card-title">Gyakorlat</div>
@@ -188,7 +189,7 @@ export function openModuleDetail(person, code, canEdit, onUpdate) {
     <form id="theory-form" class="mb-2">
       <div class="grid grid-2">
         <div class="field"><label>Elméleti eredmény (%)</label><input type="number" min="0" max="100" id="mf-theory" value="${st.theory ?? ""}" /></div>
-        <div class="field"><label>Vizsgáztató</label><input id="mf-examiner" value="${esc(rec.examiner || "")}" placeholder="Név" /></div>
+        <div class="field"><label>Vizsgáztató</label><input id="mf-examiner" value="${esc(rec.examiner || "A rendszer")}" placeholder="Név" /></div>
       </div>
       <div class="field"><label>Vizsga dátuma</label><input type="date" id="mf-date" value="${esc(rec.theoryDate || "")}" /></div>
       <button type="submit" class="btn btn-sm">Elméleti eredmény mentése</button>
