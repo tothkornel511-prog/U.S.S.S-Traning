@@ -6,15 +6,15 @@
    Hiányzó térképkép esetén sötét placeholderre esik vissza, hogy a
    pöttyök/címkék attól még szerkeszthetők/megtekinthetők maradjanak.
    ========================================================================== */
-import { esc } from "./utils.js?v=6";
+import { esc } from "./utils.js?v=7";
 
-const STAGE_W = 2000;
-const DEFAULT_STAGE_H = 2700; // placeholder arány, amíg nincs kép betöltve
+const DEFAULT_STAGE_W = 1400;
+const DEFAULT_STAGE_H = 1900; // placeholder arány, amíg nincs kép betöltve
 
 export function createPanZoomMap(container, opts = {}) {
   const { image, alt = "Térkép", editable = false, minScale = 0.3, maxScale = 6 } = opts;
   let scale = 1, tx = 0, ty = 0;
-  let stageH = DEFAULT_STAGE_H;
+  let stageW = DEFAULT_STAGE_W, stageH = DEFAULT_STAGE_H;
   let clickCb = null;
   let dragging = false, moved = false, lastX = 0, lastY = 0;
 
@@ -40,17 +40,21 @@ export function createPanZoomMap(container, opts = {}) {
   const pinsLayer = container.querySelector(".pz-pins");
   const labelsLayer = container.querySelector(".pz-labels");
 
-  stage.style.width = STAGE_W + "px";
+  stage.style.width = stageW + "px";
   stage.style.height = stageH + "px";
 
   const img = new Image();
   img.alt = alt;
   img.decoding = "async";
   img.addEventListener("load", () => {
-    // A stage-t a kép valós arányához igazítjuk, hogy ne nyúljon/vágódjon
-    // torz méretre — a pöttyök/címkék %-os pozíciója emiatt nem változik.
+    // A stage a kép valódi pixelméretét kapja (nem egy fix, esetleg
+    // felskálázó dobozt) — így 1:1 nézetben a térkép éles marad, és
+    // a nagyítás csak azon túl kezd lágyulni. A pöttyök/címkék %-os
+    // pozíciója emiatt nem változik.
     if (img.naturalWidth && img.naturalHeight) {
-      stageH = STAGE_W * (img.naturalHeight / img.naturalWidth);
+      stageW = img.naturalWidth;
+      stageH = img.naturalHeight;
+      stage.style.width = stageW + "px";
       stage.style.height = stageH + "px";
     }
     imgBox.innerHTML = "";
@@ -78,8 +82,8 @@ export function createPanZoomMap(container, opts = {}) {
   function fitToViewport() {
     const vw = viewport.clientWidth || 600;
     const vh = viewport.clientHeight || 400;
-    scale = clamp(Math.min(vw / STAGE_W, vh / stageH) * 0.98, minScale, maxScale);
-    tx = (vw - STAGE_W * scale) / 2;
+    scale = clamp(Math.min(vw / stageW, vh / stageH) * 0.98, minScale, maxScale);
+    tx = (vw - stageW * scale) / 2;
     ty = (vh - stageH * scale) / 2;
     applyTransform();
   }
@@ -159,7 +163,7 @@ export function createPanZoomMap(container, opts = {}) {
     focus(x, y, targetScale = 2.2) {
       const vw = viewport.clientWidth, vh = viewport.clientHeight;
       scale = clamp(targetScale, minScale, maxScale);
-      tx = vw / 2 - (x / 100) * STAGE_W * scale;
+      tx = vw / 2 - (x / 100) * stageW * scale;
       ty = vh / 2 - (y / 100) * stageH * scale;
       applyTransform();
     },

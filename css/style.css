@@ -32,10 +32,10 @@
 
   /* Visszafogott LED-szerű fényhangsúlyok — státuszjelzőkhöz és aktív
      állapotokhoz, nem díszítésnek. Kis sugár, alacsony opacitás. */
-  --glow-gold:  0 0 1px rgba(232,200,135,0.8), 0 0 14px rgba(198,166,100,0.35);
-  --glow-green: 0 0 1px rgba(127,209,156,0.9), 0 0 9px rgba(78,158,111,0.55);
-  --glow-yellow:0 0 1px rgba(217,165,58,0.9),  0 0 9px rgba(217,165,58,0.5);
-  --glow-red:   0 0 1px rgba(240,162,155,0.9), 0 0 9px rgba(209,85,74,0.55);
+  --glow-gold:  0 0 2px rgba(232,200,135,0.95), 0 0 8px rgba(198,166,100,0.75), 0 0 22px rgba(198,166,100,0.5);
+  --glow-green: 0 0 2px rgba(140,224,169,0.95), 0 0 8px rgba(78,158,111,0.85), 0 0 20px rgba(78,158,111,0.55);
+  --glow-yellow:0 0 2px rgba(230,182,80,0.95),  0 0 8px rgba(217,165,58,0.85), 0 0 20px rgba(217,165,58,0.55);
+  --glow-red:   0 0 2px rgba(245,175,168,0.95), 0 0 8px rgba(209,85,74,0.85),  0 0 20px rgba(209,85,74,0.55);
   --bevel: inset 0 1px 0 rgba(255,255,255,0.045);
 }
 
@@ -292,13 +292,13 @@ button {
   padding: 3px 10px; border-radius: 999px; font-size: 11px; font-weight: 600;
   letter-spacing: 0.03em; border: 1px solid transparent;
 }
-.badge-green { background: var(--green-bg); color: #7fd19c; border-color: rgba(78,158,111,0.4); }
-.badge-yellow { background: var(--yellow-bg); color: var(--yellow); border-color: rgba(217,165,58,0.4); }
-.badge-red { background: var(--red-bg); color: #f0a29b; border-color: rgba(209,85,74,0.4); }
+.badge-green { background: var(--green-bg); color: #7fd19c; border-color: rgba(78,158,111,0.45); box-shadow: 0 0 10px rgba(78,158,111,0.2); }
+.badge-yellow { background: var(--yellow-bg); color: var(--yellow); border-color: rgba(217,165,58,0.45); box-shadow: 0 0 10px rgba(217,165,58,0.2); }
+.badge-red { background: var(--red-bg); color: #f0a29b; border-color: rgba(209,85,74,0.45); box-shadow: 0 0 10px rgba(209,85,74,0.2); }
 .badge-gray { background: rgba(255,255,255,0.05); color: var(--text-low); border-color: var(--line-soft); }
 .badge-gold { background: rgba(198,166,100,0.14); color: var(--gold-bright); border-color: rgba(198,166,100,0.4); }
 
-.dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+.dot { width: 9px; height: 9px; border-radius: 50%; display: inline-block; }
 .dot-green { background: var(--green); box-shadow: var(--glow-green); }
 .dot-yellow { background: var(--yellow); box-shadow: var(--glow-yellow); }
 .dot-red { background: var(--red); box-shadow: var(--glow-red); }

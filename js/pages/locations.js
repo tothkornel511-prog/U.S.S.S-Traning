@@ -1,9 +1,9 @@
-import { getLocations, getLocation, upsertLocation, deleteLocation, ref, mapById } from "../store.js?v=6";
-import { hasRole, actorLabel } from "../auth.js?v=6";
-import { esc, fmtDateTime, toast, openModal, closeModal } from "../utils.js?v=6";
-import { navigate } from "../router.js?v=6";
-import { createPanZoomMap } from "../mapview.js?v=6";
-import { openOnMap } from "./map.js?v=6";
+import { getLocations, getLocation, upsertLocation, deleteLocation, ref, mapById } from "../store.js?v=7";
+import { hasRole, actorLabel } from "../auth.js?v=7";
+import { esc, fmtDateTime, toast, openModal, closeModal } from "../utils.js?v=7";
+import { navigate } from "../router.js?v=7";
+import { createPanZoomMap } from "../mapview.js?v=7";
+import { openOnMap } from "./map.js?v=7";
 
 export function renderLocationsList(container) {
   const canEdit = hasRole("TRAINING");
@@ -87,11 +87,11 @@ export function renderLocationDetail(container, id) {
   });
 }
 
-function openLocationForm(loc) {
+export function openLocationForm(loc, preset = {}) {
   const isNew = !loc;
   let entrances = loc ? JSON.parse(JSON.stringify(loc.entrances || [])) : [];
-  let pos = { x: loc?.x ?? 50, y: loc?.y ?? 50 };
-  let mapId = loc?.map || ref.MAPS[0].id;
+  let pos = { x: loc?.x ?? preset.x ?? 50, y: loc?.y ?? preset.y ?? 50 };
+  let mapId = loc?.map || preset.map || ref.MAPS[0].id;
 
   openModal(`
     <div class="modal-head"><h3>${isNew ? "Új védett helyszín" : "Helyszín szerkesztése"}</h3><button class="modal-close" data-close-modal>×</button></div>

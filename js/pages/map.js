@@ -1,11 +1,13 @@
-import { ref, mapById, locationsForMap, districtsForMap, upsertDistrict, deleteDistrict } from "../store.js?v=6";
-import { hasRole, actorLabel } from "../auth.js?v=6";
-import { esc, toast, openModal, closeModal } from "../utils.js?v=6";
-import { navigate } from "../router.js?v=6";
-import { createPanZoomMap } from "../mapview.js?v=6";
+import { ref, mapById, locationsForMap, districtsForMap, upsertDistrict, deleteDistrict } from "../store.js?v=7";
+import { hasRole, actorLabel } from "../auth.js?v=7";
+import { esc, toast, openModal, closeModal } from "../utils.js?v=7";
+import { navigate } from "../router.js?v=7";
+import { createPanZoomMap } from "../mapview.js?v=7";
+import { openLocationForm } from "./locations.js?v=7";
 
 let activeMapId = null;
 let addingDistrict = false;
+let addingLocation = false;
 let pendingFocus = null; // { mapId, locationId } set by openOnMap()
 
 export function openOnMap(mapId, locationId) {
@@ -25,7 +27,10 @@ export function renderMapPage(container, mapId) {
     <div class="map-layout">
       <div class="map-page-canvas" id="map-page-canvas"></div>
       <div class="card">
-        <div class="card-title mb-1">Regisztrált védett helyszínek — ${esc(map.name)}</div>
+        <div class="flex justify-between items-center mb-1">
+          <div class="card-title" style="margin:0">Regisztrált védett helyszínek — ${esc(map.name)}</div>
+          ${canEdit ? `<button class="btn btn-sm" id="add-location-btn">+ Helyszín</button>` : ""}
+        </div>
         <div id="map-loc-list"></div>
         <div class="divider"></div>
         <div class="flex justify-between items-center mb-1">
@@ -90,9 +95,20 @@ export function renderMapPage(container, mapId) {
   if (canEdit) {
     document.getElementById("add-district-btn").addEventListener("click", () => {
       addingDistrict = true;
+      addingLocation = false;
       toast("Kattints a térképre a körzet pozíciójához.");
     });
+    document.getElementById("add-location-btn").addEventListener("click", () => {
+      addingLocation = true;
+      addingDistrict = false;
+      toast("Kattints a térképre az új védett helyszín pozíciójához.");
+    });
     api.onMapClick((pos) => {
+      if (addingLocation) {
+        addingLocation = false;
+        openLocationForm(null, { map: activeMapId, x: pos.x, y: pos.y });
+        return;
+      }
       if (!addingDistrict) return;
       addingDistrict = false;
       openModal(`

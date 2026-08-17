@@ -2,19 +2,19 @@
    U.S.S.S. ELITE TRAINING SYSTEM — APP ENTRY
    ========================================================================== */
 
-import { seedIfNeeded, globalSearch } from "./store.js?v=6";
-import { isAuthenticated, currentSession, logout, hasRole, ROLES } from "./auth.js?v=6";
-import { registerRoute, resolve, startRouter, navigate, currentPath } from "./router.js?v=6";
-import { esc, sealMark } from "./utils.js?v=6";
-import { renderLogin } from "./pages/login.js?v=6";
-import { renderDashboard } from "./pages/dashboard.js?v=6";
-import { renderPersonnelList } from "./pages/personnel.js?v=6";
-import { renderProfile } from "./pages/profile.js?v=6";
-import { renderMatrix } from "./pages/matrix.js?v=6";
-import { renderProtocolsList, renderProtocolDetail } from "./pages/protocols.js?v=6";
-import { renderLocationsList, renderLocationDetail } from "./pages/locations.js?v=6";
-import { renderMapPage } from "./pages/map.js?v=6";
-import { renderAdmin } from "./pages/admin.js?v=6";
+import { seedIfNeeded, globalSearch } from "./store.js?v=7";
+import { isAuthenticated, currentSession, logout, hasRole, ROLES } from "./auth.js?v=7";
+import { registerRoute, resolve, startRouter, navigate, currentPath } from "./router.js?v=7";
+import { esc, sealMark } from "./utils.js?v=7";
+import { renderLogin } from "./pages/login.js?v=7";
+import { renderDashboard } from "./pages/dashboard.js?v=7";
+import { renderPersonnelList } from "./pages/personnel.js?v=7";
+import { renderProfile } from "./pages/profile.js?v=7";
+import { renderMatrix } from "./pages/matrix.js?v=7";
+import { renderProtocolsList, renderProtocolDetail } from "./pages/protocols.js?v=7";
+import { renderLocationsList, renderLocationDetail } from "./pages/locations.js?v=7";
+import { renderMapPage } from "./pages/map.js?v=7";
+import { renderAdmin } from "./pages/admin.js?v=7";
 
 seedIfNeeded();
 
