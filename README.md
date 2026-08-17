@@ -32,16 +32,12 @@ python3 -m http.server 8000
 
 (Common: `npx serve .` is működik.)
 
-## Teszt hozzáférések
+## Hozzáférések
 
-| Szerepkör | User ID   | Access Code  |
-|-----------|-----------|--------------|
-| Admin     | USSS-004  | ELITE-2026   |
-| Training  | USSS-80   | TRAIN-2026   |
-| Viewer    | USSS-91   | VIEW-2026    |
-
-Ezeket az Adminisztráció → Hozzáférések oldalon lehet módosítani, új kódot
-generálni, vagy hozzáférést visszavonni.
+A kezdeti hozzáférési kódok nincsenek a README-ben feltüntetve — ez egy
+publikus repó, a kódokat a rendszergazda tartja nyilván. Az Adminisztráció →
+Hozzáférések oldalon bármikor módosíthatók, új kód generálható, vagy a
+hozzáférés visszavonható.
 
 ## Projektstruktúra
 

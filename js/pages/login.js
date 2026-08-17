@@ -1,11 +1,11 @@
 import { login } from "../auth.js";
-import { esc } from "../utils.js";
+import { esc, sealMark } from "../utils.js";
 
 export function renderLogin(root, onSuccess) {
   root.innerHTML = `
     <div class="login-screen">
       <div class="login-card">
-        <div class="login-seal">U</div>
+        <div class="login-seal">${sealMark(56)}</div>
         <div class="login-title">U.S.S.S.</div>
         <div class="login-sub">Elite Training &amp; Personnel System</div>
         <div id="login-error"></div>
@@ -21,9 +21,7 @@ export function renderLogin(root, onSuccess) {
           <button type="submit" class="btn btn-gold btn-block">Belépés</button>
         </form>
         <div class="login-demo">
-          Teszt hozzáférés — Admin: <code>USSS-004</code> / <code>ELITE-2026</code><br/>
-          Training: <code>USSS-80</code> / <code>TRAIN-2026</code> &nbsp;·&nbsp;
-          Viewer: <code>USSS-91</code> / <code>VIEW-2026</code>
+          Hozzáférés kizárólag a rendszergazda által kiadott azonosítóval és kóddal lehetséges.
         </div>
       </div>
     </div>

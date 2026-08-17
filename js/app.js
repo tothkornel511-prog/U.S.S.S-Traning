@@ -5,7 +5,7 @@
 import { seedIfNeeded, globalSearch } from "./store.js";
 import { isAuthenticated, currentSession, logout, hasRole, ROLES } from "./auth.js";
 import { registerRoute, resolve, startRouter, navigate, currentPath } from "./router.js";
-import { esc } from "./utils.js";
+import { esc, sealMark } from "./utils.js";
 import { renderLogin } from "./pages/login.js";
 import { renderDashboard } from "./pages/dashboard.js";
 import { renderPersonnelList } from "./pages/personnel.js";
@@ -51,7 +51,7 @@ function renderShell() {
     <div class="app-shell">
       <aside class="sidebar" id="sidebar">
         <div class="brand">
-          <div class="brand-seal">U</div>
+          <div class="brand-seal">${sealMark(34)}</div>
           <div>
             <div class="brand-name">U.S.S.S. ELITE</div>
             <div class="brand-sub">Training System</div>

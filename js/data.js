@@ -112,11 +112,11 @@ export const PERSONNEL = [
   { usssId: "USSS-109", name: "Dr. Lakatos László",             position: "Judge",             level: "I",  status: "Aktív"  },
 ];
 
-/* Kezdeti hozzáférési kódok (Admin később szerkesztheti / generálhatja) */
+/* Kezdeti hozzáférési kódok (Admin később szerkesztheti / generálhatja / visszavonhatja) */
 export const ACCESS_CODES = [
-  { usssId: "USSS-004", code: "ELITE-2026", role: "ADMIN" },
-  { usssId: "USSS-80",  code: "TRAIN-2026", role: "TRAINING" },
-  { usssId: "USSS-91",  code: "VIEW-2026",  role: "VIEWER" },
+  { usssId: "USSS-118", code: "7QXN-4KRT", role: "ADMIN" },    // Dominic Hayes
+  { usssId: "USSS-004", code: "3MVD-9GHC", role: "ADMIN" },    // Tyron Wolf
+  { usssId: "USSS-98",  code: "5PLZ-8XWQ", role: "TRAINING" }, // Christoph Norbert Kleinemann
 ];
 
 export const PROTECTED_LOCATIONS = [
