@@ -2,19 +2,19 @@
    U.S.S.S. ELITE TRAINING SYSTEM — APP ENTRY
    ========================================================================== */
 
-import { seedIfNeeded, globalSearch, getCustomCss } from "./store.js?v=11";
-import { isAuthenticated, currentSession, logout, hasRole, ROLES } from "./auth.js?v=11";
-import { registerRoute, resolve, startRouter, navigate, currentPath } from "./router.js?v=11";
-import { esc, sealMark } from "./utils.js?v=11";
-import { renderLogin } from "./pages/login.js?v=11";
-import { renderDashboard } from "./pages/dashboard.js?v=11";
-import { renderPersonnelList } from "./pages/personnel.js?v=11";
-import { renderProfile } from "./pages/profile.js?v=11";
-import { renderMatrix } from "./pages/matrix.js?v=11";
-import { renderProtocolsList, renderProtocolDetail } from "./pages/protocols.js?v=11";
-import { renderLocationsList, renderLocationDetail } from "./pages/locations.js?v=11";
-import { renderMapPage } from "./pages/map.js?v=11";
-import { renderAdmin } from "./pages/admin.js?v=11";
+import { seedIfNeeded, globalSearch, getCustomCss } from "./store.js?v=12";
+import { isAuthenticated, currentSession, logout, hasRole, ROLES } from "./auth.js?v=12";
+import { registerRoute, resolve, startRouter, navigate, currentPath } from "./router.js?v=12";
+import { esc, sealMark } from "./utils.js?v=12";
+import { renderLogin } from "./pages/login.js?v=12";
+import { renderDashboard } from "./pages/dashboard.js?v=12";
+import { renderPersonnelList } from "./pages/personnel.js?v=12";
+import { renderProfile } from "./pages/profile.js?v=12";
+import { renderMatrix } from "./pages/matrix.js?v=12";
+import { renderProtocolsList, renderProtocolDetail } from "./pages/protocols.js?v=12";
+import { renderLocationsList, renderLocationDetail } from "./pages/locations.js?v=12";
+import { renderMapPage } from "./pages/map.js?v=12";
+import { renderAdmin } from "./pages/admin.js?v=12";
 
 seedIfNeeded();
 applyCustomCss();
@@ -37,7 +37,7 @@ const NAV = [
   ]},
   { group: "Állomány & Képzés", items: [
     { path: "/personnel", label: "Állomány", icon: "☰" },
-    { path: "/matrix", label: "Kiképzési Mátrix", icon: "▦" },
+    { path: "/matrix", label: "Kiképzési Áttekintés", icon: "▦" },
     { path: "/protocols", label: "Jegyzőkönyvek", icon: "▤" },
   ]},
   { group: "Objektumok", items: [

@@ -1,8 +1,8 @@
-import { getPersonnel, ref, moduleState, moduleByCode, levelLabel } from "../store.js?v=11";
-import { hasRole } from "../auth.js?v=11";
-import { esc, initials } from "../utils.js?v=11";
-import { navigate } from "../router.js?v=11";
-import { openModuleDetail } from "./profile.js?v=11";
+import { getPersonnel, ref, moduleState, moduleByCode, levelLabel } from "../store.js?v=12";
+import { hasRole } from "../auth.js?v=12";
+import { esc, initials } from "../utils.js?v=12";
+import { navigate } from "../router.js?v=12";
+import { openModuleDetail } from "./profile.js?v=12";
 
 let filterLevel = "";
 let filterModule = "";
@@ -36,7 +36,7 @@ export function renderMatrix(container) {
     <div class="matrix-wrap">
       <table class="matrix-table" id="matrix-table"></table>
     </div>
-    <div class="small text-low mt-2">✓ = teljesítve · ✗ = sikertelen / nincs teljesítve · ⏳ = elmélet kész, gyakorlatra vár · ×N = próbálkozások száma. Kattints egy cellára a részletekért.</div>
+    <div class="small text-low mt-2">✓ = teljesítve · ✗ = sikertelen / nincs teljesítve · ⏳ = elmélet kész, gyakorlatra vár · E: = elméleti eredmény · ×N = próbálkozások száma. Kattints egy cellára a részletekért.</div>
   `;
 
   document.getElementById("mx-level").value = filterLevel;
@@ -98,10 +98,10 @@ export function renderMatrix(container) {
     if (!rec || (rec.theory === null || rec.theory === undefined) && !rec.practical) {
       return `<td class="matrix-cell mc-empty" data-cell="${esc(person.usssId)}::${esc(code)}"><span class="matrix-empty">—</span></td>`;
     }
-    const pct = st.theory !== null && st.theory !== undefined ? `${st.theory}%` : "—";
+    const pct = st.theory !== null && st.theory !== undefined ? `E: ${st.theory}%` : "—";
     const attempts = (rec.history || []).length;
     const icon = st.color === "green" ? "✓" : st.color === "yellow" ? "⏳" : "✗";
-    return `<td class="matrix-cell mc-${st.color}" data-cell="${esc(person.usssId)}::${esc(code)}">
+    return `<td class="matrix-cell mc-${st.color}" data-cell="${esc(person.usssId)}::${esc(code)}" title="Elméleti eredmény">
       <span class="mc-icon">${icon}</span>
       <span class="mc-pct">${pct}</span>
       ${attempts > 1 ? `<span class="mc-attempts">×${attempts}</span>` : ""}
