@@ -1,9 +1,9 @@
-import { ref, mapById, locationsForMap, districtsForMap, upsertDistrict, deleteDistrict } from "../store.js?v=14";
-import { hasRole, actorLabel } from "../auth.js?v=14";
-import { esc, toast, openModal, closeModal } from "../utils.js?v=14";
-import { navigate } from "../router.js?v=14";
-import { createPanZoomMap } from "../mapview.js?v=14";
-import { openLocationForm } from "./locations.js?v=14";
+import { ref, mapById, locationsForMap, districtsForMap, upsertDistrict, deleteDistrict } from "../store.js?v=15";
+import { hasRole, actorLabel } from "../auth.js?v=15";
+import { esc, toast, openModal, closeModal } from "../utils.js?v=15";
+import { navigate } from "../router.js?v=15";
+import { createPanZoomMap } from "../mapview.js?v=15";
+import { openLocationForm } from "./locations.js?v=15";
 
 let activeMapId = null;
 let addingDistrict = false;

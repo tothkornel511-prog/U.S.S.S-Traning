@@ -9,7 +9,7 @@
 import {
   LEVELS, SERVICE_STATUSES, POSITIONS, MODULES, LEVEL_MODULE_ORDER,
   PERSONNEL, ACCESS_CODES, PROTECTED_LOCATIONS, AUDIT_LOG_SEED, MAPS, DISTRICTS,
-} from "./data.js?v=14";
+} from "./data.js?v=15";
 
 /* v7: Roxwood/Cayo Perico eltávolítva, csak Los Santos térkép maradt. */
 const NS = "usss_ets_v7_";
@@ -96,6 +96,7 @@ export function seedIfNeeded() {
     write(KEYS.seeded, true);
   }
   applyPositionPatch();
+  applyHijSplitPatch();
 }
 
 /* Célzott, egyszeri pozíció-javítás — csak a felsorolt személyek "position"
@@ -121,6 +122,30 @@ function applyPositionPatch() {
   });
   if (changed) savePersonnel(list);
   write(POSITION_PATCH_KEY, true);
+}
+
+/* Célzott, egyszeri migráció: a H/I/J modulok mostantól szintenként külön
+   kódot kapnak (H1/H2, I1/I2, J1/J2), mert az alap és az "ismételt" emelt
+   szintű változat innentől külön nyomon követett vizsga. A korábban a közös
+   H/I/J kód alatt rögzített eredményeket átmásolja az alapszintű (…1) kódra,
+   hogy semmi ne vesszen el — a modul tartalma és minden más adat változatlan. */
+const HIJ_SPLIT_PATCH_KEY = NS + "hij_split_patch_2026_08_17a";
+function applyHijSplitPatch() {
+  if (read(HIJ_SPLIT_PATCH_KEY, false)) return;
+  const list = getPersonnel();
+  let changed = false;
+  list.forEach((p) => {
+    if (!p.modules) return;
+    [["H", "H1"], ["I", "I1"], ["J", "J1"]].forEach(([oldCode, newCode]) => {
+      if (p.modules[oldCode] && !p.modules[newCode]) {
+        p.modules[newCode] = p.modules[oldCode];
+        delete p.modules[oldCode];
+        changed = true;
+      }
+    });
+  });
+  if (changed) savePersonnel(list);
+  write(HIJ_SPLIT_PATCH_KEY, true);
 }
 
 export function resetAllData() {

@@ -59,19 +59,22 @@ export const MODULES = [
   { code: "F1",   name: "Utcai lövész vizsga",                           levels: ["III"],       theory: true, practical: true },
   { code: "G1H",  name: "Erőnléti oktatás – haladó fokozat",             levels: ["III"],       theory: true, practical: true },
   { code: "G3",   name: "Mentális felkészülés",                         levels: ["III"],       theory: true, practical: true },
-  { code: "I",    name: "Kiképzés az éj leple alatt",                    levels: ["III", "V"],  theory: true, practical: true },
+  { code: "I1",   name: "Kiképzés az éj leple alatt",                    levels: ["III"],       theory: true, practical: true },
   { code: "M",    name: "Együttműködés más szervezetekkel",              levels: ["III"],       theory: true, practical: true },
 
   { code: "D",    name: "Taktikai kiképzés",                             levels: ["IV"],        theory: true, practical: true },
   { code: "F2",   name: "Épületharc lövész vizsga",                      levels: ["IV"],        theory: true, practical: true },
   { code: "G2H",  name: "Közelharci oktatás – haladó fokozat",           levels: ["IV"],        theory: true, practical: true },
-  { code: "H",    name: "Helikopter pilóta képzés",                      levels: ["IV", "V"],   theory: true, practical: true },
-  { code: "J",    name: "Ejtőernyős vizsga követelmények",               levels: ["IV", "V"],   theory: true, practical: true },
+  { code: "H1",   name: "Helikopter pilóta képzés",                      levels: ["IV"],        theory: true, practical: true },
+  { code: "J1",   name: "Ejtőernyős vizsga követelmények",               levels: ["IV"],        theory: true, practical: true },
   { code: "O",    name: "Advance és rendezvénybiztosítás",               levels: ["IV"],        theory: true, practical: true },
   { code: "S1",   name: "Vízi műveletek",                                levels: ["IV"],        theory: true, practical: true },
   { code: "T1",   name: "Tűzszerész ismeretek",                          levels: ["IV"],        theory: true, practical: true },
 
   { code: "F3",   name: "Légi egység lövész vizsga",                     levels: ["V"],         theory: true, practical: true },
+  { code: "H2",   name: "Helikopter pilóta képzés – ismételt / emelt szint", levels: ["V"],      theory: true, practical: true },
+  { code: "I2",   name: "Kiképzés az éj leple alatt – ismételt",         levels: ["V"],          theory: true, practical: true },
+  { code: "J2",   name: "Ejtőernyős vizsga követelmények – ismételt",    levels: ["V"],          theory: true, practical: true },
   { code: "S2",   name: "Búvárképzés",                                   levels: ["V"],         theory: true, practical: true },
   { code: "T2",   name: "Víz alatti robbanószerkezet",                   levels: ["V"],         theory: true, practical: true },
 
@@ -79,14 +82,17 @@ export const MODULES = [
   { code: "LSNTA",name: "Adóhatósági szolgálat",                         levels: ["SPEC"],      theory: true, practical: true },
 ];
 
-/* Sorrend, ahogy egy adott szinten a modulokat mutatjuk (H/I/J duplikáció nélkül) */
+/* Sorrend, ahogy egy adott szinten a modulokat mutatjuk. A H/I/J modulok
+   emelt szintű (V.) megismétlése önálló kóddal (H2/I2/J2) szerepel az
+   alapszintű változattól (H1/I1/J1) elkülönítve — külön nyomon követett
+   vizsgák, nem ugyanaz a rekord. */
 export const LEVEL_MODULE_ORDER = {
   "0":   ["0"],
   "I":   ["A", "G1", "K", "L", "R"],
   "II":  ["B1", "E", "F", "G2", "N", "P"],
-  "III": ["B2", "C", "F1", "G1H", "G3", "I", "M"],
-  "IV":  ["D", "F2", "G2H", "H", "J", "O", "S1", "T1"],
-  "V":   ["F3", "H", "I", "J", "S2", "T2"],
+  "III": ["B2", "C", "F1", "G1H", "G3", "I1", "M"],
+  "IV":  ["D", "F2", "G2H", "H1", "J1", "O", "S1", "T1"],
+  "V":   ["F3", "H2", "I2", "J2", "S2", "T2"],
   "SPEC":["ADM", "LSNTA"],
 };
 

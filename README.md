@@ -56,7 +56,9 @@ js/
   auth.js       – bejelentkezés, szerepkör-ellenőrzés
   store.js      – adatréteg (localStorage), üzleti logika (modul-állapot,
                   készenlét %, próbaidő-számítás, szintlépés, vizsgastatisztika stb.)
-  data.js       – kezdeti minta-adatok (32 modul, állomány, pozíciók, térképek…)
+  data.js       – kezdeti minta-adatok (35 modul — a H/I/J külön kóddal
+                  szerepel alap- és emelt/ismételt szinten, állomány,
+                  pozíciók, térképek…)
   utils.js      – UI segédfüggvények (escape, toast, modal, dátum-formázás, pecsét-SVG)
   mapview.js    – újrafelhasználható nagyítható/panozható térkép-komponens
   pages/        – oldalankénti render-modulok (a map.js a Térkép oldal)
