@@ -1,6 +1,6 @@
-import { getAccessCodes, upsertAccessCode, revokeAccessCode, generateCode, getAuditLog, getPersonnel, resetAllData, ref, getPositionEntries, addPosition, removePosition } from "../store.js?v=10";
-import { hasRole, actorLabel, ROLES } from "../auth.js?v=10";
-import { esc, fmtDateTime, toast, openModal, closeModal } from "../utils.js?v=10";
+import { getAccessCodes, upsertAccessCode, revokeAccessCode, generateCode, getAuditLog, getPersonnel, resetAllData, ref, getPositionEntries, addPosition, removePosition, getCustomCss, setCustomCss } from "../store.js?v=11";
+import { hasRole, actorLabel, ROLES } from "../auth.js?v=11";
+import { esc, fmtDateTime, toast, openModal, closeModal } from "../utils.js?v=11";
 
 let activeTab = "access";
 
@@ -213,6 +213,15 @@ function renderAuditTab(content) {
 
 function renderSystemTab(content) {
   content.innerHTML = `
+    <div class="card mb-2">
+      <div class="card-title mb-1">Egyéni CSS (fejlesztői)</div>
+      <p class="text-mid small mb-1">Ide bármilyen CSS-t beilleszthetsz — azonnal, kód-push és várakozás nélkül alkalmazódik az oldalra. Ez a legközelebbi eszköz ahhoz, hogy a böngészőből "belenyúlj a kódba": vizuális finomítások (színek, méretek, elrendezés-részletek) igen, de teljes JS/HTML-szerkesztés statikus GitHub Pages oldalon nem lehetséges biztonságosan backend nélkül.</p>
+      <textarea id="custom-css-input" rows="10" style="width:100%; font-family:var(--font-mono); font-size:12.5px; background:var(--bg-base); border:1px solid var(--line-soft); border-radius:var(--radius-sm); color:var(--text-hi); padding:12px;" placeholder="/* pl. .btn-gold { border-radius: 4px; } */">${esc(getCustomCss())}</textarea>
+      <div class="flex justify-between mt-1">
+        <button class="btn btn-sm" id="clear-css">Törlés</button>
+        <button class="btn btn-gold btn-sm" id="save-css">Alkalmaz</button>
+      </div>
+    </div>
     <div class="card">
       <div class="card-title mb-1">Adatkezelés</div>
       <p class="text-mid small">A rendszer jelenleg a böngésző localStorage-át használja adattárolásra (GitHub Pages kompatibilitás miatt). Az adatkezelési réteg (js/store.js) el van választva a felülettől, így később valódi backend / adatbázis csatlakoztatható.</p>
@@ -223,6 +232,30 @@ function renderSystemTab(content) {
       <button class="btn btn-danger" id="reset-data">Minden adat visszaállítása alapértelmezettre</button>
     </div>
   `;
+
+  function applyCssLive(css) {
+    let styleEl = document.getElementById("custom-css");
+    if (!styleEl) {
+      styleEl = document.createElement("style");
+      styleEl.id = "custom-css";
+      document.head.appendChild(styleEl);
+    }
+    styleEl.textContent = css;
+  }
+
+  document.getElementById("save-css").addEventListener("click", () => {
+    const css = document.getElementById("custom-css-input").value;
+    setCustomCss(css, actorLabel());
+    applyCssLive(css);
+    toast("Egyéni CSS alkalmazva");
+  });
+  document.getElementById("clear-css").addEventListener("click", () => {
+    document.getElementById("custom-css-input").value = "";
+    setCustomCss("", actorLabel());
+    applyCssLive("");
+    toast("Egyéni CSS törölve");
+  });
+
   document.getElementById("reset-data").addEventListener("click", () => {
     if (confirm("Ez visszaállítja a teljes rendszert az alapértelmezett minta-adatokra. Biztosan folytatja?")) {
       resetAllData();

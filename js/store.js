@@ -9,7 +9,7 @@
 import {
   LEVELS, SERVICE_STATUSES, POSITIONS, MODULES, LEVEL_MODULE_ORDER,
   PERSONNEL, ACCESS_CODES, PROTECTED_LOCATIONS, AUDIT_LOG_SEED, MAPS, DISTRICTS,
-} from "./data.js?v=10";
+} from "./data.js?v=11";
 
 /* v7: Roxwood/Cayo Perico eltávolítva, csak Los Santos térkép maradt. */
 const NS = "usss_ets_v7_";
@@ -27,6 +27,24 @@ const KEYS = {
 
 /* Elméleti vizsgánál ez alatt a százalék alatt a modul nem számít teljesítettnek. */
 export const THEORY_PASS_THRESHOLD = 80;
+
+/* Egyéni CSS — admin a böngészőből finomíthatja a design-t kód/push nélkül.
+   Szándékosan a névtér-verzión kívüli, fix kulcs, hogy egy jövőbeli reset
+   vagy verzióváltás se törölje a beállított stílust. */
+const CUSTOM_CSS_KEY = "usss_ets_custom_css";
+export function getCustomCss() {
+  return localStorage.getItem(CUSTOM_CSS_KEY) || "";
+}
+export function setCustomCss(css, actorLabel) {
+  try {
+    localStorage.setItem(CUSTOM_CSS_KEY, css || "");
+    logAudit(actorLabel, "Egyéni CSS frissítve", `${(css || "").length} karakter`);
+    return true;
+  } catch (e) {
+    console.error("Custom CSS write error", e);
+    return false;
+  }
+}
 
 function read(key, fallback) {
   try {
@@ -66,16 +84,43 @@ function seedPersonnel() {
 }
 
 export function seedIfNeeded() {
-  if (read(KEYS.seeded, false)) return;
-  write(KEYS.personnel, seedPersonnel());
-  write(KEYS.accessCodes, ACCESS_CODES);
-  write(KEYS.locations, PROTECTED_LOCATIONS);
-  write(KEYS.districts, DISTRICTS);
-  write(KEYS.positions, POSITIONS.flatMap((g) => g.items.map((name) => ({ group: g.group, name }))));
-  write(KEYS.protocols, []);
-  write(KEYS.auditLog, AUDIT_LOG_SEED);
-  write(KEYS.nextProtocol, 1);
-  write(KEYS.seeded, true);
+  if (!read(KEYS.seeded, false)) {
+    write(KEYS.personnel, seedPersonnel());
+    write(KEYS.accessCodes, ACCESS_CODES);
+    write(KEYS.locations, PROTECTED_LOCATIONS);
+    write(KEYS.districts, DISTRICTS);
+    write(KEYS.positions, POSITIONS.flatMap((g) => g.items.map((name) => ({ group: g.group, name }))));
+    write(KEYS.protocols, []);
+    write(KEYS.auditLog, AUDIT_LOG_SEED);
+    write(KEYS.nextProtocol, 1);
+    write(KEYS.seeded, true);
+  }
+  applyPositionPatch();
+}
+
+/* Célzott, egyszeri pozíció-javítás — csak a felsorolt személyek "position"
+   mezőjét írja át, mindent mást (vizsgaeredményeket, próbálkozásokat stb.)
+   érintetlenül hagy. Nem igényel teljes resetet. */
+const POSITION_PATCH_KEY = NS + "position_patch_2026_08_17a";
+const POSITION_PATCHES = {
+  "USSS-004": "President",
+  "USSS-80": "Secretary of Development",
+  "USSS-98": "Secretary of Homeland Security",
+  "USSS-109": "Secretary of Health",
+  "USSS-96": "U.S.S.S Director",
+  "USSS-50": "Lawyer",
+  "USSS-119": "U.S.S.S Agent",
+};
+function applyPositionPatch() {
+  if (read(POSITION_PATCH_KEY, false)) return;
+  const list = getPersonnel();
+  let changed = false;
+  Object.entries(POSITION_PATCHES).forEach(([usssId, position]) => {
+    const p = list.find((x) => x.usssId === usssId);
+    if (p && p.position !== position) { p.position = position; changed = true; }
+  });
+  if (changed) savePersonnel(list);
+  write(POSITION_PATCH_KEY, true);
 }
 
 export function resetAllData() {
@@ -264,12 +309,14 @@ export function setModulePractical(usssId, code, result, actorLabel, extra = {})
   p.modules[code] = p.modules[code] || { theory: null, practical: undefined, history: [] };
   const prev = p.modules[code].practical;
   p.modules[code].practical = result;
+  p.modules[code].practicalExaminer = actorLabel || "A rendszer";
   p.modules[code].history = p.modules[code].history || [];
   p.modules[code].history.push({
     date: new Date().toISOString(),
     type: "practical",
     theory: p.modules[code].theory,
     result,
+    examiner: actorLabel || "A rendszer",
     ...extra,
   });
   savePersonnel(list);

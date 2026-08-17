@@ -2,21 +2,32 @@
    U.S.S.S. ELITE TRAINING SYSTEM — APP ENTRY
    ========================================================================== */
 
-import { seedIfNeeded, globalSearch } from "./store.js?v=10";
-import { isAuthenticated, currentSession, logout, hasRole, ROLES } from "./auth.js?v=10";
-import { registerRoute, resolve, startRouter, navigate, currentPath } from "./router.js?v=10";
-import { esc, sealMark } from "./utils.js?v=10";
-import { renderLogin } from "./pages/login.js?v=10";
-import { renderDashboard } from "./pages/dashboard.js?v=10";
-import { renderPersonnelList } from "./pages/personnel.js?v=10";
-import { renderProfile } from "./pages/profile.js?v=10";
-import { renderMatrix } from "./pages/matrix.js?v=10";
-import { renderProtocolsList, renderProtocolDetail } from "./pages/protocols.js?v=10";
-import { renderLocationsList, renderLocationDetail } from "./pages/locations.js?v=10";
-import { renderMapPage } from "./pages/map.js?v=10";
-import { renderAdmin } from "./pages/admin.js?v=10";
+import { seedIfNeeded, globalSearch, getCustomCss } from "./store.js?v=11";
+import { isAuthenticated, currentSession, logout, hasRole, ROLES } from "./auth.js?v=11";
+import { registerRoute, resolve, startRouter, navigate, currentPath } from "./router.js?v=11";
+import { esc, sealMark } from "./utils.js?v=11";
+import { renderLogin } from "./pages/login.js?v=11";
+import { renderDashboard } from "./pages/dashboard.js?v=11";
+import { renderPersonnelList } from "./pages/personnel.js?v=11";
+import { renderProfile } from "./pages/profile.js?v=11";
+import { renderMatrix } from "./pages/matrix.js?v=11";
+import { renderProtocolsList, renderProtocolDetail } from "./pages/protocols.js?v=11";
+import { renderLocationsList, renderLocationDetail } from "./pages/locations.js?v=11";
+import { renderMapPage } from "./pages/map.js?v=11";
+import { renderAdmin } from "./pages/admin.js?v=11";
 
 seedIfNeeded();
+applyCustomCss();
+
+export function applyCustomCss() {
+  let styleEl = document.getElementById("custom-css");
+  if (!styleEl) {
+    styleEl = document.createElement("style");
+    styleEl.id = "custom-css";
+    document.head.appendChild(styleEl);
+  }
+  styleEl.textContent = getCustomCss();
+}
 
 const root = document.getElementById("root");
 

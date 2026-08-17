@@ -2,10 +2,10 @@ import {
   getPerson, ref, moduleState, readinessPercent, levelProgress, probationInfo,
   setModuleTheory, setModulePractical, approveLevelUp, nextLevelId, liftProbation,
   levelLabel, moduleByCode, examStats, THEORY_PASS_THRESHOLD,
-} from "../store.js?v=10";
-import { hasRole, actorLabel } from "../auth.js?v=10";
-import { esc, initials, fmtDate, fmtDateTime, toast, openModal, closeModal } from "../utils.js?v=10";
-import { navigate } from "../router.js?v=10";
+} from "../store.js?v=11";
+import { hasRole, actorLabel } from "../auth.js?v=11";
+import { esc, initials, fmtDate, fmtDateTime, toast, openModal, closeModal } from "../utils.js?v=11";
+import { navigate } from "../router.js?v=11";
 
 let activeTab = "modules";
 
@@ -177,7 +177,11 @@ export function openModuleDetail(person, code, canEdit, onUpdate) {
         <div class="card-value" style="font-size:22px">${st.theory !== null && st.theory !== undefined ? st.theory + "%" : "—"}</div>
         ${st.theory !== null && st.theory !== undefined ? `<span class="badge ${st.theory >= THEORY_PASS_THRESHOLD ? "badge-green" : "badge-red"} mt-1">${st.theory >= THEORY_PASS_THRESHOLD ? "Sikeres" : `Sikertelen (<${THEORY_PASS_THRESHOLD}%)`}</span>` : ""}
       </div>
-      <div class="card" style="flex:1"><div class="card-title">Gyakorlat</div><div class="card-value" style="font-size:22px"><span class="badge ${resultColor(st.practical)}">${esc(resultLabel(st.practical) || "—")}</span></div></div>
+      <div class="card" style="flex:1">
+        <div class="card-title">Gyakorlat</div>
+        <div class="card-value" style="font-size:22px"><span class="badge ${resultColor(st.practical)}">${esc(resultLabel(st.practical) || "—")}</span></div>
+        ${rec.practicalExaminer ? `<div class="small text-low mt-1">Vizsgáztató: ${esc(rec.practicalExaminer)}</div>` : ""}
+      </div>
     </div>
 
     ${canEdit && def.theory ? `
@@ -203,7 +207,7 @@ export function openModuleDetail(person, code, canEdit, onUpdate) {
     <div class="divider"></div>
     <div class="card-title mb-1">Vizsgatörténet</div>
     ${history.length ? history.slice().reverse().map((h) => `
-      <div class="history-item"><span>${esc(h.type === "theory" ? "Elméleti" : "Gyakorlati")} próbálkozás ${h.theory !== null && h.theory !== undefined ? `· ${h.theory}%` : ""}</span>
+      <div class="history-item"><span>${esc(h.type === "theory" ? "Elméleti" : "Gyakorlati")} próbálkozás ${h.theory !== null && h.theory !== undefined ? `· ${h.theory}%` : ""} ${h.examiner ? `<span class="text-low">· ${esc(h.examiner)}</span>` : ""}</span>
       <span><span class="badge ${resultColor(h.result)}">${esc(resultLabel(h.result))}</span> <span class="text-low">${fmtDate(h.date)}</span></span></div>
     `).join("") : `<div class="text-low small">Nincs korábbi próbálkozás.</div>`}
   `);

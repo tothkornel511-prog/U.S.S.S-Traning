@@ -350,21 +350,30 @@ tbody tr:hover { background: rgba(198,166,100,0.04); }
 .filters select option { background: var(--bg-panel); color: var(--text-hi); }
 
 /* Matrix */
-.matrix-wrap { overflow: auto; border: 1px solid var(--line-soft); border-radius: var(--radius-lg); max-height: 70vh; }
+.matrix-wrap { overflow: auto; border: 1px solid var(--line-soft); border-radius: var(--radius-lg); max-height: 74vh; background: rgba(6,7,10,0.5); }
 .matrix-table { border-collapse: separate; border-spacing: 0; }
 .matrix-table th, .matrix-table td { border-bottom: 1px solid var(--line-soft); border-right: 1px solid var(--line-soft); }
 .matrix-table th.sticky-col, .matrix-table td.sticky-col {
-  position: sticky; left: 0; background: var(--bg-panel); z-index: 5; min-width: 220px;
+  position: sticky; left: 0; background: var(--bg-panel); z-index: 5; min-width: 200px;
 }
-.matrix-table thead th { position: sticky; top: 0; z-index: 6; }
+.matrix-table thead th { position: sticky; top: 0; z-index: 6; background: var(--bg-panel-2); }
 .matrix-table thead th.sticky-col { z-index: 10; }
-.matrix-cell { text-align: center; cursor: pointer; padding: 10px 12px !important; min-width: 74px; transition: background .12s ease; }
-.matrix-cell .mc-pct { display: block; font-family: var(--font-mono); font-size: 12px; color: var(--text-hi); }
-.matrix-cell .mc-dot { display: inline-block; margin-top: 4px; }
-.matrix-cell.mc-green { background: rgba(78,158,111,0.09); box-shadow: inset 0 0 12px rgba(78,158,111,0.12); }
-.matrix-cell.mc-yellow { background: rgba(217,165,58,0.09); box-shadow: inset 0 0 12px rgba(217,165,58,0.1); }
-.matrix-cell.mc-red { background: rgba(209,85,74,0.06); box-shadow: inset 0 0 12px rgba(209,85,74,0.08); }
-.matrix-cell:hover { background: rgba(198,166,100,0.14); }
+.mx-group-head {
+  font-family: var(--font-display); font-size: 12px; color: var(--gold-bright);
+  letter-spacing: 0.04em; text-shadow: 0 0 10px rgba(198,166,100,0.35);
+  border-bottom: 1px solid rgba(198,166,100,0.3) !important;
+}
+.matrix-cell { text-align: center; cursor: pointer; padding: 9px 10px !important; min-width: 62px; transition: background .12s ease, box-shadow .12s ease; position: relative; }
+.matrix-cell .mc-icon { display: block; font-size: 15px; line-height: 1.1; }
+.matrix-cell .mc-pct { display: block; font-family: var(--font-mono); font-size: 10.5px; color: var(--text-mid); margin-top: 2px; }
+.matrix-cell .mc-attempts { position: absolute; top: 3px; right: 5px; font-size: 8.5px; font-family: var(--font-mono); color: var(--text-low); }
+.matrix-cell.mc-green { background: rgba(78,158,111,0.1); box-shadow: inset 0 0 14px rgba(78,158,111,0.15); }
+.matrix-cell.mc-green .mc-icon { color: #7fd19c; text-shadow: var(--glow-green); }
+.matrix-cell.mc-yellow { background: rgba(217,165,58,0.1); box-shadow: inset 0 0 14px rgba(217,165,58,0.12); }
+.matrix-cell.mc-yellow .mc-icon { color: var(--yellow); text-shadow: var(--glow-yellow); }
+.matrix-cell.mc-red { background: rgba(209,85,74,0.08); box-shadow: inset 0 0 14px rgba(209,85,74,0.1); }
+.matrix-cell.mc-red .mc-icon { color: #f0a29b; text-shadow: var(--glow-red); }
+.matrix-cell:hover { background: rgba(198,166,100,0.14); box-shadow: inset 0 0 0 1px rgba(198,166,100,0.2); }
 .matrix-empty { color: var(--text-low); }
 .level-chip { font-size: 10px; padding: 2px 8px; border-radius: 999px; border: 1px solid rgba(198,166,100,0.4); color: var(--gold-bright); box-shadow: 0 0 8px rgba(198,166,100,0.15); }
 
@@ -418,6 +427,14 @@ tbody tr:hover { background: rgba(198,166,100,0.04); }
 .history-item { display: flex; justify-content: space-between; padding: 9px 0; border-bottom: 1px solid var(--line-soft); font-size: 12.5px; }
 .history-item:last-child { border-bottom: none; }
 
+/* Classification stamp — védett-helyszín oldalak fejléce */
+.classification-strip {
+  display: inline-block; font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.14em;
+  color: var(--gold-bright); border: 1px solid rgba(198,166,100,0.35); border-radius: 999px;
+  padding: 5px 14px; margin-bottom: 14px; background: rgba(198,166,100,0.06);
+  box-shadow: 0 0 14px rgba(198,166,100,0.12); text-transform: uppercase;
+}
+
 /* Locations */
 .loc-card {
   border: 1px solid var(--line-soft); border-radius: var(--radius-lg); overflow: hidden;
@@ -426,10 +443,20 @@ tbody tr:hover { background: rgba(198,166,100,0.04); }
 }
 .loc-card:hover {
   transform: translateY(-3px);
-  border-color: var(--line);
-  box-shadow: 0 22px 48px rgba(0,0,0,0.4), 0 0 0 1px rgba(198,166,100,0.1);
+  border-color: rgba(198,166,100,0.35);
+  box-shadow: 0 22px 48px rgba(0,0,0,0.4), 0 0 0 1px rgba(198,166,100,0.14), 0 0 26px rgba(198,166,100,0.08);
 }
-.loc-card-img { height: 130px; background: linear-gradient(160deg, #1c1810, #0d0c08); display: flex; align-items: center; justify-content: center; color: var(--text-low); font-size: 24px; }
+.loc-card-img {
+  height: 140px; position: relative; overflow: hidden;
+  background: linear-gradient(160deg, #1c1810, #0d0c08); display: flex; align-items: center; justify-content: center;
+}
+.loc-card-ic { font-size: 26px; opacity: .5; }
+.loc-card-scrim { position: absolute; inset: 0; background: linear-gradient(180deg, transparent 40%, rgba(6,7,10,0.75) 100%); pointer-events: none; }
+.loc-card-id {
+  position: absolute; top: 8px; left: 8px; font-family: var(--font-mono); font-size: 9.5px; letter-spacing: 0.08em;
+  color: var(--gold-bright); background: rgba(6,7,10,0.6); border: 1px solid rgba(198,166,100,0.3);
+  border-radius: 999px; padding: 2px 8px; backdrop-filter: blur(4px);
+}
 .loc-card-body { padding: 14px 16px; }
 
 /* ---------------- Nagyítható/panozható térkép (mapview.js) ---------------- */

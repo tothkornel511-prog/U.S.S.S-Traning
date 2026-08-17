@@ -1,15 +1,16 @@
-import { getLocations, getLocation, upsertLocation, deleteLocation, ref, mapById } from "../store.js?v=10";
-import { hasRole, actorLabel } from "../auth.js?v=10";
-import { esc, fmtDateTime, toast, openModal, closeModal } from "../utils.js?v=10";
-import { navigate } from "../router.js?v=10";
-import { createPanZoomMap } from "../mapview.js?v=10";
-import { openOnMap } from "./map.js?v=10";
+import { getLocations, getLocation, upsertLocation, deleteLocation, ref, mapById } from "../store.js?v=11";
+import { hasRole, actorLabel } from "../auth.js?v=11";
+import { esc, fmtDateTime, toast, openModal, closeModal } from "../utils.js?v=11";
+import { navigate } from "../router.js?v=11";
+import { createPanZoomMap } from "../mapview.js?v=11";
+import { openOnMap } from "./map.js?v=11";
 
 export function renderLocationsList(container) {
   const canEdit = hasRole("TRAINING");
   const locations = getLocations();
 
   container.innerHTML = `
+    <div class="classification-strip">VÉDETT LÉTESÍTMÉNYEK NYILVÁNTARTÁSA · KORLÁTOZOTT HOZZÁFÉRÉS</div>
     <div class="section-head">
       <h2 style="visibility:hidden">.</h2>
       <div class="actions">${canEdit ? `<button class="btn btn-gold" id="new-loc">+ Új helyszín</button>` : ""}</div>
@@ -17,7 +18,11 @@ export function renderLocationsList(container) {
     <div class="grid grid-3" id="loc-grid">
       ${locations.length ? locations.map((l) => `
         <div class="loc-card row-link" data-nav="/locations/${esc(l.id)}">
-          <div class="loc-card-img">${l.image ? `<img src="${esc(l.image)}" style="width:100%;height:100%;object-fit:cover"/>` : "🛡️"}</div>
+          <div class="loc-card-img">
+            ${l.image ? `<img src="${esc(l.image)}" style="width:100%;height:100%;object-fit:cover"/>` : `<span class="loc-card-ic">🛡️</span>`}
+            <div class="loc-card-scrim"></div>
+            <span class="loc-card-id">${esc(l.id)}</span>
+          </div>
           <div class="loc-card-body">
             <div class="flex justify-between items-center">
               <div class="person-name">${esc(l.name)}</div>
@@ -45,6 +50,7 @@ export function renderLocationDetail(container, id) {
 
   container.innerHTML = `
     <a href="#/locations" class="text-low small">← Vissza a helyszínekhez</a>
+    <div class="classification-strip mt-2">${esc(loc.id)} · VÉDETT LÉTESÍTMÉNY · KORLÁTOZOTT HOZZÁFÉRÉS</div>
     <div class="grid grid-2 mt-2" style="grid-template-columns: 1.1fr 1fr;">
       <div class="card">
         <div class="flex justify-between items-center mb-1">

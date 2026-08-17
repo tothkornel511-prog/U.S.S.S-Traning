@@ -94,12 +94,12 @@ export const LEVEL_MODULE_ORDER = {
    Újonc státusszal indul, semmilyen képzési előzmény nélkül — az admin
    innen állítja majd be egyénileg a tényleges szinteket és eredményeket. */
 export const PERSONNEL = [
-  { usssId: "USSS-004", name: "Tyron Wolf",                  position: "U.S.S.S Director",   level: "0", status: "Újonc" },
-  { usssId: "USSS-80",  name: "Oliver Smith",                position: "U.S.S.S Agent",      level: "0", status: "Újonc" },
+  { usssId: "USSS-004", name: "Tyron Wolf",                  position: "President",                      level: "0", status: "Újonc" },
+  { usssId: "USSS-80",  name: "Oliver Smith",                position: "Secretary of Development",       level: "0", status: "Újonc" },
   { usssId: "USSS-91",  name: "Titus Long",                  position: "U.S.S.S Agent",      level: "0", status: "Újonc" },
   { usssId: "USSS-121", name: "Alexander Freamen",           position: "U.S.S.S Agent",      level: "0", status: "Újonc" },
   { usssId: "USSS-112", name: "Brian Sorrento",               position: "U.S.S.S Agent",      level: "0", status: "Újonc" },
-  { usssId: "USSS-119", name: "Dr. Rick Deckard",             position: "Secretary of Health", level: "0", status: "Újonc" },
+  { usssId: "USSS-119", name: "Dr. Rick Deckard",             position: "U.S.S.S Agent",      level: "0", status: "Újonc" },
   { usssId: "USSS-8",   name: "Günther Grün",                 position: "U.S.S.S Agent",      level: "0", status: "Újonc" },
   { usssId: "USSS-120", name: "Harrelson Grant",               position: "U.S.S.S Agent",      level: "0", status: "Újonc" },
   { usssId: "USSS-111", name: "Harvey Ross",                   position: "U.S.S.S Agent",      level: "0", status: "Újonc" },
@@ -108,11 +108,11 @@ export const PERSONNEL = [
   { usssId: "USSS-107", name: "Matthew Willams",               position: "U.S.S.S Agent",      level: "0", status: "Újonc" },
   { usssId: "USSS-106", name: "Michel Smith",                  position: "U.S.S.S Agent",      level: "0", status: "Újonc" },
   { usssId: "USSS-123", name: "Valentino Rossi",                position: "U.S.S.S Agent",      level: "0", status: "Újonc" },
-  { usssId: "USSS-50",  name: "Henry Hudson",                   position: "U.S.S.S Director",   level: "0", status: "Újonc" },
-  { usssId: "USSS-98",  name: "Christoph Norbert Kleinemann",   position: "U.S.S.S Agent",      level: "0", status: "Újonc" },
+  { usssId: "USSS-50",  name: "Henry Hudson",                   position: "Lawyer",                        level: "0", status: "Újonc" },
+  { usssId: "USSS-98",  name: "Christoph Norbert Kleinemann",   position: "Secretary of Homeland Security", level: "0", status: "Újonc" },
   { usssId: "USSS-118", name: "Dominic Hayes",                  position: "Oktatásvezető",       level: "0", status: "Újonc" },
-  { usssId: "USSS-96",  name: "Dr. Hajas Ricsi",                position: "Attorney General",    level: "0", status: "Újonc" },
-  { usssId: "USSS-109", name: "Dr. Lakatos László",             position: "Judge",               level: "0", status: "Újonc" },
+  { usssId: "USSS-96",  name: "Dr. Hajas Ricsi",                position: "U.S.S.S Director",              level: "0", status: "Újonc" },
+  { usssId: "USSS-109", name: "Dr. Lakatos László",             position: "Secretary of Health",           level: "0", status: "Újonc" },
 ];
 
 /* Kezdeti hozzáférési kódok (Admin később szerkesztheti / generálhatja / visszavonhatja) */

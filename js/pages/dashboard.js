@@ -1,7 +1,7 @@
-import { getPersonnel, getProtocols, getLocations, readinessPercent, ref } from "../store.js?v=10";
-import { hasRole } from "../auth.js?v=10";
-import { esc, initials } from "../utils.js?v=10";
-import { navigate } from "../router.js?v=10";
+import { getPersonnel, getProtocols, getLocations, readinessPercent, ref } from "../store.js?v=11";
+import { hasRole } from "../auth.js?v=11";
+import { esc, initials } from "../utils.js?v=11";
+import { navigate } from "../router.js?v=11";
 
 export function renderDashboard(container) {
   const personnel = getPersonnel();
