@@ -123,6 +123,13 @@ button {
   transition: border-color .15s ease, box-shadow .15s ease;
 }
 .field select, .field textarea { font-family: var(--font-body); letter-spacing: normal; }
+.field select {
+  appearance: none; -webkit-appearance: none;
+  padding-right: 34px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='M5 8l5 5 5-5' fill='none' stroke='%23c6a664' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 12px center; background-size: 13px;
+}
+.field select option { background: var(--bg-panel); color: var(--text-hi); }
 .field input:focus, .field select:focus, .field textarea:focus {
   outline: none;
   border-color: var(--gold-dim);
@@ -329,7 +336,18 @@ tbody tr:hover { background: rgba(198,166,100,0.04); }
 
 /* Filters bar */
 .filters { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 16px; }
-.filters select, .filters input { background: var(--bg-panel); border: 1px solid var(--line-soft); color: var(--text-hi); border-radius: var(--radius-sm); padding: 8px 10px; font-size: 12.5px; }
+.filters select, .filters input {
+  background: var(--bg-panel); border: 1px solid var(--line-soft); color: var(--text-hi);
+  border-radius: var(--radius-sm); padding: 8px 10px; font-size: 12.5px;
+  transition: border-color .15s ease;
+}
+.filters select {
+  appearance: none; -webkit-appearance: none; padding-right: 30px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='M5 8l5 5 5-5' fill='none' stroke='%23c6a664' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 10px center; background-size: 12px;
+}
+.filters select:focus, .filters input:focus { outline: none; border-color: var(--gold-dim); box-shadow: 0 0 0 3px rgba(198,166,100,0.1); }
+.filters select option { background: var(--bg-panel); color: var(--text-hi); }
 
 /* Matrix */
 .matrix-wrap { overflow: auto; border: 1px solid var(--line-soft); border-radius: var(--radius-lg); max-height: 70vh; }

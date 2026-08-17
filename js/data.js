@@ -16,7 +16,7 @@ export const LEVELS = [
 export const SERVICE_STATUSES = ["Újonc", "Aktív", "Inaktív", "Felfüggesztett"];
 
 export const POSITIONS = [
-  { group: "U.S.S.S.", items: ["U.S.S.S Director", "U.S.S.S Agent"] },
+  { group: "U.S.S.S.", items: ["U.S.S.S Director", "Oktatásvezető", "U.S.S.S Agent"] },
   {
     group: "Önkormányzat",
     items: [
@@ -110,7 +110,7 @@ export const PERSONNEL = [
   { usssId: "USSS-123", name: "Valentino Rossi",                position: "U.S.S.S Agent",      level: "0", status: "Újonc" },
   { usssId: "USSS-50",  name: "Henry Hudson",                   position: "U.S.S.S Director",   level: "0", status: "Újonc" },
   { usssId: "USSS-98",  name: "Christoph Norbert Kleinemann",   position: "U.S.S.S Agent",      level: "0", status: "Újonc" },
-  { usssId: "USSS-118", name: "Dominic Hayes",                  position: "U.S.S.S Agent",      level: "0", status: "Újonc" },
+  { usssId: "USSS-118", name: "Dominic Hayes",                  position: "Oktatásvezető",       level: "0", status: "Újonc" },
   { usssId: "USSS-96",  name: "Dr. Hajas Ricsi",                position: "Attorney General",    level: "0", status: "Újonc" },
   { usssId: "USSS-109", name: "Dr. Lakatos László",             position: "Judge",               level: "0", status: "Újonc" },
 ];
