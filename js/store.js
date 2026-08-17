@@ -234,7 +234,7 @@ export function examStats(person) {
   };
 }
 
-export function setModulePractical(usssId, code, result, actorLabel) {
+export function setModulePractical(usssId, code, result, actorLabel, extra = {}) {
   // result: 'waiting' | 'pass' | 'fail'
   const list = getPersonnel();
   const p = list.find((x) => x.usssId === usssId);
@@ -246,12 +246,14 @@ export function setModulePractical(usssId, code, result, actorLabel) {
   p.modules[code].history = p.modules[code].history || [];
   p.modules[code].history.push({
     date: new Date().toISOString(),
+    type: "practical",
     theory: p.modules[code].theory,
     result,
+    ...extra,
   });
   savePersonnel(list);
   logAudit(actorLabel, "Gyakorlati vizsga rögzítve",
-    `${p.name} – ${code}: ${prev || "—"} → ${result}`);
+    `${p.name} – ${code}: ${prev || "—"} → ${result}${extra.protocolId ? ` (${extra.protocolId})` : ""}`);
   checkLevelUpEligibility(p, actorLabel);
 }
 
@@ -359,7 +361,7 @@ export function createProtocol(data, actorLabel) {
     moduleCode: data.moduleCode,
     date: data.date,
     examiner: data.examiner,
-    participants: data.participants || [], // [{usssId, result, note}]
+    participants: data.participants || [], // [{usssId, examined, examResult, note}]
     notes: data.notes || "",
     createdBy: actorLabel,
     createdAt: new Date().toISOString(),
@@ -369,22 +371,41 @@ export function createProtocol(data, actorLabel) {
   write(KEYS.protocols, list);
   write(KEYS.nextProtocol, seq + 1);
 
-  // Kapcsolat a személyi profilokkal: minden résztvevő képzési előzményébe bekerül
-  const personnel = getPersonnel();
-  data.participants.forEach((part) => {
-    const p = personnel.find((x) => x.usssId === part.usssId);
-    if (!p) return;
-    p.modules = p.modules || {};
-    p.modules[data.moduleCode] = p.modules[data.moduleCode] || { theory: null, practical: undefined, history: [] };
-    p.modules[data.moduleCode].history = p.modules[data.moduleCode].history || [];
-    p.modules[data.moduleCode].history.push({
-      date: new Date(data.date).toISOString(),
-      protocolId: id,
-      note: part.note || "",
-      result: part.result || "résztvevő",
+  const participants = data.participants || [];
+
+  // Akik vizsgáztak (sikeres/sikertelen): ez a modul tényleges gyakorlati
+  // állapotát is frissíti, nem csak egy előzmény-bejegyzést hagy hátra.
+  participants
+    .filter((part) => part.examResult === "pass" || part.examResult === "fail")
+    .forEach((part) => {
+      setModulePractical(part.usssId, data.moduleCode, part.examResult, actorLabel, {
+        protocolId: id,
+        note: part.note || "",
+      });
     });
-  });
-  savePersonnel(personnel);
+
+  // Akik csak részt vettek (nem vizsgáztak): könnyű előzmény-bejegyzés, a
+  // modul állapotát nem módosítja. Friss olvasás, hogy a fenti mentéseket
+  // ne írja felül.
+  const attendedOnly = participants.filter((part) => part.examResult !== "pass" && part.examResult !== "fail");
+  if (attendedOnly.length) {
+    const personnel = getPersonnel();
+    attendedOnly.forEach((part) => {
+      const p = personnel.find((x) => x.usssId === part.usssId);
+      if (!p) return;
+      p.modules = p.modules || {};
+      p.modules[data.moduleCode] = p.modules[data.moduleCode] || { theory: null, practical: undefined, history: [] };
+      p.modules[data.moduleCode].history = p.modules[data.moduleCode].history || [];
+      p.modules[data.moduleCode].history.push({
+        date: new Date(data.date).toISOString(),
+        type: "attendance",
+        protocolId: id,
+        note: part.note || "",
+        result: "résztvevő",
+      });
+    });
+    savePersonnel(personnel);
+  }
 
   logAudit(actorLabel, "Jegyzőkönyv létrehozva", `${id} — ${data.moduleCode}`);
   return protocol;

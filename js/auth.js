@@ -12,8 +12,8 @@ const SESSION_KEY = "usss_ets_v1_session";
 
 export const ROLES = {
   ADMIN: { label: "Admin", level: 3 },
-  TRAINING: { label: "Training Officer", level: 2 },
-  VIEWER: { label: "Viewer", level: 1 },
+  TRAINING: { label: "Oktatásvezető", level: 2 },
+  VIEWER: { label: "Megfigyelő", level: 1 },
 };
 
 export function login(usssId, code) {

@@ -78,7 +78,7 @@ export function renderDashboard(container) {
       </div>
     </div>
 
-    ${!hasRole("TRAINING") ? `<div class="text-low small">Megtekintési jogosultsággal rendelkezik. Módosításokhoz Training vagy Admin jogosultság szükséges.</div>` : ""}
+    ${!hasRole("TRAINING") ? `<div class="text-low small">Megtekintési jogosultsággal rendelkezik. Módosításokhoz Oktatásvezetői vagy Admin jogosultság szükséges.</div>` : ""}
   `;
 
   container.querySelectorAll("[data-nav]").forEach((n) =>

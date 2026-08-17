@@ -7,15 +7,15 @@ export function renderLogin(root, onSuccess) {
       <div class="login-card">
         <div class="login-seal">${sealMark(56)}</div>
         <div class="login-title">U.S.S.S.</div>
-        <div class="login-sub">Elite Training &amp; Personnel System</div>
+        <div class="login-sub">Elit Kiképzési és Személyzeti Rendszer</div>
         <div id="login-error"></div>
         <form id="login-form">
           <div class="field">
-            <label>User ID</label>
+            <label>Azonosító</label>
             <input type="text" id="usssId" placeholder="USSS-004" autocomplete="off" required />
           </div>
           <div class="field">
-            <label>Access Code</label>
+            <label>Hozzáférési kód</label>
             <input type="password" id="code" placeholder="••••••••" autocomplete="off" required />
           </div>
           <button type="submit" class="btn btn-gold btn-block">Belépés</button>

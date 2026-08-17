@@ -158,9 +158,9 @@ export const PROTECTED_LOCATIONS = [
     image: "",
     x: 52, y: 46,
     entrances: [
-      { name: "Main Entrance", x: 51, y: 44 },
-      { name: "Staff Entrance", x: 55, y: 47 },
-      { name: "Vehicle Entrance", x: 49, y: 49 },
+      { name: "Főbejárat", x: 51, y: 44 },
+      { name: "Személyzeti bejárat", x: 55, y: 47 },
+      { name: "Járműbejárat", x: 49, y: 49 },
     ],
     updatedBy: "USSS-004",
     updatedAt: "2026-08-10T10:00:00.000Z",

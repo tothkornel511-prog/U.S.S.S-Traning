@@ -6,7 +6,7 @@ let activeTab = "access";
 
 export function renderAdmin(container) {
   if (!hasRole("TRAINING")) {
-    container.innerHTML = `<div class="denied"><div class="ic">⛔</div><h3>Hozzáférés megtagadva</h3><p class="text-low">Ehhez az oldalhoz Training vagy Admin jogosultság szükséges.</p></div>`;
+    container.innerHTML = `<div class="denied"><div class="ic">⛔</div><h3>Hozzáférés megtagadva</h3><p class="text-low">Ehhez az oldalhoz Oktatásvezetői vagy Admin jogosultság szükséges.</p></div>`;
     return;
   }
   const isAdmin = hasRole("ADMIN");
@@ -14,7 +14,7 @@ export function renderAdmin(container) {
   container.innerHTML = `
     <div class="tabs">
       <button class="tab-btn ${activeTab === "access" ? "active" : ""}" data-tab="access">Hozzáférések</button>
-      <button class="tab-btn ${activeTab === "audit" ? "active" : ""}" data-tab="audit">Audit Log</button>
+      <button class="tab-btn ${activeTab === "audit" ? "active" : ""}" data-tab="audit">Eseménynapló</button>
       ${isAdmin ? `<button class="tab-btn ${activeTab === "system" ? "active" : ""}" data-tab="system">Rendszerbeállítások</button>` : ""}
     </div>
     <div id="admin-tab-content"></div>
@@ -87,8 +87,8 @@ function openAccessForm(personnel, entry) {
       <div class="field"><label>Szerepkör</label>
         <select id="af-role">
           <option value="ADMIN" ${entry?.role === "ADMIN" ? "selected" : ""}>Admin — teljes hozzáférés</option>
-          <option value="TRAINING" ${entry?.role === "TRAINING" ? "selected" : ""}>Training — oktatás / vizsga kezelés</option>
-          <option value="VIEWER" ${entry?.role === "VIEWER" ? "selected" : ""}>Viewer — csak megtekintés</option>
+          <option value="TRAINING" ${entry?.role === "TRAINING" ? "selected" : ""}>Oktatásvezető — oktatás / vizsga kezelés</option>
+          <option value="VIEWER" ${entry?.role === "VIEWER" ? "selected" : ""}>Megfigyelő — csak megtekintés</option>
         </select>
       </div>
       <div class="field">

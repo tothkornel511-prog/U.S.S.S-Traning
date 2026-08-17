@@ -47,7 +47,7 @@ export function renderProfile(container, usssId) {
     </div>
 
     <div class="grid grid-3 section">
-      <div class="card"><div class="card-title">Training Readiness</div><div class="card-value">${readiness}%</div><div class="progress mt-1"><div style="width:${readiness}%"></div></div></div>
+      <div class="card"><div class="card-title">Képzési Készenlét</div><div class="card-value">${readiness}%</div><div class="progress mt-1"><div style="width:${readiness}%"></div></div></div>
       <div class="card"><div class="card-title">Teljesített modulok</div><div class="card-value">${completedModules} / ${totalModules}</div><div class="card-sub">Vizsgák összesen: ${exam.totalAttempts} · Elmélet: ${exam.theoryPass} sikeres / ${exam.theoryFail} sikertelen · Gyakorlat: ${exam.practicalPass} sikeres / ${exam.practicalFail} sikertelen</div></div>
       <div class="card"><div class="card-title">Szakirányok</div><div class="card-value" style="font-size:20px">${specialtyBadges(person)}</div></div>
     </div>

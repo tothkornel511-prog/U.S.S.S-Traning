@@ -26,7 +26,7 @@ export function renderProtocolsList(container) {
             <td>${esc(p.moduleCode)} — ${esc(moduleByCode(p.moduleCode)?.name || "")}</td>
             <td>${fmtDate(p.date)}</td>
             <td>${esc(p.examiner || "—")}</td>
-            <td>${p.participants.length} fő</td>
+            <td>${p.participants.length} fő${participantSummary(p.participants)}</td>
           </tr>`).join("") : `<tr><td colspan="5"><div class="empty-state"><h3>Nincs még jegyzőkönyv</h3><p>Hozza létre az elsőt a fenti gombbal.</p></div></td></tr>`}
       </tbody>
     </table></div>
@@ -34,6 +34,13 @@ export function renderProtocolsList(container) {
 
   container.querySelectorAll("[data-nav]").forEach((n) => n.addEventListener("click", () => navigate(n.getAttribute("data-nav"))));
   document.getElementById("new-protocol")?.addEventListener("click", () => openProtocolForm(allModules));
+}
+
+function participantSummary(participants) {
+  const pass = participants.filter((p) => p.examResult === "pass").length;
+  const fail = participants.filter((p) => p.examResult === "fail").length;
+  if (!pass && !fail) return "";
+  return ` <span class="text-low small">(${pass ? `${pass} sikeres` : ""}${pass && fail ? ", " : ""}${fail ? `${fail} sikertelen` : ""})</span>`;
 }
 
 function openProtocolForm(allModules) {
@@ -71,19 +78,35 @@ function openProtocolForm(allModules) {
   const partList = document.getElementById("pr-participants");
   function redrawParticipants() {
     partList.innerHTML = selected.map((s, i) => `
-      <div class="module-row" style="cursor:default; padding:8px 10px;">
-        <span>${esc(personnel.find((p) => p.usssId === s.usssId)?.name || s.usssId)}</span>
-        <div class="flex gap-1 items-center">
-          <select data-result-idx="${i}">
-            <option value="résztvevő" ${s.result === "résztvevő" ? "selected" : ""}>Résztvevő</option>
-            <option value="pass" ${s.result === "pass" ? "selected" : ""}>Sikeres</option>
-            <option value="fail" ${s.result === "fail" ? "selected" : ""}>Sikertelen</option>
-          </select>
+      <div class="participant-row">
+        <div class="flex justify-between items-center">
+          <span class="text-hi">${esc(personnel.find((p) => p.usssId === s.usssId)?.name || s.usssId)}</span>
           <button type="button" class="btn btn-sm" data-remove-idx="${i}">×</button>
         </div>
+        <label class="flex items-center gap-1 small text-mid" style="cursor:pointer; margin-top:6px;">
+          <input type="checkbox" data-examined-idx="${i}" ${s.examined ? "checked" : ""} /> Vizsgázott ezen az oktatáson
+        </label>
+        ${s.examined ? `
+        <div class="flex gap-1 mt-1">
+          <button type="button" class="btn btn-sm ${s.examResult === "pass" ? "btn-result-pass active" : "btn-result-pass"}" data-result-idx="${i}" data-result="pass">Sikeres</button>
+          <button type="button" class="btn btn-sm ${s.examResult === "fail" ? "btn-result-fail active" : "btn-result-fail"}" data-result-idx="${i}" data-result="fail">Sikertelen</button>
+        </div>` : `<div class="small text-low mt-1">Csak részt vett, a modul állapota nem változik.</div>`}
       </div>`).join("");
-    partList.querySelectorAll("[data-result-idx]").forEach((sel) =>
-      sel.addEventListener("change", () => { selected[Number(sel.getAttribute("data-result-idx"))].result = sel.value; })
+
+    partList.querySelectorAll("[data-examined-idx]").forEach((cb) =>
+      cb.addEventListener("change", () => {
+        const i = Number(cb.getAttribute("data-examined-idx"));
+        selected[i].examined = cb.checked;
+        if (!cb.checked) selected[i].examResult = null;
+        redrawParticipants();
+      })
+    );
+    partList.querySelectorAll("[data-result-idx]").forEach((btn) =>
+      btn.addEventListener("click", () => {
+        const i = Number(btn.getAttribute("data-result-idx"));
+        selected[i].examResult = btn.getAttribute("data-result");
+        redrawParticipants();
+      })
     );
     partList.querySelectorAll("[data-remove-idx]").forEach((b) =>
       b.addEventListener("click", () => { selected.splice(Number(b.getAttribute("data-remove-idx")), 1); redrawParticipants(); })
@@ -93,7 +116,7 @@ function openProtocolForm(allModules) {
   document.getElementById("pr-add-participant").addEventListener("change", (e) => {
     const id = e.target.value;
     if (id && !selected.find((s) => s.usssId === id)) {
-      selected.push({ usssId: id, result: "résztvevő", note: "" });
+      selected.push({ usssId: id, examined: false, examResult: null, note: "" });
       redrawParticipants();
     }
     e.target.value = "";
@@ -104,6 +127,9 @@ function openProtocolForm(allModules) {
     const moduleCode = document.getElementById("pr-module").value;
     if (!moduleCode) return toast("Válasszon vizsgát / oktatást.", "warn");
     if (!selected.length) return toast("Adjon hozzá legalább egy résztvevőt.", "warn");
+    if (selected.some((s) => s.examined && !s.examResult)) {
+      return toast("Minden vizsgázott résztvevőnél válassz eredményt (sikeres/sikertelen).", "warn");
+    }
     const protocol = createProtocol({
       moduleCode,
       date: document.getElementById("pr-date").value,
@@ -146,9 +172,12 @@ export function renderProtocolDetail(container, id) {
       <div class="card-title mb-1">Résztvevők (${protocol.participants.length})</div>
       ${protocol.participants.map((pt) => {
         const p = personnel.find((x) => x.usssId === pt.usssId);
+        const badge = pt.examResult === "pass" ? { c: "badge-green", t: "Sikeres" }
+          : pt.examResult === "fail" ? { c: "badge-red", t: "Sikertelen" }
+          : { c: "badge-gray", t: "Résztvevő (nem vizsgázott)" };
         return `<div class="history-item">
           <a href="#/personnel/${esc(pt.usssId)}" class="text-hi">${esc(p?.name || pt.usssId)}</a>
-          <span class="badge ${pt.result === "pass" ? "badge-green" : pt.result === "fail" ? "badge-red" : "badge-gray"}">${pt.result === "pass" ? "Sikeres" : pt.result === "fail" ? "Sikertelen" : "Résztvevő"}</span>
+          <span class="badge ${badge.c}">${badge.t}</span>
         </div>`;
       }).join("")}
       ${protocol.notes ? `<div class="divider"></div><div class="card-title mb-1">Megjegyzések</div><div class="text-mid" style="white-space:pre-wrap">${esc(protocol.notes)}</div>` : ""}

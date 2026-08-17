@@ -22,11 +22,11 @@ const root = document.getElementById("root");
 
 const NAV = [
   { group: "Áttekintés", items: [
-    { path: "/dashboard", label: "Dashboard", icon: "◈" },
+    { path: "/dashboard", label: "Vezérlőpult", icon: "◈" },
   ]},
   { group: "Állomány & Képzés", items: [
     { path: "/personnel", label: "Állomány", icon: "☰" },
-    { path: "/matrix", label: "Training Matrix", icon: "▦" },
+    { path: "/matrix", label: "Képzési Mátrix", icon: "▦" },
     { path: "/protocols", label: "Jegyzőkönyvek", icon: "▤" },
   ]},
   { group: "Objektumok", items: [
@@ -57,7 +57,7 @@ function renderShell() {
           <div class="brand-seal">${sealMark(34)}</div>
           <div>
             <div class="brand-name">U.S.S.S. ELITE</div>
-            <div class="brand-sub">Training System</div>
+            <div class="brand-sub">Kiképzési Rendszer</div>
           </div>
         </div>
         <nav id="nav-root" style="flex:1; overflow-y:auto;"></nav>
