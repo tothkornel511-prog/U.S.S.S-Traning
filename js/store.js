@@ -9,15 +9,16 @@
 import {
   LEVELS, SERVICE_STATUSES, POSITIONS, MODULES, LEVEL_MODULE_ORDER,
   PERSONNEL, ACCESS_CODES, PROTECTED_LOCATIONS, AUDIT_LOG_SEED, MAPS, DISTRICTS,
-} from "./data.js?v=8";
+} from "./data.js?v=9";
 
-/* v5: Dominic Hayes pozíciója Oktatásvezető + garantált újra-seedelés. */
-const NS = "usss_ets_v5_";
+/* v6: pozíciólista admin felületről szerkeszthető (nem csak kódból). */
+const NS = "usss_ets_v6_";
 const KEYS = {
   personnel: NS + "personnel",
   accessCodes: NS + "access_codes",
   locations: NS + "locations",
   districts: NS + "districts",
+  positions: NS + "positions",
   protocols: NS + "protocols",
   auditLog: NS + "audit_log",
   seeded: NS + "seeded",
@@ -70,6 +71,7 @@ export function seedIfNeeded() {
   write(KEYS.accessCodes, ACCESS_CODES);
   write(KEYS.locations, PROTECTED_LOCATIONS);
   write(KEYS.districts, DISTRICTS);
+  write(KEYS.positions, POSITIONS.flatMap((g) => g.items.map((name) => ({ group: g.group, name }))));
   write(KEYS.protocols, []);
   write(KEYS.auditLog, AUDIT_LOG_SEED);
   write(KEYS.nextProtocol, 1);
@@ -82,10 +84,31 @@ export function resetAllData() {
 }
 
 /* ---------- Static reference data ------------------------------------ */
-export const ref = { LEVELS, SERVICE_STATUSES, POSITIONS, MODULES, LEVEL_MODULE_ORDER, MAPS };
+export const ref = { LEVELS, SERVICE_STATUSES, MODULES, LEVEL_MODULE_ORDER, MAPS };
 
 export function mapById(id) {
   return MAPS.find((m) => m.id === id) || MAPS[0];
+}
+
+/* ---------- Pozíciók (admin felületről szerkeszthető) -------------------*/
+export function getPositionEntries() {
+  return read(KEYS.positions, []);
+}
+export function getPositions() {
+  return getPositionEntries().map((p) => p.name);
+}
+export function addPosition(name, group, actorLabel) {
+  const trimmed = (name || "").trim();
+  if (!trimmed) return;
+  const list = getPositionEntries();
+  if (list.some((p) => p.name.toLowerCase() === trimmed.toLowerCase())) return;
+  list.push({ group: group || "Egyéb", name: trimmed });
+  write(KEYS.positions, list);
+  logAudit(actorLabel, "Pozíció hozzáadva", trimmed);
+}
+export function removePosition(name, actorLabel) {
+  write(KEYS.positions, getPositionEntries().filter((p) => p.name !== name));
+  logAudit(actorLabel, "Pozíció törölve", name);
 }
 
 export function moduleByCode(code) {

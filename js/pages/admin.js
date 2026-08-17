@@ -1,6 +1,6 @@
-import { getAccessCodes, upsertAccessCode, revokeAccessCode, generateCode, getAuditLog, getPersonnel, resetAllData, ref } from "../store.js?v=8";
-import { hasRole, actorLabel, ROLES } from "../auth.js?v=8";
-import { esc, fmtDateTime, toast, openModal, closeModal } from "../utils.js?v=8";
+import { getAccessCodes, upsertAccessCode, revokeAccessCode, generateCode, getAuditLog, getPersonnel, resetAllData, ref, getPositionEntries, addPosition, removePosition } from "../store.js?v=9";
+import { hasRole, actorLabel, ROLES } from "../auth.js?v=9";
+import { esc, fmtDateTime, toast, openModal, closeModal } from "../utils.js?v=9";
 
 let activeTab = "access";
 
@@ -14,6 +14,7 @@ export function renderAdmin(container) {
   container.innerHTML = `
     <div class="tabs">
       <button class="tab-btn ${activeTab === "access" ? "active" : ""}" data-tab="access">Hozzáférések</button>
+      <button class="tab-btn ${activeTab === "positions" ? "active" : ""}" data-tab="positions">Pozíciók</button>
       <button class="tab-btn ${activeTab === "audit" ? "active" : ""}" data-tab="audit">Eseménynapló</button>
       ${isAdmin ? `<button class="tab-btn ${activeTab === "system" ? "active" : ""}" data-tab="system">Rendszerbeállítások</button>` : ""}
     </div>
@@ -26,8 +27,80 @@ export function renderAdmin(container) {
 
   const content = document.getElementById("admin-tab-content");
   if (activeTab === "access") renderAccessTab(content, isAdmin);
+  else if (activeTab === "positions") renderPositionsTab(content, isAdmin);
   else if (activeTab === "audit") renderAuditTab(content);
   else if (activeTab === "system") renderSystemTab(content);
+}
+
+function renderPositionsTab(content, isAdmin) {
+  const entries = getPositionEntries();
+  const groups = [...new Set(entries.map((p) => p.group))];
+
+  content.innerHTML = `
+    <div class="section-head">
+      <h2 style="font-size:15px">Pozíciók / rangok</h2>
+      ${isAdmin ? `<button class="btn btn-gold btn-sm" id="new-position">+ Új pozíció</button>` : ""}
+    </div>
+    <p class="text-low small mb-2">Ezek jelennek meg a Pozíció mezőben a személyi profiloknál. Új rang felvételéhez nincs szükség kódmódosításra.</p>
+    ${groups.map((g) => `
+      <div class="card-title mb-1 mt-2">${esc(g)}</div>
+      ${entries.filter((p) => p.group === g).map((p) => `
+        <div class="history-item">
+          <span>${esc(p.name)}</span>
+          ${isAdmin ? `<button class="btn btn-sm btn-danger" data-remove-pos="${esc(p.name)}">×</button>` : ""}
+        </div>`).join("") || `<div class="text-low small">Nincs pozíció ebben a csoportban.</div>`}
+    `).join("")}
+  `;
+
+  if (isAdmin) {
+    document.getElementById("new-position").addEventListener("click", () => openPositionForm(groups));
+    content.querySelectorAll("[data-remove-pos]").forEach((b) =>
+      b.addEventListener("click", () => {
+        const name = b.getAttribute("data-remove-pos");
+        if (confirm(`Törli a(z) "${name}" pozíciót a listából?`)) {
+          removePosition(name, actorLabel());
+          toast("Pozíció törölve");
+          renderAdmin(document.getElementById("content"));
+        }
+      })
+    );
+  }
+}
+
+function openPositionForm(existingGroups) {
+  openModal(`
+    <div class="modal-head"><h3>Új pozíció</h3><button class="modal-close" data-close-modal>×</button></div>
+    <form id="position-form">
+      <div class="field"><label>Pozíció neve</label><input required id="pf-name" autofocus placeholder="pl. Deputy Director" /></div>
+      <div class="field"><label>Csoport</label>
+        <select id="pf-group">
+          ${existingGroups.map((g) => `<option value="${esc(g)}">${esc(g)}</option>`).join("")}
+          <option value="__new__">+ Új csoport…</option>
+        </select>
+      </div>
+      <div class="field" id="pf-new-group-wrap" style="display:none;"><label>Új csoport neve</label><input id="pf-new-group" placeholder="pl. Rendőrség" /></div>
+      <div class="flex justify-between mt-2">
+        <button type="button" class="btn" data-close-modal>Mégse</button>
+        <button type="submit" class="btn btn-gold">Mentés</button>
+      </div>
+    </form>
+  `);
+
+  document.getElementById("pf-group").addEventListener("change", (e) => {
+    document.getElementById("pf-new-group-wrap").style.display = e.target.value === "__new__" ? "block" : "none";
+  });
+
+  document.getElementById("position-form").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const name = document.getElementById("pf-name").value.trim();
+    const groupSel = document.getElementById("pf-group").value;
+    const group = groupSel === "__new__" ? document.getElementById("pf-new-group").value.trim() : groupSel;
+    if (!name || !group) return;
+    addPosition(name, group, actorLabel());
+    toast("Pozíció hozzáadva");
+    closeModal();
+    renderAdmin(document.getElementById("content"));
+  });
 }
 
 function renderAccessTab(content, isAdmin) {

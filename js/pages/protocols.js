@@ -1,7 +1,7 @@
-import { getProtocols, getProtocol, getPersonnel, createProtocol, ref, moduleByCode } from "../store.js?v=8";
-import { hasRole, actorLabel } from "../auth.js?v=8";
-import { esc, fmtDate, fmtDateTime, toast, openModal, closeModal } from "../utils.js?v=8";
-import { navigate } from "../router.js?v=8";
+import { getProtocols, getProtocol, getPersonnel, createProtocol, ref, moduleByCode } from "../store.js?v=9";
+import { hasRole, actorLabel } from "../auth.js?v=9";
+import { esc, fmtDate, fmtDateTime, toast, openModal, closeModal } from "../utils.js?v=9";
+import { navigate } from "../router.js?v=9";
 
 export function renderProtocolsList(container) {
   const canEdit = hasRole("TRAINING");

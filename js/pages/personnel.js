@@ -1,7 +1,7 @@
-import { getPersonnel, upsertPerson, deletePerson, readinessPercent, ref, probationInfo } from "../store.js?v=8";
-import { hasRole, actorLabel } from "../auth.js?v=8";
-import { esc, initials, toast, openModal, closeModal } from "../utils.js?v=8";
-import { navigate } from "../router.js?v=8";
+import { getPersonnel, upsertPerson, deletePerson, readinessPercent, ref, probationInfo, getPositions } from "../store.js?v=9";
+import { hasRole, actorLabel } from "../auth.js?v=9";
+import { esc, initials, toast, openModal, closeModal } from "../utils.js?v=9";
+import { navigate } from "../router.js?v=9";
 
 let state = { search: "", position: "", level: "", status: "" };
 
@@ -21,7 +21,7 @@ export function renderPersonnelList(container) {
       <input id="f-search" type="text" placeholder="Keresés név / USSS ID alapján…" />
       <select id="f-level"><option value="">Minden szint</option>${ref.LEVELS.map((l) => `<option value="${l.id}">${esc(l.label)}</option>`).join("")}</select>
       <select id="f-status"><option value="">Minden státusz</option>${ref.SERVICE_STATUSES.map((s) => `<option value="${s}">${s}</option>`).join("")}</select>
-      <select id="f-position"><option value="">Minden pozíció</option>${ref.POSITIONS.flatMap((g) => g.items).map((p) => `<option value="${esc(p)}">${esc(p)}</option>`).join("")}</select>
+      <select id="f-position"><option value="">Minden pozíció</option>${getPositions().map((p) => `<option value="${esc(p)}">${esc(p)}</option>`).join("")}</select>
     </div>
     <div class="table-wrap"><table>
       <thead><tr><th>Név</th><th>Pozíció</th><th>Szint</th><th>Státusz</th><th>Készenlét</th><th>Próbaidő</th>${canAdmin ? "<th></th>" : ""}</tr></thead>
@@ -96,7 +96,7 @@ export function renderPersonnelList(container) {
 
 function openPersonForm(person) {
   const isNew = !person;
-  const positions = ref.POSITIONS.flatMap((g) => g.items);
+  const positions = getPositions();
   const overlay = openModal(`
     <div class="modal-head">
       <h3>${isNew ? "Új személy felvétele" : "Profil szerkesztése"}</h3>
