@@ -1,11 +1,11 @@
 import {
   getPerson, ref, moduleState, readinessPercent, levelProgress, probationInfo,
   setModuleTheory, setModulePractical, approveLevelUp, nextLevelId, liftProbation,
-  levelLabel, moduleByCode, examStats, THEORY_PASS_THRESHOLD,
-} from "../store.js?v=13";
-import { hasRole, actorLabel } from "../auth.js?v=13";
-import { esc, initials, fmtDate, fmtDateTime, toast, openModal, closeModal } from "../utils.js?v=13";
-import { navigate } from "../router.js?v=13";
+  levelLabel, moduleByCode, examStats, THEORY_PASS_THRESHOLD, deleteHistoryEntry,
+} from "../store.js?v=14";
+import { hasRole, actorLabel } from "../auth.js?v=14";
+import { esc, initials, fmtDate, fmtDateTime, toast, openModal, closeModal } from "../utils.js?v=14";
+import { navigate } from "../router.js?v=14";
 
 let activeTab = "modules";
 
@@ -206,11 +206,23 @@ export function openModuleDetail(person, code, canEdit, onUpdate) {
 
     <div class="divider"></div>
     <div class="card-title mb-1">Vizsgatörténet</div>
-    ${history.length ? history.slice().reverse().map((h) => `
+    ${history.length ? history.map((h, idx) => ({ h, idx })).slice().reverse().map(({ h, idx }) => `
       <div class="history-item"><span>${esc(h.type === "theory" ? "Elméleti" : "Gyakorlati")} próbálkozás ${h.theory !== null && h.theory !== undefined ? `· ${h.theory}%` : ""} ${h.examiner ? `<span class="text-low">· ${esc(h.examiner)}</span>` : ""}</span>
-      <span><span class="badge ${resultColor(h.result)}">${esc(resultLabel(h.result))}</span> <span class="text-low">${fmtDate(h.date)}</span></span></div>
+      <span class="flex items-center gap-1"><span class="badge ${resultColor(h.result)}">${esc(resultLabel(h.result))}</span> <span class="text-low">${fmtDate(h.date)}</span>${canEdit ? `<button type="button" class="btn btn-sm btn-danger" data-del-history="${idx}" title="Próbálkozás törlése">×</button>` : ""}</span></div>
     `).join("") : `<div class="text-low small">Nincs korábbi próbálkozás.</div>`}
   `);
+
+  document.querySelectorAll("[data-del-history]").forEach((b) =>
+    b.addEventListener("click", () => {
+      if (!confirm("Biztosan törli ezt a próbálkozást az előzményből?")) return;
+      deleteHistoryEntry(person.usssId, code, Number(b.getAttribute("data-del-history")), actorLabel());
+      toast("Próbálkozás törölve");
+      closeModal();
+      onUpdate && onUpdate();
+      const refreshed = getPerson(person.usssId);
+      if (refreshed) openModuleDetail(refreshed, code, canEdit, onUpdate);
+    })
+  );
 
   document.getElementById("theory-form")?.addEventListener("submit", (e) => {
     e.preventDefault();

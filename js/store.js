@@ -9,7 +9,7 @@
 import {
   LEVELS, SERVICE_STATUSES, POSITIONS, MODULES, LEVEL_MODULE_ORDER,
   PERSONNEL, ACCESS_CODES, PROTECTED_LOCATIONS, AUDIT_LOG_SEED, MAPS, DISTRICTS,
-} from "./data.js?v=13";
+} from "./data.js?v=14";
 
 /* v7: Roxwood/Cayo Perico eltávolítva, csak Los Santos térkép maradt. */
 const NS = "usss_ets_v7_";
@@ -323,6 +323,32 @@ export function setModulePractical(usssId, code, result, actorLabel, extra = {})
   logAudit(actorLabel, "Gyakorlati vizsga rögzítve",
     `${p.name} – ${code}: ${prev || "—"} → ${result}${extra.protocolId ? ` (${extra.protocolId})` : ""}`);
   checkLevelUpEligibility(p, actorLabel);
+}
+
+/* Egy próbálkozás törlése a modul előzményéből (téves rögzítés javítása).
+   Törlés után az aktuális elméleti/gyakorlati állapot a maradék előzmény
+   legutóbbi bejegyzéséhez igazodik — ha nem marad ilyen, üresre áll vissza. */
+export function deleteHistoryEntry(usssId, code, historyIndex, actorLabel) {
+  const list = getPersonnel();
+  const p = list.find((x) => x.usssId === usssId);
+  if (!p || !p.modules || !p.modules[code]) return;
+  const rec = p.modules[code];
+  const history = rec.history || [];
+  if (historyIndex < 0 || historyIndex >= history.length) return;
+  const [removed] = history.splice(historyIndex, 1);
+
+  const lastTheory = [...history].reverse().find((h) => h.type === "theory");
+  const lastPractical = [...history].reverse().find((h) => h.type === "practical");
+  rec.theory = lastTheory ? lastTheory.theory : null;
+  rec.practical = lastPractical ? lastPractical.result : undefined;
+
+  savePersonnel(list);
+  logAudit(actorLabel, "Próbálkozás törölve",
+    `${p.name} – ${code}: ${removed.type === "theory" ? "elméleti" : "gyakorlati"} próbálkozás (${fmtHistoryDate(removed.date)})`);
+  checkLevelUpEligibility(p, actorLabel);
+}
+function fmtHistoryDate(iso) {
+  try { return new Date(iso).toLocaleDateString("hu-HU"); } catch { return iso; }
 }
 
 function checkLevelUpEligibility(person, actorLabel) {
