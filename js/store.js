@@ -11,10 +11,10 @@ import {
   PERSONNEL, ACCESS_CODES, PROTECTED_LOCATIONS, AUDIT_LOG_SEED, MAPS, DISTRICTS,
 } from "./data.js";
 
-/* v2: teljes állomány- és képzésreset (mindenki próbaidős, nulla előzmény),
-   térkép/körzet adatok bevezetése — a névtér-verzió emelése garantálja, hogy
-   minden korábban seedelt böngésző is a friss alapadatokkal induljon újra. */
-const NS = "usss_ets_v2_";
+/* v3: ismételt teljes reset (mindenki próbaidős, nulla előzmény) + minden
+   modulnak elmélet ÉS gyakorlat is kell — a névtér-verzió emelése garantálja,
+   hogy minden korábban seedelt böngésző is a friss alapadatokkal induljon újra. */
+const NS = "usss_ets_v3_";
 const KEYS = {
   personnel: NS + "personnel",
   accessCodes: NS + "access_codes",

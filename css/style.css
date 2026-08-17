@@ -58,7 +58,11 @@ body {
 
 h1, h2, h3, h4 { font-family: var(--font-display); color: var(--text-hi); font-weight: 600; margin: 0; letter-spacing: 0.01em; }
 a { color: inherit; text-decoration: none; }
-button { font-family: var(--font-body); cursor: pointer; }
+button {
+  font-family: var(--font-body); cursor: pointer;
+  background: none; border: none; color: inherit; margin: 0;
+  -webkit-appearance: none; appearance: none;
+}
 ::selection { background: rgba(198,166,100,0.35); color: #fff; }
 
 /* Scrollbars */
@@ -381,7 +385,8 @@ tbody tr:hover { background: rgba(198,166,100,0.04); }
 .profile-name { font-size: 24px; }
 .profile-id { font-family: var(--font-mono); color: var(--gold); font-size: 13px; }
 .tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--line-soft); margin-bottom: 18px; }
-.tab-btn { padding: 10px 14px; font-size: 12.5px; color: var(--text-low); border-bottom: 2px solid transparent; font-weight: 600; transition: color .15s ease; }
+.tab-btn { padding: 10px 14px; font-size: 12.5px; color: var(--text-low); border-bottom: 2px solid transparent; font-weight: 600; border-radius: var(--radius-sm) var(--radius-sm) 0 0; transition: color .15s ease, background .15s ease; }
+.tab-btn:hover { color: var(--text-hi); background: rgba(255,255,255,0.03); }
 .tab-btn.active { color: var(--gold-bright); border-color: var(--gold); text-shadow: 0 0 12px rgba(198,166,100,0.4); }
 
 .module-row { display: flex; align-items: center; justify-content: space-between; padding: 12px 14px; border: 1px solid var(--line-soft); border-radius: var(--radius-md); margin-bottom: 8px; background: var(--bg-panel-2); cursor: pointer; }

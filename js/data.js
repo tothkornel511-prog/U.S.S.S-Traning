@@ -36,46 +36,47 @@ export const POSITIONS = [
 ];
 
 /* Minden modul EGYSZER szerepel az adatbázisban (H, I, J is), a "levels" tömb
-   mondja meg, mely képzési szinte(ke)n jelenik meg. "spec" = szinten kívüli. */
+   mondja meg, mely képzési szinte(ke)n jelenik meg. "spec" = szinten kívüli.
+   Minden modulnak van elméleti ÉS gyakorlati vizsgája is. */
 export const MODULES = [
-  { code: "0",    name: "Belépés, betanulás és bázisrend",              levels: ["0"],         theory: true,  practical: false },
+  { code: "0",    name: "Belépés, betanulás és bázisrend",              levels: ["0"],         theory: true, practical: true },
 
-  { code: "A",    name: "Alapvető ismeretek",                            levels: ["I"],         theory: true,  practical: false },
-  { code: "G1",   name: "Erőnléti oktatás – alapfok",                    levels: ["I"],         theory: false, practical: true  },
-  { code: "K",    name: "Kommunikációs tréning",                         levels: ["I"],         theory: true,  practical: false },
-  { code: "L",    name: "Kód használat",                                 levels: ["I"],         theory: true,  practical: false },
-  { code: "R",    name: "Szolgálati rend és dokumentáció",               levels: ["I"],         theory: true,  practical: false },
+  { code: "A",    name: "Alapvető ismeretek",                            levels: ["I"],         theory: true, practical: true },
+  { code: "G1",   name: "Erőnléti oktatás – alapfok",                    levels: ["I"],         theory: true, practical: true },
+  { code: "K",    name: "Kommunikációs tréning",                         levels: ["I"],         theory: true, practical: true },
+  { code: "L",    name: "Kód használat",                                 levels: ["I"],         theory: true, practical: true },
+  { code: "R",    name: "Szolgálati rend és dokumentáció",               levels: ["I"],         theory: true, practical: true },
 
-  { code: "B1",   name: "Kormányzati járművek vezetése – alapismeretek", levels: ["II"],        theory: true,  practical: true  },
-  { code: "E",    name: "Egészségügyi oktatás",                          levels: ["II"],        theory: true,  practical: false },
-  { code: "F",    name: "Lőfegyver használat alapjai",                   levels: ["II"],        theory: true,  practical: true  },
-  { code: "G2",   name: "Közelharci oktatás – alapfok",                  levels: ["II"],        theory: false, practical: true  },
-  { code: "N",    name: "Jogi ismeretek és kényszerítő eszközök",        levels: ["II"],        theory: true,  practical: false },
-  { code: "P",    name: "Titoktartás és információvédelem",              levels: ["II"],        theory: true,  practical: false },
+  { code: "B1",   name: "Kormányzati járművek vezetése – alapismeretek", levels: ["II"],        theory: true, practical: true },
+  { code: "E",    name: "Egészségügyi oktatás",                          levels: ["II"],        theory: true, practical: true },
+  { code: "F",    name: "Lőfegyver használat alapjai",                   levels: ["II"],        theory: true, practical: true },
+  { code: "G2",   name: "Közelharci oktatás – alapfok",                  levels: ["II"],        theory: true, practical: true },
+  { code: "N",    name: "Jogi ismeretek és kényszerítő eszközök",        levels: ["II"],        theory: true, practical: true },
+  { code: "P",    name: "Titoktartás és információvédelem",              levels: ["II"],        theory: true, practical: true },
 
-  { code: "B2",   name: "Kormányzati járművek vezetése – emelt szint",   levels: ["III"],       theory: true,  practical: true  },
-  { code: "C",    name: "Konvoj közlekedés",                             levels: ["III"],       theory: true,  practical: true  },
-  { code: "F1",   name: "Utcai lövész vizsga",                           levels: ["III"],       theory: true,  practical: true  },
-  { code: "G1H",  name: "Erőnléti oktatás – haladó fokozat",             levels: ["III"],       theory: false, practical: true  },
-  { code: "G3",   name: "Mentális felkészülés",                         levels: ["III"],       theory: true,  practical: false },
-  { code: "I",    name: "Kiképzés az éj leple alatt",                    levels: ["III", "V"],  theory: true,  practical: true  },
-  { code: "M",    name: "Együttműködés más szervezetekkel",              levels: ["III"],       theory: true,  practical: false },
+  { code: "B2",   name: "Kormányzati járművek vezetése – emelt szint",   levels: ["III"],       theory: true, practical: true },
+  { code: "C",    name: "Konvoj közlekedés",                             levels: ["III"],       theory: true, practical: true },
+  { code: "F1",   name: "Utcai lövész vizsga",                           levels: ["III"],       theory: true, practical: true },
+  { code: "G1H",  name: "Erőnléti oktatás – haladó fokozat",             levels: ["III"],       theory: true, practical: true },
+  { code: "G3",   name: "Mentális felkészülés",                         levels: ["III"],       theory: true, practical: true },
+  { code: "I",    name: "Kiképzés az éj leple alatt",                    levels: ["III", "V"],  theory: true, practical: true },
+  { code: "M",    name: "Együttműködés más szervezetekkel",              levels: ["III"],       theory: true, practical: true },
 
-  { code: "D",    name: "Taktikai kiképzés",                             levels: ["IV"],        theory: true,  practical: true  },
-  { code: "F2",   name: "Épületharc lövész vizsga",                      levels: ["IV"],        theory: true,  practical: true  },
-  { code: "G2H",  name: "Közelharci oktatás – haladó fokozat",           levels: ["IV"],        theory: false, practical: true  },
-  { code: "H",    name: "Helikopter pilóta képzés",                      levels: ["IV", "V"],   theory: true,  practical: true  },
-  { code: "J",    name: "Ejtőernyős vizsga követelmények",               levels: ["IV", "V"],   theory: true,  practical: true  },
-  { code: "O",    name: "Advance és rendezvénybiztosítás",               levels: ["IV"],        theory: true,  practical: false },
-  { code: "S1",   name: "Vízi műveletek",                                levels: ["IV"],        theory: true,  practical: true  },
-  { code: "T1",   name: "Tűzszerész ismeretek",                          levels: ["IV"],        theory: true,  practical: true  },
+  { code: "D",    name: "Taktikai kiképzés",                             levels: ["IV"],        theory: true, practical: true },
+  { code: "F2",   name: "Épületharc lövész vizsga",                      levels: ["IV"],        theory: true, practical: true },
+  { code: "G2H",  name: "Közelharci oktatás – haladó fokozat",           levels: ["IV"],        theory: true, practical: true },
+  { code: "H",    name: "Helikopter pilóta képzés",                      levels: ["IV", "V"],   theory: true, practical: true },
+  { code: "J",    name: "Ejtőernyős vizsga követelmények",               levels: ["IV", "V"],   theory: true, practical: true },
+  { code: "O",    name: "Advance és rendezvénybiztosítás",               levels: ["IV"],        theory: true, practical: true },
+  { code: "S1",   name: "Vízi műveletek",                                levels: ["IV"],        theory: true, practical: true },
+  { code: "T1",   name: "Tűzszerész ismeretek",                          levels: ["IV"],        theory: true, practical: true },
 
-  { code: "F3",   name: "Légi egység lövész vizsga",                     levels: ["V"],         theory: true,  practical: true  },
-  { code: "S2",   name: "Búvárképzés",                                   levels: ["V"],         theory: true,  practical: true  },
-  { code: "T2",   name: "Víz alatti robbanószerkezet",                   levels: ["V"],         theory: true,  practical: true  },
+  { code: "F3",   name: "Légi egység lövész vizsga",                     levels: ["V"],         theory: true, practical: true },
+  { code: "S2",   name: "Búvárképzés",                                   levels: ["V"],         theory: true, practical: true },
+  { code: "T2",   name: "Víz alatti robbanószerkezet",                   levels: ["V"],         theory: true, practical: true },
 
-  { code: "ADM",  name: "Önkormányzati adminisztráció",                  levels: ["SPEC"],      theory: true,  practical: false },
-  { code: "LSNTA",name: "Adóhatósági szolgálat",                         levels: ["SPEC"],      theory: true,  practical: false },
+  { code: "ADM",  name: "Önkormányzati adminisztráció",                  levels: ["SPEC"],      theory: true, practical: true },
+  { code: "LSNTA",name: "Adóhatósági szolgálat",                         levels: ["SPEC"],      theory: true, practical: true },
 ];
 
 /* Sorrend, ahogy egy adott szinten a modulokat mutatjuk (H/I/J duplikáció nélkül) */
