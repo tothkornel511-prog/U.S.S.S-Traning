@@ -122,18 +122,15 @@ export const ACCESS_CODES = [
   { usssId: "USSS-98",  code: "5PLZ-8XWQ", role: "TRAINING" }, // Christoph Norbert Kleinemann
 ];
 
-/* Elérhető GTA térképek a Védett helyszínekhez / Térkép oldalhoz. Amíg egy
+/* Elérhető GTA térkép a Védett helyszínekhez / Térkép oldalhoz. Amíg az
    "image" útvonalon nincs fájl, a térkép-nézet erről tájékoztat, de a
    pöttyök/körzetek attól még szerkeszthetők egy sötét placeholder felületen. */
 export const MAPS = [
   { id: "los-santos",  name: "Los Santos & Blaine County", image: "assets/maps/los-santos.webp" },
-  { id: "roxwood",     name: "Roxwood",                    image: "assets/maps/roxwood.webp" },
-  { id: "cayo-perico", name: "Cayo Perico",                image: "assets/maps/cayo-perico.jpg" },
 ];
 
 /* Körzet-feliratok a Térkép oldalon. Kezdeti, hozzávetőleges pozíciók —
-   admin/training a Térkép oldalon a térképre kattintva pontosíthatja,
-   miután a tényleges térképkép fel lett töltve. */
+   admin/training a Térkép oldalon a térképre kattintva pontosíthatja. */
 export const DISTRICTS = [
   { id: "D-001", map: "los-santos", name: "Downtown",       x: 51, y: 78 },
   { id: "D-002", map: "los-santos", name: "Vinewood",       x: 47, y: 72 },
@@ -144,8 +141,6 @@ export const DISTRICTS = [
   { id: "D-007", map: "los-santos", name: "Paleto Bay",     x: 55, y: 15 },
   { id: "D-008", map: "los-santos", name: "Grapeseed",      x: 66, y: 22 },
   { id: "D-009", map: "los-santos", name: "Chumash",        x: 20, y: 55 },
-  { id: "D-010", map: "cayo-perico", name: "El Rubio Compound", x: 45, y: 50 },
-  { id: "D-011", map: "cayo-perico", name: "Airstrip",          x: 20, y: 30 },
 ];
 
 export const PROTECTED_LOCATIONS = [

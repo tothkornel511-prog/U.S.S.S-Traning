@@ -9,10 +9,10 @@
 import {
   LEVELS, SERVICE_STATUSES, POSITIONS, MODULES, LEVEL_MODULE_ORDER,
   PERSONNEL, ACCESS_CODES, PROTECTED_LOCATIONS, AUDIT_LOG_SEED, MAPS, DISTRICTS,
-} from "./data.js?v=9";
+} from "./data.js?v=10";
 
-/* v6: pozíciólista admin felületről szerkeszthető (nem csak kódból). */
-const NS = "usss_ets_v6_";
+/* v7: Roxwood/Cayo Perico eltávolítva, csak Los Santos térkép maradt. */
+const NS = "usss_ets_v7_";
 const KEYS = {
   personnel: NS + "personnel",
   accessCodes: NS + "access_codes",

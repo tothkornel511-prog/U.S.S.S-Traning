@@ -1,6 +1,6 @@
-import { getAccessCodes, upsertAccessCode, revokeAccessCode, generateCode, getAuditLog, getPersonnel, resetAllData, ref, getPositionEntries, addPosition, removePosition } from "../store.js?v=9";
-import { hasRole, actorLabel, ROLES } from "../auth.js?v=9";
-import { esc, fmtDateTime, toast, openModal, closeModal } from "../utils.js?v=9";
+import { getAccessCodes, upsertAccessCode, revokeAccessCode, generateCode, getAuditLog, getPersonnel, resetAllData, ref, getPositionEntries, addPosition, removePosition } from "../store.js?v=10";
+import { hasRole, actorLabel, ROLES } from "../auth.js?v=10";
+import { esc, fmtDateTime, toast, openModal, closeModal } from "../utils.js?v=10";
 
 let activeTab = "access";
 
