@@ -1,5 +1,5 @@
-import { login } from "../auth.js?v=7";
-import { esc, sealMark } from "../utils.js?v=7";
+import { login } from "../auth.js?v=8";
+import { esc, sealMark } from "../utils.js?v=8";
 
 export function renderLogin(root, onSuccess) {
   root.innerHTML = `

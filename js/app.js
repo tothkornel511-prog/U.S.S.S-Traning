@@ -2,19 +2,19 @@
    U.S.S.S. ELITE TRAINING SYSTEM — APP ENTRY
    ========================================================================== */
 
-import { seedIfNeeded, globalSearch } from "./store.js?v=7";
-import { isAuthenticated, currentSession, logout, hasRole, ROLES } from "./auth.js?v=7";
-import { registerRoute, resolve, startRouter, navigate, currentPath } from "./router.js?v=7";
-import { esc, sealMark } from "./utils.js?v=7";
-import { renderLogin } from "./pages/login.js?v=7";
-import { renderDashboard } from "./pages/dashboard.js?v=7";
-import { renderPersonnelList } from "./pages/personnel.js?v=7";
-import { renderProfile } from "./pages/profile.js?v=7";
-import { renderMatrix } from "./pages/matrix.js?v=7";
-import { renderProtocolsList, renderProtocolDetail } from "./pages/protocols.js?v=7";
-import { renderLocationsList, renderLocationDetail } from "./pages/locations.js?v=7";
-import { renderMapPage } from "./pages/map.js?v=7";
-import { renderAdmin } from "./pages/admin.js?v=7";
+import { seedIfNeeded, globalSearch } from "./store.js?v=8";
+import { isAuthenticated, currentSession, logout, hasRole, ROLES } from "./auth.js?v=8";
+import { registerRoute, resolve, startRouter, navigate, currentPath } from "./router.js?v=8";
+import { esc, sealMark } from "./utils.js?v=8";
+import { renderLogin } from "./pages/login.js?v=8";
+import { renderDashboard } from "./pages/dashboard.js?v=8";
+import { renderPersonnelList } from "./pages/personnel.js?v=8";
+import { renderProfile } from "./pages/profile.js?v=8";
+import { renderMatrix } from "./pages/matrix.js?v=8";
+import { renderProtocolsList, renderProtocolDetail } from "./pages/protocols.js?v=8";
+import { renderLocationsList, renderLocationDetail } from "./pages/locations.js?v=8";
+import { renderMapPage } from "./pages/map.js?v=8";
+import { renderAdmin } from "./pages/admin.js?v=8";
 
 seedIfNeeded();
 
@@ -26,7 +26,7 @@ const NAV = [
   ]},
   { group: "Állomány & Képzés", items: [
     { path: "/personnel", label: "Állomány", icon: "☰" },
-    { path: "/matrix", label: "Képzési Mátrix", icon: "▦" },
+    { path: "/matrix", label: "Kiképzési Mátrix", icon: "▦" },
     { path: "/protocols", label: "Jegyzőkönyvek", icon: "▤" },
   ]},
   { group: "Objektumok", items: [
