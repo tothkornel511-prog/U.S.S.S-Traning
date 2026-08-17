@@ -9,7 +9,7 @@
 import {
   LEVELS, SERVICE_STATUSES, POSITIONS, MODULES, LEVEL_MODULE_ORDER,
   PERSONNEL, ACCESS_CODES, PROTECTED_LOCATIONS, AUDIT_LOG_SEED, MAPS, DISTRICTS,
-} from "./data.js?v=17";
+} from "./data.js?v=18";
 
 /* v7: Roxwood/Cayo Perico eltávolítva, csak Los Santos térkép maradt. */
 const NS = "usss_ets_v7_";
@@ -98,6 +98,7 @@ export function seedIfNeeded() {
   applyPositionPatch();
   applyHijSplitPatch();
   applyTheoryFillPatch();
+  applyLocationIdFixPatch();
 }
 
 /* Célzott, egyszeri pozíció-javítás — csak a felsorolt személyek "position"
@@ -183,6 +184,23 @@ function applyTheoryFillPatch() {
   });
   if (changed) savePersonnel(list);
   write(THEORY_FILL_PATCH_KEY, true);
+}
+
+/* Célzott javítás: az upsertLocation-ben volt egy object-spread sorrend hiba,
+   ami miatt az admin felületen újonnan létrehozott védett helyszínek üres
+   ("") id-t kaptak — emiatt rájuk kattintva a #/locations/ útvonal nem
+   illeszkedett egyik route-ra sem, és a rendszer visszadobott a Vezérlőpultra.
+   Ez a patch minden hiányzó/üres id-jű helyszínnek generál egy valódit. */
+const LOCATION_ID_FIX_PATCH_KEY = NS + "location_id_fix_2026_08_17a";
+function applyLocationIdFixPatch() {
+  if (read(LOCATION_ID_FIX_PATCH_KEY, false)) return;
+  const list = getLocations();
+  let changed = false;
+  list.forEach((l) => {
+    if (!l.id) { l.id = uid("LOC"); changed = true; }
+  });
+  if (changed) write(KEYS.locations, list);
+  write(LOCATION_ID_FIX_PATCH_KEY, true);
 }
 
 export function resetAllData() {
@@ -579,8 +597,14 @@ export function upsertLocation(loc, actorLabel) {
   const list = getLocations();
   const idx = list.findIndex((l) => l.id === loc.id);
   const stamped = { ...loc, updatedBy: actorLabel, updatedAt: new Date().toISOString() };
-  if (idx >= 0) list[idx] = { ...list[idx], ...stamped };
-  else list.push({ id: loc.id || uid("LOC"), entrances: [], ...stamped });
+  if (idx >= 0) {
+    list[idx] = { ...list[idx], ...stamped };
+  } else {
+    // A "...stamped" tartalmaz egy explicit id:undefined kulcsot új helyszínnél
+    // (mert a form loc?.id-t küld), ami felülírná a generált ID-t, ha korábban
+    // állna a sorban — ezért az id-nek a spread UTÁN kell jönnie.
+    list.push({ entrances: [], ...stamped, id: loc.id || uid("LOC") });
+  }
   write(KEYS.locations, list);
   logAudit(actorLabel, "Védett helyszín mentve", stamped.name);
 }
@@ -603,7 +627,7 @@ export function upsertDistrict(district, actorLabel) {
   const list = getDistricts();
   const idx = list.findIndex((d) => d.id === district.id);
   if (idx >= 0) list[idx] = { ...list[idx], ...district };
-  else list.push({ id: uid("D"), ...district });
+  else list.push({ ...district, id: district.id || uid("D") });
   write(KEYS.districts, list);
   logAudit(actorLabel, "Körzet mentve", `${district.name} (${district.map})`);
 }
