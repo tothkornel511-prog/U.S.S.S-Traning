@@ -8,19 +8,26 @@
 
 import {
   LEVELS, SERVICE_STATUSES, POSITIONS, MODULES, LEVEL_MODULE_ORDER,
-  PERSONNEL, ACCESS_CODES, PROTECTED_LOCATIONS, AUDIT_LOG_SEED,
+  PERSONNEL, ACCESS_CODES, PROTECTED_LOCATIONS, AUDIT_LOG_SEED, MAPS, DISTRICTS,
 } from "./data.js";
 
-const NS = "usss_ets_v1_";
+/* v2: teljes állomány- és képzésreset (mindenki próbaidős, nulla előzmény),
+   térkép/körzet adatok bevezetése — a névtér-verzió emelése garantálja, hogy
+   minden korábban seedelt böngésző is a friss alapadatokkal induljon újra. */
+const NS = "usss_ets_v2_";
 const KEYS = {
   personnel: NS + "personnel",
   accessCodes: NS + "access_codes",
   locations: NS + "locations",
+  districts: NS + "districts",
   protocols: NS + "protocols",
   auditLog: NS + "audit_log",
   seeded: NS + "seeded",
   nextProtocol: NS + "next_protocol_seq",
 };
+
+/* Elméleti vizsgánál ez alatt a százalék alatt a modul nem számít teljesítettnek. */
+export const THEORY_PASS_THRESHOLD = 80;
 
 function read(key, fallback) {
   try {
@@ -64,6 +71,7 @@ export function seedIfNeeded() {
   write(KEYS.personnel, seedPersonnel());
   write(KEYS.accessCodes, ACCESS_CODES);
   write(KEYS.locations, PROTECTED_LOCATIONS);
+  write(KEYS.districts, DISTRICTS);
   write(KEYS.protocols, []);
   write(KEYS.auditLog, AUDIT_LOG_SEED);
   write(KEYS.nextProtocol, 1);
@@ -76,7 +84,11 @@ export function resetAllData() {
 }
 
 /* ---------- Static reference data ------------------------------------ */
-export const ref = { LEVELS, SERVICE_STATUSES, POSITIONS, MODULES, LEVEL_MODULE_ORDER };
+export const ref = { LEVELS, SERVICE_STATUSES, POSITIONS, MODULES, LEVEL_MODULE_ORDER, MAPS };
+
+export function mapById(id) {
+  return MAPS.find((m) => m.id === id) || MAPS[0];
+}
 
 export function moduleByCode(code) {
   return MODULES.find((m) => m.code === code);
@@ -136,9 +148,14 @@ export function moduleState(person, code) {
   const needsTheory = def.theory;
   const needsPractical = def.practical;
 
-  const theoryDone = !needsTheory || (theory !== null && theory !== undefined);
+  const theorySubmitted = theory !== null && theory !== undefined;
+  const theoryPassed = theorySubmitted && theory >= THEORY_PASS_THRESHOLD;
+  const theoryDone = !needsTheory || theoryPassed;
 
   if (!theoryDone) {
+    if (theorySubmitted) {
+      return { color: "red", label: `Elméleti vizsga sikertelen (<${THEORY_PASS_THRESHOLD}%)`, theory, practical };
+    }
     return { color: "red", label: "Nincs teljesítve", theory, practical };
   }
   if (!needsPractical) {
@@ -181,9 +198,40 @@ export function setModuleTheory(usssId, code, { theory, theoryDate, examiner }, 
   p.modules[code].theory = theory;
   p.modules[code].theoryDate = theoryDate || new Date().toISOString().slice(0, 10);
   p.modules[code].examiner = examiner || "";
+  p.modules[code].history = p.modules[code].history || [];
+  if (theory !== null && theory !== undefined) {
+    p.modules[code].history.push({
+      date: new Date(theoryDate || Date.now()).toISOString(),
+      type: "theory",
+      theory,
+      result: theory >= THEORY_PASS_THRESHOLD ? "pass" : "fail",
+    });
+  }
   savePersonnel(list);
-  logAudit(actorLabel, "Elméleti eredmény rögzítve", `${p.name} – ${code}: ${theory}%`);
+  logAudit(actorLabel, "Elméleti eredmény rögzítve",
+    `${p.name} – ${code}: ${theory}% (${theory >= THEORY_PASS_THRESHOLD ? "sikeres" : "sikertelen"})`);
   checkLevelUpEligibility(p, actorLabel);
+}
+
+/* Egy személy összes elméleti/gyakorlati próbálkozása a modul-előzményekből. */
+export function examStats(person) {
+  let theoryAttempts = 0, theoryPass = 0, theoryFail = 0, practicalPass = 0, practicalFail = 0;
+  Object.values(person.modules || {}).forEach((rec) => {
+    (rec.history || []).forEach((h) => {
+      if (h.type === "theory") {
+        theoryAttempts++;
+        if (h.result === "pass") theoryPass++; else theoryFail++;
+      } else if (h.result === "pass") {
+        practicalPass++;
+      } else if (h.result === "fail") {
+        practicalFail++;
+      }
+    });
+  });
+  return {
+    theoryAttempts, theoryPass, theoryFail, practicalPass, practicalFail,
+    totalAttempts: theoryAttempts + practicalPass + practicalFail,
+  };
 }
 
 export function setModulePractical(usssId, code, result, actorLabel) {
@@ -361,6 +409,29 @@ export function upsertLocation(loc, actorLabel) {
 export function deleteLocation(id, actorLabel) {
   write(KEYS.locations, getLocations().filter((l) => l.id !== id));
   logAudit(actorLabel, "Védett helyszín törölve", id);
+}
+export function locationsForMap(mapId) {
+  return getLocations().filter((l) => (l.map || "los-santos") === mapId);
+}
+
+/* ---------- Körzet-feliratok a Térkép oldalhoz --------------------------*/
+export function getDistricts() {
+  return read(KEYS.districts, []);
+}
+export function districtsForMap(mapId) {
+  return getDistricts().filter((d) => d.map === mapId);
+}
+export function upsertDistrict(district, actorLabel) {
+  const list = getDistricts();
+  const idx = list.findIndex((d) => d.id === district.id);
+  if (idx >= 0) list[idx] = { ...list[idx], ...district };
+  else list.push({ id: uid("D"), ...district });
+  write(KEYS.districts, list);
+  logAudit(actorLabel, "Körzet mentve", `${district.name} (${district.map})`);
+}
+export function deleteDistrict(id, actorLabel) {
+  write(KEYS.districts, getDistricts().filter((d) => d.id !== id));
+  logAudit(actorLabel, "Körzet törölve", id);
 }
 
 /* ---------- Audit log ----------------------------------------------------*/

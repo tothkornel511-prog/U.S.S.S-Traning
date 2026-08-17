@@ -1,7 +1,7 @@
 import {
   getPerson, ref, moduleState, readinessPercent, levelProgress, probationInfo,
   setModuleTheory, setModulePractical, approveLevelUp, nextLevelId, liftProbation,
-  levelLabel, moduleByCode,
+  levelLabel, moduleByCode, examStats, THEORY_PASS_THRESHOLD,
 } from "../store.js";
 import { hasRole, actorLabel } from "../auth.js";
 import { esc, initials, fmtDate, fmtDateTime, toast, openModal, closeModal } from "../utils.js";
@@ -24,12 +24,7 @@ export function renderProfile(container, usssId) {
   const totalModules = new Set(Object.entries(ref.LEVEL_MODULE_ORDER).filter(([k]) => k !== "SPEC").flatMap(([, v]) => v)).size;
   const completedModules = Object.keys(person.modules || {}).filter((c) => moduleState(person, c).color === "green").length;
 
-  let theoryCount = 0, practicalPass = 0, practicalFail = 0;
-  Object.values(person.modules || {}).forEach((rec) => {
-    if (rec.theory !== null && rec.theory !== undefined) theoryCount++;
-    if (rec.practical === "pass") practicalPass++;
-    if (rec.practical === "fail") practicalFail++;
-  });
+  const exam = examStats(person);
 
   container.innerHTML = `
     <a href="#/personnel" class="text-low small">← Vissza az állományhoz</a>
@@ -53,7 +48,7 @@ export function renderProfile(container, usssId) {
 
     <div class="grid grid-3 section">
       <div class="card"><div class="card-title">Training Readiness</div><div class="card-value">${readiness}%</div><div class="progress mt-1"><div style="width:${readiness}%"></div></div></div>
-      <div class="card"><div class="card-title">Teljesített modulok</div><div class="card-value">${completedModules} / ${totalModules}</div><div class="card-sub">Elméleti vizsgák: ${theoryCount} · Gyakorlati siker: ${practicalPass} · Sikertelen: ${practicalFail}</div></div>
+      <div class="card"><div class="card-title">Teljesített modulok</div><div class="card-value">${completedModules} / ${totalModules}</div><div class="card-sub">Vizsgák összesen: ${exam.totalAttempts} · Elmélet: ${exam.theoryPass} sikeres / ${exam.theoryFail} sikertelen · Gyakorlat: ${exam.practicalPass} sikeres / ${exam.practicalFail} sikertelen</div></div>
       <div class="card"><div class="card-title">Szakirányok</div><div class="card-value" style="font-size:20px">${specialtyBadges(person)}</div></div>
     </div>
 
@@ -121,7 +116,7 @@ function renderTab(person, canEdit) {
                 <span class="text-hi">${esc(def.name)}</span>
               </div>
               <div class="flex items-center gap-1">
-                ${st.theory !== null && st.theory !== undefined ? `<span class="text-low small">${st.theory}%</span>` : ""}
+                ${st.theory !== null && st.theory !== undefined ? `<span class="small" style="color:${st.theory >= THEORY_PASS_THRESHOLD ? "var(--green)" : "var(--red)"}">${st.theory}%</span>` : ""}
                 <span class="badge badge-${st.color}">${esc(st.label)}</span>
               </div>
             </div>`;
@@ -177,7 +172,11 @@ export function openModuleDetail(person, code, canEdit, onUpdate) {
       <button class="modal-close" data-close-modal>×</button>
     </div>
     <div class="flex gap-2 mb-2">
-      <div class="card" style="flex:1"><div class="card-title">Elmélet</div><div class="card-value" style="font-size:22px">${st.theory !== null && st.theory !== undefined ? st.theory + "%" : "—"}</div></div>
+      <div class="card" style="flex:1">
+        <div class="card-title">Elmélet</div>
+        <div class="card-value" style="font-size:22px">${st.theory !== null && st.theory !== undefined ? st.theory + "%" : "—"}</div>
+        ${st.theory !== null && st.theory !== undefined ? `<span class="badge ${st.theory >= THEORY_PASS_THRESHOLD ? "badge-green" : "badge-red"} mt-1">${st.theory >= THEORY_PASS_THRESHOLD ? "Sikeres" : `Sikertelen (<${THEORY_PASS_THRESHOLD}%)`}</span>` : ""}
+      </div>
       <div class="card" style="flex:1"><div class="card-title">Gyakorlat</div><div class="card-value" style="font-size:22px"><span class="badge ${resultColor(st.practical)}">${esc(resultLabel(st.practical) || "—")}</span></div></div>
     </div>
 
@@ -204,7 +203,7 @@ export function openModuleDetail(person, code, canEdit, onUpdate) {
     <div class="divider"></div>
     <div class="card-title mb-1">Vizsgatörténet</div>
     ${history.length ? history.slice().reverse().map((h) => `
-      <div class="history-item"><span>${h.theory !== null && h.theory !== undefined ? h.theory + "% · " : ""}próbálkozás</span>
+      <div class="history-item"><span>${esc(h.type === "theory" ? "Elméleti" : "Gyakorlati")} próbálkozás ${h.theory !== null && h.theory !== undefined ? `· ${h.theory}%` : ""}</span>
       <span><span class="badge ${resultColor(h.result)}">${esc(resultLabel(h.result))}</span> <span class="text-low">${fmtDate(h.date)}</span></span></div>
     `).join("") : `<div class="text-low small">Nincs korábbi próbálkozás.</div>`}
   `);

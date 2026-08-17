@@ -13,6 +13,7 @@ import { renderProfile } from "./pages/profile.js";
 import { renderMatrix } from "./pages/matrix.js";
 import { renderProtocolsList, renderProtocolDetail } from "./pages/protocols.js";
 import { renderLocationsList, renderLocationDetail } from "./pages/locations.js";
+import { renderMapPage } from "./pages/map.js";
 import { renderAdmin } from "./pages/admin.js";
 
 seedIfNeeded();
@@ -30,6 +31,7 @@ const NAV = [
   ]},
   { group: "Objektumok", items: [
     { path: "/locations", label: "Védett helyszínek", icon: "◆" },
+    { path: "/map", label: "Térkép", icon: "🗺" },
   ]},
   { group: "Rendszer", items: [
     { path: "/admin", label: "Adminisztráció", icon: "⚙", minRole: "TRAINING" },
@@ -40,6 +42,7 @@ function pageTitleFor(path) {
   if (path.startsWith("/personnel/")) return { crumb: "Állomány", title: "Személyi profil" };
   if (path.startsWith("/protocols/")) return { crumb: "Jegyzőkönyvek", title: "Jegyzőkönyv részletei" };
   if (path.startsWith("/locations/")) return { crumb: "Objektumok", title: "Helyszín részletei" };
+  if (path.startsWith("/map")) return { crumb: "Objektumok", title: "Térkép" };
   const flat = NAV.flatMap((g) => g.items);
   const found = flat.find((i) => i.path === path);
   return found ? { crumb: found.label, title: found.label } : { crumb: "", title: "U.S.S.S." };
@@ -146,7 +149,7 @@ function renderNav() {
       <div class="nav-group">
         <div class="nav-group-label">${esc(group.group)}</div>
         ${items.map((i) => `
-          <a href="#${i.path}" class="nav-link ${path === i.path ? "active" : ""}">
+          <a href="#${i.path}" class="nav-link ${(path === i.path || path.startsWith(i.path + "/")) ? "active" : ""}">
             <span class="ic">${i.icon}</span>${esc(i.label)}
           </a>`).join("")}
       </div>`;
@@ -162,6 +165,8 @@ registerRoute("/protocols", () => renderProtocolsList(document.getElementById("c
 registerRoute("/protocols/:id", (p) => renderProtocolDetail(document.getElementById("content"), p.id));
 registerRoute("/locations", () => renderLocationsList(document.getElementById("content")));
 registerRoute("/locations/:id", (p) => renderLocationDetail(document.getElementById("content"), p.id));
+registerRoute("/map", () => renderMapPage(document.getElementById("content")));
+registerRoute("/map/:mapId", (p) => renderMapPage(document.getElementById("content"), p.mapId));
 registerRoute("/admin", () => renderAdmin(document.getElementById("content")));
 
 function onRouteChange() {

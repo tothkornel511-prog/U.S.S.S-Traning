@@ -89,27 +89,29 @@ export const LEVEL_MODULE_ORDER = {
   "SPEC":["ADM", "LSNTA"],
 };
 
-/* Kezdeti állomány. A % értékek NEM végleges adatok — csak minta-kitöltés. */
+/* Kezdeti állomány. Teljes visszaállítás: mindenki 0. szint (Próbaidős) /
+   Újonc státusszal indul, semmilyen képzési előzmény nélkül — az admin
+   innen állítja majd be egyénileg a tényleges szinteket és eredményeket. */
 export const PERSONNEL = [
-  { usssId: "USSS-004", name: "Tyron Wolf",                  position: "U.S.S.S Director", level: "III", status: "Aktív"  },
-  { usssId: "USSS-80",  name: "Oliver Smith",                position: "U.S.S.S Agent",    level: "III", status: "Aktív"  },
-  { usssId: "USSS-91",  name: "Titus Long",                  position: "U.S.S.S Agent",    level: "II",  status: "Aktív"  },
-  { usssId: "USSS-121", name: "Alexander Freamen",           position: "U.S.S.S Agent",    level: "I",   status: "Újonc"  },
-  { usssId: "USSS-112", name: "Brian Sorrento",               position: "U.S.S.S Agent",    level: "IV",  status: "Aktív"  },
-  { usssId: "USSS-119", name: "Dr. Rick Deckard",             position: "Secretary of Health", level: "II", status: "Aktív" },
-  { usssId: "USSS-8",   name: "Günther Grün",                 position: "U.S.S.S Agent",    level: "V",   status: "Aktív"  },
-  { usssId: "USSS-120", name: "Harrelson Grant",               position: "U.S.S.S Agent",    level: "0",   status: "Újonc"  },
-  { usssId: "USSS-111", name: "Harvey Ross",                   position: "U.S.S.S Agent",    level: "III", status: "Aktív"  },
-  { usssId: "USSS-124", name: "Jensen Walker",                 position: "U.S.S.S Agent",    level: "0",   status: "Újonc"  },
-  { usssId: "USSS-92",  name: "John Smith",                    position: "U.S.S.S Agent",    level: "II",  status: "Inaktív" },
-  { usssId: "USSS-107", name: "Matthew Willams",               position: "U.S.S.S Agent",    level: "I",   status: "Aktív"  },
-  { usssId: "USSS-106", name: "Michel Smith",                  position: "U.S.S.S Agent",    level: "III", status: "Felfüggesztett" },
-  { usssId: "USSS-123", name: "Valentino Rossi",                position: "U.S.S.S Agent",    level: "IV",  status: "Aktív"  },
-  { usssId: "USSS-50",  name: "Henry Hudson",                   position: "U.S.S.S Director", level: "V",   status: "Aktív"  },
-  { usssId: "USSS-98",  name: "Christoph Norbert Kleinemann",   position: "U.S.S.S Agent",    level: "II",  status: "Aktív"  },
-  { usssId: "USSS-118", name: "Dominic Hayes",                  position: "U.S.S.S Agent",    level: "III", status: "Aktív"  },
-  { usssId: "USSS-96",  name: "Dr. Hajas Ricsi",                position: "Attorney General",  level: "II", status: "Aktív"  },
-  { usssId: "USSS-109", name: "Dr. Lakatos László",             position: "Judge",             level: "I",  status: "Aktív"  },
+  { usssId: "USSS-004", name: "Tyron Wolf",                  position: "U.S.S.S Director",   level: "0", status: "Újonc" },
+  { usssId: "USSS-80",  name: "Oliver Smith",                position: "U.S.S.S Agent",      level: "0", status: "Újonc" },
+  { usssId: "USSS-91",  name: "Titus Long",                  position: "U.S.S.S Agent",      level: "0", status: "Újonc" },
+  { usssId: "USSS-121", name: "Alexander Freamen",           position: "U.S.S.S Agent",      level: "0", status: "Újonc" },
+  { usssId: "USSS-112", name: "Brian Sorrento",               position: "U.S.S.S Agent",      level: "0", status: "Újonc" },
+  { usssId: "USSS-119", name: "Dr. Rick Deckard",             position: "Secretary of Health", level: "0", status: "Újonc" },
+  { usssId: "USSS-8",   name: "Günther Grün",                 position: "U.S.S.S Agent",      level: "0", status: "Újonc" },
+  { usssId: "USSS-120", name: "Harrelson Grant",               position: "U.S.S.S Agent",      level: "0", status: "Újonc" },
+  { usssId: "USSS-111", name: "Harvey Ross",                   position: "U.S.S.S Agent",      level: "0", status: "Újonc" },
+  { usssId: "USSS-124", name: "Jensen Walker",                 position: "U.S.S.S Agent",      level: "0", status: "Újonc" },
+  { usssId: "USSS-92",  name: "John Smith",                    position: "U.S.S.S Agent",      level: "0", status: "Újonc" },
+  { usssId: "USSS-107", name: "Matthew Willams",               position: "U.S.S.S Agent",      level: "0", status: "Újonc" },
+  { usssId: "USSS-106", name: "Michel Smith",                  position: "U.S.S.S Agent",      level: "0", status: "Újonc" },
+  { usssId: "USSS-123", name: "Valentino Rossi",                position: "U.S.S.S Agent",      level: "0", status: "Újonc" },
+  { usssId: "USSS-50",  name: "Henry Hudson",                   position: "U.S.S.S Director",   level: "0", status: "Újonc" },
+  { usssId: "USSS-98",  name: "Christoph Norbert Kleinemann",   position: "U.S.S.S Agent",      level: "0", status: "Újonc" },
+  { usssId: "USSS-118", name: "Dominic Hayes",                  position: "U.S.S.S Agent",      level: "0", status: "Újonc" },
+  { usssId: "USSS-96",  name: "Dr. Hajas Ricsi",                position: "Attorney General",    level: "0", status: "Újonc" },
+  { usssId: "USSS-109", name: "Dr. Lakatos László",             position: "Judge",               level: "0", status: "Újonc" },
 ];
 
 /* Kezdeti hozzáférési kódok (Admin később szerkesztheti / generálhatja / visszavonhatja) */
@@ -119,11 +121,39 @@ export const ACCESS_CODES = [
   { usssId: "USSS-98",  code: "5PLZ-8XWQ", role: "TRAINING" }, // Christoph Norbert Kleinemann
 ];
 
+/* Elérhető GTA térképek a Védett helyszínekhez / Térkép oldalhoz. Az "image"
+   útvonalra kell feltölteni a tényleges térképfájlt (jpg/png) — amíg az
+   nincs ott, a térkép-nézet erről tájékoztat, de a pöttyök/körzetek attól
+   még szerkeszthetők és megjelennek egy sötét placeholder felületen. */
+export const MAPS = [
+  { id: "los-santos",  name: "Los Santos & Blaine County", image: "assets/maps/los-santos.jpg" },
+  { id: "roxwood",     name: "Roxwood",                    image: "assets/maps/roxwood.jpg" },
+  { id: "cayo-perico", name: "Cayo Perico",                image: "assets/maps/cayo-perico.jpg" },
+];
+
+/* Körzet-feliratok a Térkép oldalon. Kezdeti, hozzávetőleges pozíciók —
+   admin/training a Térkép oldalon a térképre kattintva pontosíthatja,
+   miután a tényleges térképkép fel lett töltve. */
+export const DISTRICTS = [
+  { id: "D-001", map: "los-santos", name: "Downtown",       x: 51, y: 78 },
+  { id: "D-002", map: "los-santos", name: "Vinewood",       x: 47, y: 72 },
+  { id: "D-003", map: "los-santos", name: "Rockford Hills", x: 44, y: 75 },
+  { id: "D-004", map: "los-santos", name: "Del Perro",      x: 38, y: 76 },
+  { id: "D-005", map: "los-santos", name: "La Mesa",        x: 55, y: 76 },
+  { id: "D-006", map: "los-santos", name: "Sandy Shores",   x: 62, y: 45 },
+  { id: "D-007", map: "los-santos", name: "Paleto Bay",     x: 55, y: 15 },
+  { id: "D-008", map: "los-santos", name: "Grapeseed",      x: 66, y: 22 },
+  { id: "D-009", map: "los-santos", name: "Chumash",        x: 20, y: 55 },
+  { id: "D-010", map: "cayo-perico", name: "El Rubio Compound", x: 45, y: 50 },
+  { id: "D-011", map: "cayo-perico", name: "Airstrip",          x: 20, y: 30 },
+];
+
 export const PROTECTED_LOCATIONS = [
   {
     id: "LOC-001",
     name: "Government Building",
     place: "Los Santos, Downtown",
+    map: "los-santos",
     description: "Az önkormányzat és a kormányzati vezetés elsődleges székhelye. Fokozott U.S.S.S. jelenlét.",
     image: "",
     x: 52, y: 46,
@@ -139,6 +169,7 @@ export const PROTECTED_LOCATIONS = [
     id: "LOC-002",
     name: "Pillbox Medical Center",
     place: "Los Santos, Strawberry",
+    map: "los-santos",
     description: "Kiemelt egészségügyi intézmény, sérült tisztviselők és VIP ellátása.",
     image: "",
     x: 46, y: 58,
@@ -151,19 +182,5 @@ export const PROTECTED_LOCATIONS = [
   },
 ];
 
-export const AUDIT_LOG_SEED = [
-  {
-    id: "AL-0001",
-    timestamp: "2026-08-17T18:42:00.000Z",
-    actor: "Training Officer",
-    action: "Gyakorlati vizsga módosítva",
-    detail: "Oliver Smith – F1: Sikertelen → Sikeres",
-  },
-  {
-    id: "AL-0002",
-    timestamp: "2026-08-16T09:15:00.000Z",
-    actor: "Commander",
-    action: "Szintlépés jóváhagyva",
-    detail: "Dominic Hayes: III. szint → IV. szint",
-  },
-];
+/* Teljes visszaállítás: nincs korábbi vizsga- vagy szintlépés-esemény. */
+export const AUDIT_LOG_SEED = [];

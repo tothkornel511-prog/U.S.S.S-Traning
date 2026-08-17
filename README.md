@@ -16,9 +16,15 @@ vanilla JS ES modulokkal, localStorage adatréteggel.
   színkódolt állapotokkal (🔴/🟡/🟢), cellára kattintva megnyílik a modul részlete
 - **Oktatási jegyzőkönyvek** — automatikus azonosító (TR-2026-001…), résztvevők,
   amelyek a személyek képzési előzményébe is bekerülnek
-- **Védett helyszínek** — leírás, bejáratok, egyszerű kattintható térkép-előnézet
-  (később valódi GTA V térképréteg illeszthető be)
+- **Védett helyszínek** — leírás, bejáratok, nagyítható/panozható térkép-előnézet
+- **Térkép** — külön oldal Los Santos / Roxwood / Cayo Perico térképekkel, az
+  összes regisztrált védett helyszínnel és szerkeszthető körzet-feliratokkal
+  (lásd `assets/maps/README.md` a térképképek feltöltéséhez)
 - **Adminisztráció** — hozzáférés-kezelés, kódgenerálás, audit log
+
+Elméleti vizsgánál **80% alatt a modul nem számít teljesítettnek** — a
+rendszer minden próbálkozást (elméleti és gyakorlati is) elment, és a
+profilon/modul-részletben megszámolja a sikeres/sikertelen vizsgák számát.
 
 ## Helyi futtatás
 
@@ -49,10 +55,12 @@ js/
   router.js     – egyszerű hash-router
   auth.js       – bejelentkezés, szerepkör-ellenőrzés
   store.js      – adatréteg (localStorage), üzleti logika (modul-állapot,
-                  készenlét %, próbaidő-számítás, szintlépés stb.)
-  data.js       – kezdeti minta-adatok (32 modul, állomány, pozíciók…)
-  utils.js      – UI segédfüggvények (escape, toast, modal, dátum-formázás)
-  pages/        – oldalankénti render-modulok
+                  készenlét %, próbaidő-számítás, szintlépés, vizsgastatisztika stb.)
+  data.js       – kezdeti minta-adatok (32 modul, állomány, pozíciók, térképek…)
+  utils.js      – UI segédfüggvények (escape, toast, modal, dátum-formázás, pecsét-SVG)
+  mapview.js    – újrafelhasználható nagyítható/panozható térkép-komponens
+  pages/        – oldalankénti render-modulok (a map.js a Térkép oldal)
+assets/maps/    – ide kerülnek a térképképek (lásd assets/maps/README.md)
 ```
 
 ## Adatkezelés / későbbi backend
