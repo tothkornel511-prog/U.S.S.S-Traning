@@ -15,7 +15,7 @@ import { renderProtocolsList, renderProtocolDetail } from "./pages/protocols.js?
 import { renderLocationsList, renderLocationDetail } from "./pages/locations.js?v=20";
 import { renderMapPage } from "./pages/map.js?v=20";
 import { renderRecruitmentList, renderApplicantDetail } from "./pages/recruitment.js?v=20";
-import { renderExamList, renderExamDetail } from "./pages/exam.js?v=21";
+import { renderExamList, renderExamDetail } from "./pages/exam.js?v=22";
 import { renderAdmin } from "./pages/admin.js?v=20";
 
 seedIfNeeded();

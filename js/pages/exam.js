@@ -1,7 +1,7 @@
 import {
   getExams, getExam, createExam, setExamAnswer, setExamFinalComment, finishExam, deleteExam,
   getExamQuestions, getExamCategories, examScoreSummary, EXAM_MAX_SCORE, EXAM_PASS_PCT,
-} from "../store.js?v=21";
+} from "../store.js?v=22";
 import { hasRole, actorLabel, currentSession } from "../auth.js?v=20";
 import { esc, fmtDate, fmtDateTime, toast, openModal, closeModal } from "../utils.js?v=20";
 import { navigate } from "../router.js?v=20";
@@ -9,6 +9,7 @@ import { navigate } from "../router.js?v=20";
 export function renderExamList(container) {
   const canEdit = hasRole("TRAINING");
   const exams = getExams();
+  const questions = getExamQuestions();
 
   container.innerHTML = `
     <div class="classification-strip">U.S.S.S. FELVÉTELI VIZSGA · KIZÁRÓLAG OKTATÁSVEZETŐI HASZNÁLATRA</div>
@@ -26,6 +27,16 @@ export function renderExamList(container) {
       <thead><tr><th>ID</th><th>Jelölt</th><th>Dátum</th><th>Pontszám</th><th>%</th><th>Eredmény</th><th>Vizsgáztató</th></tr></thead>
       <tbody id="exam-rows"></tbody>
     </table></div>
+    <details class="card mt-2" open>
+      <summary class="card-title" style="cursor:pointer">U.S.S.S. IC kérdésbank · ${questions.length} kérdés</summary>
+      <p class="text-low small mt-1">A kérdéseket a vizsgáztató szóban, IC-ben teszi fel. A jelentkező a weboldalt nem használja.</p>
+      ${getExamCategories().map((category) => `
+        <div class="section mt-2">
+          <div class="card-title mb-1">${esc(category)}</div>
+          ${questions.filter((q) => q.category === category).map((q) => `<div class="history-item"><span class="module-code">Q${String(q.num).padStart(2, "0")}</span><span>${esc(q.text)}</span></div>`).join("")}
+        </div>
+      `).join("")}
+    </details>
   `;
 
   container.querySelectorAll("[data-nav]").forEach((n) => n.addEventListener("click", () => navigate(n.getAttribute("data-nav"))));
