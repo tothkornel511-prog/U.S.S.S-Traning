@@ -213,7 +213,7 @@ export const EXAM_CATEGORIES = [
   "VI. CSAPATMUNKA / DÖNTÉSHOZATAL",
 ];
 
-export const EXAM_QUESTIONS = [
+const LEGACY_EXAM_QUESTIONS = [
   { id: "Q01", num: 1, category: EXAM_CATEGORIES[0],
     text: "Miért szeretne az United States Secret Service állományába jelentkezni?",
     tips: ["komoly motiváció", "szolgálat", "felelősségvállalás", "emberek védelme", "hosszú távú elköteleződés"],
@@ -330,3 +330,68 @@ export const EXAM_QUESTIONS = [
   { id: "Q39", num: 39, category: EXAM_CATEGORIES[5], text: "Észreveszi, hogy egyik kollégája nem figyel megfelelően. Mit tesz?", tips: ["azonnali jelzés", "korrekció", "jelentés"] },
   { id: "Q40", num: 40, category: EXAM_CATEGORIES[5], text: "Szolgálat közben hibázik, és komolyabb helyzet alakul ki. Mit tesz közvetlenül utána?", tips: ["felelősségvállalás", "kárelhárítás", "jelentés"] },
 ];
+
+const EXAM_QUESTION_TEXTS = [
+  ["I. SZEMÉLYES / MOTIVÁCIÓ", [
+    "Miért szeretne az önkormányzat testőrségéhez csatlakozni?",
+    "Mi fogta meg Önt ebben a munkában?",
+    "Miért gondolja úgy, hogy alkalmas lenne erre a feladatra?",
+    "Ön szerint milyen egy jó testőr?",
+    "Melyik tulajdonságát tartja a legerősebbnek, ami ebben a munkában előnyt jelenthet?",
+    "Van olyan tulajdonsága, amin Ön szerint még javítania kellene?",
+    "Hogyan viseli, ha egy felettese kijavítja vagy kritizálja a munkáját?",
+    "Mit jelent Önnek a fegyelem egy ilyen szolgálatban?",
+    "Mit jelent Önnek az, hogy egy másik ember biztonságáért Ön is felelős?",
+    "Ha hibázik szolgálat közben, hogyan kezeli a helyzetet?",
+  ]],
+  ["II. VÉDETT SZEMÉLY MELLETT", [
+    "Megérkeznek a védett személlyel egy hivatalos eseményre. Többen várják Önöket a bejáratnál, és első ránézésre nem látja át teljesen a környéket. Mit csinál, mielőtt a védett személy kiszállna?",
+    "A védett személy be szeretne menni egy étterembe, de Ön úgy látja, hogy bent nagyon nagy a tömeg, és nehéz lenne megfelelően biztosítani. Mit tenne?",
+    "Egy civil folyamatosan a védett személy közelében marad, és láthatóan figyeli őt. Ön mit tenne?",
+    "A védett személy menet közben hirtelen megváltoztatja a programját, és egy olyan helyre szeretne menni, amiről Ön előzetesen nem tudott. Hogyan reagálna?",
+    "Egy civil egyszerűen odalépne a védett személyhez, hogy beszéljen vele. Hogyan kezelné a helyzetet?",
+    "A védett személy azt mondja Önnek, hogy ne álljon ilyen közel hozzá, mert zavarja. Mit tenne?",
+  ]],
+  ["III. KOMOLYABB SZITUÁCIÓK", [
+    "A védett személy mellett van, amikor hirtelen lövés dördül. Nem tudja, honnan jött. Mihez kezd elsőként?",
+    "Egy férfi elővesz egy fegyvert a védett személy közelében. Mi a teendője?",
+    "A védett személy megsérül egy támadás során, de Ön még nem látja biztonságosnak a környéket. Hogyan járna el?",
+    "Egy személy agresszívan közeledik a védett személy felé, közben pedig folyamatosan fenyegetőzik. Mit tesz?",
+    "Egy rendezvényen valaki átjut a biztosításon, és egyenesen a védett személy felé indul. Hogyan reagálna?",
+    "A védett személy összeveszik egy civillel, és azt mondja Önnek, hogy hagyja, hadd rendezze le vele. Mit tenne?",
+    "Veszélyes helyzet alakul ki, de a védett személy nem akar elmenni a helyszínről. Hogyan győzné meg arról, hogy távozzon?",
+    "Egy helyzet közben az egyik kollégája megsérül, miközben a védett személy még mindig veszélyben van. Mit csinálna?",
+  ]],
+  ["IV. GÉPJÁRMŰVES SZOLGÁLAT", [
+    "Indulás előtt Önnek kell biztosítania, hogy a védett személy rendben el tudjon indulni. Mit ellenőrizne?",
+    "A védett személlyel odaérnek az autóhoz, de egy ismeretlen ember közvetlenül a jármű mellett áll. Mit tesz?",
+    "Útközben kiderül, hogy az eredeti útvonalon nem lehet továbbhaladni. Hogyan oldaná meg a helyzetet?",
+    "A védett személy menet közben közli, hogy mégsem oda szeretne menni, ahová eredetileg indultak. Mit tenne?",
+    "A védett személy autója lerobban egy forgalmas helyen. Mihez kezd?",
+    "Egy több járműből álló kísérés során elveszíti a kapcsolatot az egyik kísérőautóval. Hogyan jár el?",
+  ]],
+  ["V. RENDEZVÉNY / TÖMEG", [
+    "Egy nagyobb rendezvényre érkeznek, ahol már a bejáratnál nagy tömeg várja a védett személyt. Hogyan oldaná meg az érkezést?",
+    "A tömeg hirtelen megindul a védett személy felé. Mihez kezd?",
+    "A védett személy közelében két ember összeverekszik, és közben egyre többen gyűlnek köréjük. Hogyan kezeli a helyzetet?",
+    "A rendezvény végén ki kell vinni a védett személyt, de a megbeszélt kijáratnál akkora tömeg van, hogy nem lehet biztonságosan kijutni. Mit tesz?",
+    "A védett személy beszédet tart, amikor valaki folyamatosan próbál közelebb kerülni hozzá a tömegen keresztül. Hogyan reagálna?",
+  ]],
+  ["VI. CSAPATMUNKA / DÖNTÉSHOZATAL", [
+    "Észreveszi, hogy az egyik kollégája nem figyel megfelelően a védett személyre. Mit tesz?",
+    "A felettese nincs a helyszínen, közben pedig olyan helyzet alakul ki, amiben azonnal döntenie kell. Hogyan jár el?",
+    "Egy másik frakció munkatársa odajön, és megpróbálja megmondani Önnek, hogyan végezze a védett személy biztosítását. Mit válaszolna neki?",
+    "Ön és a kollégája nem értenek egyet abban, hogyan kellene biztosítani a védett személyt. Hogyan oldaná meg a nézeteltérést?",
+    "Szolgálat közben hibázik, és emiatt kialakul egy komolyabb helyzet. Mit tesz közvetlenül utána?",
+  ]],
+];
+
+export const EXAM_QUESTIONS = EXAM_QUESTION_TEXTS.flatMap(([category, texts]) =>
+  texts.map((text, index) => ({
+    id: `Q${String(EXAM_QUESTION_TEXTS.slice(0, EXAM_QUESTION_TEXTS.findIndex(([name]) => name === category)).reduce((sum, [, items]) => sum + items.length, 0) + index + 1).padStart(2, "0")}`,
+    num: EXAM_QUESTION_TEXTS.slice(0, EXAM_QUESTION_TEXTS.findIndex(([name]) => name === category)).reduce((sum, [, items]) => sum + items.length, 0) + index + 1,
+    category,
+    text,
+    tips: ["helyzet felismerése", "védett személy prioritása", "arányos döntés", "kommunikáció", "együttműködés"],
+  }))
+);
