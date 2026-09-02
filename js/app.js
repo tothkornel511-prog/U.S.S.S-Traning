@@ -48,30 +48,30 @@ const NAV = [
     { path: "/locations", label: "Védett helyszínek", icon: "◆" },
     { path: "/map", label: "Térkép", icon: "🗺" },
   ]},
-  { group: "Command Center", items: [
+  { group: "Parancsnoki Központ", items: [
     { path: "/operations/reports", label: "Jelentések", icon: "▤", minRole: "TRAINING" },
     { path: "/operations/incidents", label: "Incidensek", icon: "!", minRole: "TRAINING" },
-    { path: "/operations/threats", label: "Threat Assessment", icon: "△", minRole: "TRAINING" },
+    { path: "/operations/threats", label: "Fenyegetésértékelés", icon: "△", minRole: "TRAINING" },
     { path: "/operations/events", label: "Események", icon: "◈", minRole: "TRAINING" },
     { path: "/operations/assignments", label: "Feladatok", icon: "▣", minRole: "TRAINING" },
     { path: "/operations/protectees", label: "Védett személyek", icon: "◆", minRole: "TRAINING" },
     { path: "/operations/fleet", label: "Járműflotta", icon: "▰", minRole: "TRAINING" },
     { path: "/operations/escorts", label: "Kísérések", icon: "↗", minRole: "TRAINING" },
-    { path: "/operations/advance", label: "Advance Work", icon: "⌖", minRole: "TRAINING" },
-    { path: "/operations/protection-levels", label: "Protection Levels", icon: "◉", minRole: "TRAINING" },
-    { path: "/operations/protective-plans", label: "Protective Plans", icon: "⬡", minRole: "TRAINING" },
-    { path: "/operations/recommendations", label: "Security Recommendations", icon: "◇", minRole: "TRAINING" },
-    { path: "/operations/intelligence", label: "Protective Intelligence", icon: "⌁", minRole: "TRAINING" },
-    { path: "/operations/after-action", label: "After Action Review", icon: "↻", minRole: "TRAINING" },
-    { path: "/operations/certifications", label: "Certifications", icon: "✦", minRole: "TRAINING" },
-    { path: "/operations/documents", label: "Documents", icon: "▧", minRole: "TRAINING" },
-    { path: "/operations/discipline", label: "Discipline", icon: "⚖", minRole: "TRAINING" },
-    { path: "/operations/recognition", label: "Recognition", icon: "★", minRole: "TRAINING" },
-    { path: "/operations/government", label: "Government Directory", icon: "⌂", minRole: "TRAINING" },
-    { path: "/operations/succession", label: "Presidential Succession", icon: "Ⅰ", minRole: "TRAINING" },
-    { path: "/operations/calendar", label: "Calendar", icon: "▦", minRole: "TRAINING" },
-    { path: "/operations/notifications", label: "Notifications", icon: "◌", minRole: "TRAINING" },
-    { path: "/operations/analytics", label: "Analytics", icon: "▥", minRole: "TRAINING" },
+    { path: "/operations/advance", label: "Előzetes helyszínfelmérés", icon: "⌖", minRole: "TRAINING" },
+    { path: "/operations/protection-levels", label: "Védelmi fokozatok", icon: "◉", minRole: "TRAINING" },
+    { path: "/operations/protective-plans", label: "Védelmi tervek", icon: "⬡", minRole: "TRAINING" },
+    { path: "/operations/recommendations", label: "Biztonsági javaslatok", icon: "◇", minRole: "TRAINING" },
+    { path: "/operations/intelligence", label: "Védelmi információk", icon: "⌁", minRole: "TRAINING" },
+    { path: "/operations/after-action", label: "Utólagos értékelések", icon: "↻", minRole: "TRAINING" },
+    { path: "/operations/certifications", label: "Minősítések", icon: "✦", minRole: "TRAINING" },
+    { path: "/operations/documents", label: "Dokumentumok", icon: "▧", minRole: "TRAINING" },
+    { path: "/operations/discipline", label: "Fegyelmi ügyek", icon: "⚖", minRole: "TRAINING" },
+    { path: "/operations/recognition", label: "Elismerések", icon: "★", minRole: "TRAINING" },
+    { path: "/operations/government", label: "Kormányzati névjegyzék", icon: "⌂", minRole: "TRAINING" },
+    { path: "/operations/succession", label: "Elnöki öröklési sorrend", icon: "Ⅰ", minRole: "TRAINING" },
+    { path: "/operations/calendar", label: "Naptár", icon: "▦", minRole: "TRAINING" },
+    { path: "/operations/notifications", label: "Értesítések", icon: "◌", minRole: "TRAINING" },
+    { path: "/operations/analytics", label: "Elemzések", icon: "▥", minRole: "TRAINING" },
   ]},
   { group: "Rendszer", items: [
     { path: "/admin", label: "Adminisztráció", icon: "⚙", minRole: "TRAINING" },
@@ -100,7 +100,7 @@ function renderShell() {
           <div class="brand-seal">${sealMark(34)}</div>
           <div>
             <div class="brand-name">U.S.S.S. COMMAND</div>
-            <div class="brand-sub">Protective Operations</div>
+            <div class="brand-sub">Védelmi Műveletek</div>
           </div>
         </div>
         <nav id="nav-root" style="flex:1; overflow-y:auto;"></nav>
