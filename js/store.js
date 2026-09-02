@@ -112,6 +112,7 @@ export function seedIfNeeded() {
   applyCommandCenterSeedPatch();
   applyGovernmentHierarchySeedPatch();
   applyCommandCenterCatalogSeedPatch();
+  applyProtecteeScopePatch();
 }
 
 /* Célzott, egyszeri pozíció-javítás — csak a felsorolt személyek "position"
@@ -919,7 +920,7 @@ function applyCommandCenterSeedPatch() {
   const records = read(KEYS.operations, []);
   const existingProtectees = new Set(records.filter((record) => record.type === "protectees").map((record) => record.protectee));
   const now = new Date().toISOString();
-  getPersonnel().forEach((person) => {
+  getPersonnel().filter((person) => isProtectedGovernmentOfficial(person.position)).forEach((person) => {
     if (existingProtectees.has(person.name)) return;
     records.push({
       id: `PTC-${person.usssId}`,
@@ -945,6 +946,20 @@ function applyCommandCenterSeedPatch() {
     });
   });
   write(KEYS.operations, records);
+  write(patchKey, true);
+}
+
+function isProtectedGovernmentOfficial(position) {
+  return position === "President" || position === "Vice President" || position === "Chief Of Staff" || /^Secretary of /.test(position);
+}
+
+function applyProtecteeScopePatch() {
+  const patchKey = NS + "protectee_scope_2026_09_02";
+  if (read(patchKey, false)) return;
+  const protectedNames = new Set(getPersonnel().filter((person) => isProtectedGovernmentOfficial(person.position)).map((person) => person.name));
+  const records = read(KEYS.operations, []);
+  const scoped = records.filter((record) => record.type !== "protectees" || !record.tags?.includes("standing-detail") || protectedNames.has(record.protectee));
+  if (scoped.length !== records.length) write(KEYS.operations, scoped);
   write(patchKey, true);
 }
 
