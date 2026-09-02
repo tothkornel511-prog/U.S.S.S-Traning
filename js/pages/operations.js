@@ -4,7 +4,7 @@ import {
   createOperationRecord,
   updateOperationRecord,
   archiveOperationRecord,
-} from "../store.js?v=36";
+} from "../store.js?v=40";
 import { actorLabel, hasRole } from "../auth.js?v=20";
 import { esc, fmtDate, toast, openModal, closeModal } from "../utils.js?v=20";
 import { navigate } from "../router.js?v=20";
@@ -26,7 +26,7 @@ export function renderOperations(container, type = "reports") {
     <div class="classification-strip">U.S.S.S. PARANCSNOKI KÖZPONT · ${esc(meta.label)}</div>
     <div class="command-page-head">
       <div><div class="eyebrow">MŰVELETI OSZTÁLY / ELLENŐRZÖTT NYILVÁNTARTÁS</div><h2>${esc(meta.label)}</h2><p class="text-low small">Strukturált védelmi nyilvántartás · minden módosítás auditálva.</p></div>
-      <div class="operation-head-actions"><button class="btn btn-sm" id="export-operations">Adatok exportálása</button>${canEdit ? `<button class="btn btn-gold" id="new-operation">+ ${esc(meta.singular)}</button>` : ""}</div>
+      <div class="operation-head-actions"><button class="btn btn-sm" id="export-operations">JSON export</button><button class="btn btn-sm" id="export-csv">CSV export</button>${canEdit ? `<button class="btn btn-gold" id="new-operation">+ ${esc(meta.singular)}</button>` : ""}</div>
     </div>
     <div class="filters operation-filters">
       <input id="operation-search" placeholder="Keresés azonosító, cím, személy, helyszín alapján" />
@@ -57,6 +57,7 @@ export function renderOperations(container, type = "reports") {
   ["operation-search", "operation-status", "operation-priority", "operation-archive"].forEach((id) => document.getElementById(id).addEventListener("input", render));
   document.getElementById("new-operation")?.addEventListener("click", () => openOperationForm(type, meta));
   document.getElementById("export-operations")?.addEventListener("click", () => exportOperations(records, meta.label));
+  document.getElementById("export-csv")?.addEventListener("click", () => exportCsv(records, meta.label));
   render();
 }
 
@@ -80,6 +81,18 @@ function exportOperations(records, label) {
   link.click();
   URL.revokeObjectURL(link.href);
   toast("Adatok exportálva");
+}
+
+function exportCsv(records, label) {
+  const columns = ["Azonosító", "Megnevezés", "Dátum", "Státusz", "Prioritás", "Kockázat", "Védelmi szint", "Felelős", "Helyszín", "Védett személy", "Leírás", "Intézkedés"];
+  const values = records.map((record) => [record.id, record.title, record.date, record.status, record.priority, record.risk, record.protectionLevel, record.owner, record.location, record.protectee, record.description, record.action]);
+  const csv = [columns, ...values].map((row) => row.map((value) => `"${String(value || "").replace(/"/g, '""')}"`).join(";")).join("\r\n");
+  const link = document.createElement("a");
+  link.href = URL.createObjectURL(new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8" }));
+  link.download = `usss-${label.toLowerCase().replace(/[^a-z0-9]+/g, "-")}.csv`;
+  link.click();
+  URL.revokeObjectURL(link.href);
+  toast("CSV export elkészült");
 }
 
 function renderRecord(record, canEdit) {

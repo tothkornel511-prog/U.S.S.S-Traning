@@ -2,7 +2,7 @@
    U.S.S.S. ELITE TRAINING SYSTEM — APP ENTRY
    ========================================================================== */
 
-import { seedIfNeeded, globalSearch, getCustomCss, getOperationRecords } from "./store.js?v=39";
+import { seedIfNeeded, globalSearch, getCustomCss, getOperationRecords } from "./store.js?v=40";
 import { isAuthenticated, currentSession, logout, hasRole, ROLES } from "./auth.js?v=20";
 import { registerRoute, resolve, startRouter, navigate, currentPath } from "./router.js?v=20";
 import { esc, sealMark } from "./utils.js?v=20";
@@ -249,3 +249,6 @@ function boot() {
 }
 
 boot();
+window.addEventListener("storage", () => {
+  if (isAuthenticated()) onRouteChange();
+});
