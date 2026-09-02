@@ -4,7 +4,7 @@ import {
   createOperationRecord,
   updateOperationRecord,
   archiveOperationRecord,
-} from "../store.js?v=35";
+} from "../store.js?v=36";
 import { actorLabel, hasRole } from "../auth.js?v=20";
 import { esc, fmtDate, toast, openModal, closeModal } from "../utils.js?v=20";
 import { navigate } from "../router.js?v=20";
@@ -34,6 +34,7 @@ export function renderOperations(container, type = "reports") {
       <select id="operation-priority"><option value="ALL">Minden prioritás</option>${PRIORITIES.map((value) => `<option>${value}</option>`).join("")}</select>
       <label class="filter-check"><input type="checkbox" id="operation-archive" /> Archiváltak</label>
     </div>
+    ${type === "analytics" ? renderAnalyticsOverview() : type === "notifications" ? renderNotificationsOverview() : ""}
     <div class="operation-grid" id="operation-list"></div>
   `;
   const render = () => {
@@ -57,6 +58,18 @@ export function renderOperations(container, type = "reports") {
   document.getElementById("new-operation")?.addEventListener("click", () => openOperationForm(type, meta));
   document.getElementById("export-operations")?.addEventListener("click", () => exportOperations(records, meta.label));
   render();
+}
+
+function renderAnalyticsOverview() {
+  const records = getOperationRecords();
+  const open = records.filter((record) => !record.archived && record.status !== "COMPLETED" && record.status !== "REJECTED");
+  const critical = records.filter((record) => record.priority === "CRITICAL" || record.risk === "CRITICAL");
+  return `<div class="grid grid-3 operation-kpi-grid"><div class="card"><span class="card-title">Összes rekord</span><strong>${records.length}</strong></div><div class="card"><span class="card-title">Nyitott ügyek</span><strong>${open.length}</strong></div><div class="card"><span class="card-title">Kritikus jelzések</span><strong class="command-alert">${critical.length}</strong></div></div><div class="card operation-breakdown"><div class="card-title">Modul szerinti megoszlás</div>${Object.entries(OPERATION_TYPES).map(([key, meta]) => `<div class="history-item"><span>${esc(meta.label)}</span><span class="record-id">${records.filter((record) => record.type === key).length}</span></div>`).join("")}</div>`;
+}
+
+function renderNotificationsOverview() {
+  const records = getOperationRecords().filter((record) => !record.archived && (record.priority === "CRITICAL" || record.priority === "HIGH" || record.risk === "CRITICAL"));
+  return `<div class="card notification-banner"><div class="eyebrow">AUTOMATIKUS VEZETŐI ÉRTESÍTÉSEK</div><h3>${records.length ? `${records.length} ügy figyelmet igényel` : "Nincs kiemelt nyitott figyelmeztetés"}</h3><p class="text-low small">Az értesítések a mentett operációs rekordok prioritásából és kockázati szintjéből készülnek.</p></div>`;
 }
 
 function exportOperations(records, label) {

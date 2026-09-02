@@ -700,6 +700,13 @@ details.card[open] > summary::after { content: "−"; }
 .record-footer { padding-top:12px; border-top:1px solid var(--line-soft); color:var(--text-low); font-size:11px; }
 .record-actions { margin-top:14px; display:flex; justify-content:flex-end; }
 .record-actions { gap:8px; }
+.operation-kpi-grid { margin:16px 0; }
+.operation-kpi-grid .card { min-height:96px; }
+.operation-kpi-grid strong { display:block; margin-top:6px; color:var(--gold-bright); font:30px var(--font-display); }
+.operation-kpi-grid .command-alert { color:#f0a29b; text-shadow:var(--glow-red); }
+.operation-breakdown { margin-bottom:16px; }
+.notification-banner { margin:16px 0; border-left:3px solid var(--yellow); }
+.notification-banner h3 { margin:4px 0; font-size:21px; }
 .record-detail-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; }
 .record-detail-grid > div { padding:11px; border:1px solid var(--line-soft); background:rgba(6,7,10,.3); }
 .record-detail-grid strong { display:block; color:var(--text-hi); font-size:13px; margin-top:4px; }
