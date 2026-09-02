@@ -56,6 +56,16 @@ body {
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
 }
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(90deg, rgba(198,166,100,.025) 1px, transparent 1px), linear-gradient(rgba(198,166,100,.018) 1px, transparent 1px);
+  background-size: 72px 72px;
+  mask-image: linear-gradient(to bottom, rgba(0,0,0,.8), transparent 78%);
+  z-index: -1;
+}
 
 h1, h2, h3, h4 { font-family: var(--font-display); color: var(--text-hi); font-weight: 600; margin: 0; letter-spacing: 0.01em; }
 a { color: inherit; text-decoration: none; }
@@ -184,6 +194,7 @@ button {
   display: flex; flex-direction: column;
   position: sticky; top: 0; height: 100vh;
 }
+.sidebar::after { content: "SECURE INTERNAL NETWORK"; position: absolute; bottom: 12px; left: 22px; font: 8px var(--font-mono); letter-spacing: .16em; color: rgba(198,166,100,.32); }
 .brand { display: flex; align-items: center; gap: 12px; padding: 0 6px 22px; border-bottom: 1px solid var(--line-soft); margin-bottom: 18px; }
 .brand-seal {
   width: 38px; height: 38px; border-radius: 50%;
@@ -230,6 +241,7 @@ button {
   position: sticky; top: 0; background: rgba(11,13,18,0.85); backdrop-filter: blur(10px);
   z-index: 20;
 }
+.topbar::after { content: "U.S.S.S. // PERSONNEL OPERATIONS"; margin-left: auto; color: rgba(198,166,100,.38); font: 9px var(--font-mono); letter-spacing: .14em; white-space: nowrap; }
 .page-heading { flex: none; }
 .page-heading h1 { font-size: 20px; }
 .page-heading .crumb { font-size: 11px; color: var(--text-low); letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 2px; }
@@ -256,6 +268,8 @@ button {
 .search-results .sr-empty { padding: 16px; text-align: center; color: var(--text-low); font-size: 12.5px; }
 
 .content { padding: 26px 28px 60px; flex: 1; }
+.content > * { animation: page-enter .32s ease both; }
+@keyframes page-enter { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
 /* ---------------- Cards / grid ---------------- */
 .grid { display: grid; gap: 16px; }
@@ -273,6 +287,7 @@ button {
   box-shadow: var(--bevel), 0 10px 30px rgba(0,0,0,0.25), 0 0 0 1px rgba(198,166,100,0.06), 0 0 30px rgba(198,166,100,0.14);
   transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease;
 }
+.card:hover { border-color: rgba(198,166,100,.36); box-shadow: var(--bevel), 0 16px 38px rgba(0,0,0,.32), 0 0 28px rgba(198,166,100,.1); }
 .card.row-link:hover {
   transform: translateY(-3px);
   border-color: rgba(198,166,100,0.35);
@@ -310,6 +325,7 @@ button {
 
 /* ---------------- Tables ---------------- */
 .table-wrap { overflow-x: auto; border: 1px solid var(--line-soft); border-radius: var(--radius-lg); background: rgba(18,20,27,0.4); backdrop-filter: blur(10px); }
+.table-wrap:focus-within { border-color: rgba(198,166,100,.35); box-shadow: 0 0 24px rgba(198,166,100,.08); }
 table { width: 100%; border-collapse: collapse; font-size: 13px; }
 thead th {
   text-align: left; padding: 12px 14px; background: var(--bg-panel-2);
@@ -426,6 +442,7 @@ tbody tr:hover { background: rgba(198,166,100,0.04); }
 .participant-row input[type="checkbox"] { accent-color: var(--gold); }
 
 .history-item { display: flex; justify-content: space-between; padding: 9px 0; border-bottom: 1px solid var(--line-soft); font-size: 12.5px; }
+.history-item:hover { color: var(--text-hi); background: linear-gradient(90deg, rgba(198,166,100,.06), transparent); }
 .history-item:last-child { border-bottom: none; }
 
 /* Classification stamp — védett-helyszín oldalak fejléce */
@@ -435,6 +452,7 @@ tbody tr:hover { background: rgba(198,166,100,0.04); }
   padding: 5px 14px; margin-bottom: 14px; background: rgba(198,166,100,0.06);
   box-shadow: 0 0 14px rgba(198,166,100,0.12); text-transform: uppercase;
 }
+.classification-strip::before { content: "◆  "; color: var(--gold-dim); }
 
 /* Locations */
 .loc-card {
@@ -546,6 +564,15 @@ tbody tr:hover { background: rgba(198,166,100,0.04); }
   .menu-toggle { display: inline-flex; }
   .search-wrap { display: none; }
 }
+
+/* Shared command-desk finish across dashboard, personnel, maps and exams. */
+.section-head h2 { letter-spacing: .03em; text-transform: uppercase; }
+.section-head h2::before { content: "// "; color: var(--gold-dim); font-family: var(--font-mono); font-size: .72em; }
+.btn { min-height: 38px; border-radius: 4px; letter-spacing: .02em; }
+.btn-gold { text-shadow: 0 1px 0 rgba(255,255,255,.2); }
+.field input::placeholder, .field textarea::placeholder, .filters input::placeholder { color: #555b69; }
+input[type="checkbox"] { accent-color: var(--gold); }
+@media (max-width: 900px) { .topbar::after { display: none; } .sidebar::after { display: none; } }
 .menu-toggle { display: none; background: var(--bg-panel-2); border: 1px solid var(--line-soft); color: var(--text-hi); width: 36px; height: 36px; border-radius: var(--radius-sm); align-items: center; justify-content: center; flex: none; }
 
 /* ---------- Felvételi Vizsga (Recruitment Exam) ---------- */
