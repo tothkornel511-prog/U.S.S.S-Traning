@@ -759,7 +759,7 @@ export function promoteApplicant(id, usssId, position, actorLabel) {
 }
 
 /* ---------- Felvételi vizsga (IC szóbeli, oktatásvezető pontozza) --------*/
-export const EXAM_MAX_SCORE = EXAM_QUESTIONS.length * 5; // 150
+export const EXAM_MAX_SCORE = EXAM_QUESTIONS.length * 5; // 200
 export const EXAM_PASS_PCT = 80;
 
 export function getExamQuestions() {
@@ -770,7 +770,7 @@ export function getExamCategories() {
 }
 
 function nextExamId() {
-  const seq = read(KEYS.nextExamSeq, 0);
+  const seq = Math.max(1, read(KEYS.nextExamSeq, 1));
   return { id: `USSS-${String(seq).padStart(3, "0")}`, seq };
 }
 
@@ -845,13 +845,25 @@ export function examScoreSummary(exam) {
   const pct = max ? (total / max) * 100 : 0;
   const passed = pct >= EXAM_PASS_PCT;
   let tier;
-  if (pct < 60) tier = "Súlyosan nem megfelelő";
-  else if (pct < 70) tier = "Nem megfelelő";
-  else if (pct < 80) tier = "Közel megfelelő, de sikertelen";
+  if (pct < 60) tier = "Súlyosan elégtelen";
+  else if (pct < 70) tier = "Elégtelen";
+  else if (pct < 80) tier = "Nem megfelelő";
   else if (pct < 90) tier = "Sikeres";
   else if (pct < 95) tier = "Kiemelkedő";
   else tier = "Kiváló";
-  return { total, max, pct, passed, tier, answered, totalQuestions: EXAM_QUESTIONS.length };
+  const categories = EXAM_CATEGORIES.map((category) => {
+    const categoryQuestions = EXAM_QUESTIONS.filter((q) => q.category === category);
+    const questionIds = new Set(categoryQuestions.map((q) => q.id));
+    const categoryAnswers = (exam.answers || []).filter((a) => questionIds.has(a.questionId));
+    const categoryTotal = categoryAnswers.reduce((sum, a) => sum + (typeof a.score === "number" ? a.score : 0), 0);
+    return {
+      category,
+      total: categoryTotal,
+      max: categoryQuestions.length * 5,
+      answered: categoryAnswers.filter((a) => typeof a.score === "number").length,
+    };
+  });
+  return { total, max, pct, passed, tier, answered, totalQuestions: EXAM_QUESTIONS.length, categories };
 }
 
 /* ---------- Global search ------------------------------------------------*/

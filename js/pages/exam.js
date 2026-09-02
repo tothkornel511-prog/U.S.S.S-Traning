@@ -17,27 +17,39 @@ export function renderExamList(container) {
       <h2 style="visibility:hidden">.</h2>
       <div class="actions">${canEdit ? `<button class="btn btn-gold" id="new-exam">+ Új vizsga</button>` : ""}</div>
     </div>
+    <div class="grid grid-3 mb-2">
+      <div class="field"><label>Keresés</label><input id="exam-filter" placeholder="Azonosító, jelölt, Discord, vizsgáztató" /></div>
+      <div class="field"><label>Eredmény</label><select id="exam-result-filter"><option value="all">Mindegyik</option><option value="active">Folyamatban</option><option value="passed">Sikeres</option><option value="failed">Sikertelen</option></select></div>
+      <div class="field"><label>Dátum</label><input id="exam-date-filter" type="date" /></div>
+    </div>
     <div class="table-wrap"><table>
       <thead><tr><th>ID</th><th>Jelölt</th><th>Dátum</th><th>Pontszám</th><th>%</th><th>Eredmény</th><th>Vizsgáztató</th></tr></thead>
-      <tbody>
-        ${exams.length ? exams.map((e) => {
-          const s = examScoreSummary(e);
-          return `<tr class="row-link" data-nav="/exam/${esc(e.id)}">
-            <td class="text-gold" style="font-family:var(--font-mono)">${esc(e.id)}</td>
-            <td class="text-hi">${esc(e.candidateName)}</td>
-            <td class="text-low small">${fmtDate(e.date)}</td>
-            <td style="font-family:var(--font-mono)">${s.total} / ${s.max}</td>
-            <td style="font-family:var(--font-mono)">${s.pct.toFixed(1)}%</td>
-            <td>${e.endedAt ? `<span class="badge ${s.passed ? "badge-green" : "badge-red"}">${s.passed ? "SIKERES" : "SIKERTELEN"}</span>` : `<span class="badge badge-yellow">Folyamatban</span>`}</td>
-            <td class="text-low small">${esc(e.examinerName || "—")}</td>
-          </tr>`;
-        }).join("") : `<tr><td colspan="7"><div class="empty-state"><h3>Nincs még felvételi vizsga</h3><p>Indítsa el az elsőt a fenti gombbal.</p></div></td></tr>`}
-      </tbody>
+      <tbody id="exam-rows"></tbody>
     </table></div>
   `;
 
   container.querySelectorAll("[data-nav]").forEach((n) => n.addEventListener("click", () => navigate(n.getAttribute("data-nav"))));
   document.getElementById("new-exam")?.addEventListener("click", () => openExamStartForm());
+  const updateRows = () => {
+    const query = document.getElementById("exam-filter").value.trim().toLowerCase();
+    const result = document.getElementById("exam-result-filter").value;
+    const date = document.getElementById("exam-date-filter").value;
+    const filtered = exams.filter((exam) => {
+      const searchable = [exam.id, exam.candidateName, exam.candidateDiscord, exam.examinerName].join(" ").toLowerCase();
+      const summary = examScoreSummary(exam);
+      return (!query || searchable.includes(query)) && (!date || exam.date === date) &&
+        (result === "all" || (result === "active" && !exam.endedAt) || (result === "passed" && exam.endedAt && summary.passed) || (result === "failed" && exam.endedAt && !summary.passed));
+    });
+    document.getElementById("exam-rows").innerHTML = filtered.length ? filtered.map(renderExamRow).join("") : `<tr><td colspan="7"><div class="empty-state"><h3>Nincs találat</h3></div></td></tr>`;
+    container.querySelectorAll("[data-nav]").forEach((n) => n.addEventListener("click", () => navigate(n.getAttribute("data-nav"))));
+  };
+  ["exam-filter", "exam-result-filter", "exam-date-filter"].forEach((id) => document.getElementById(id).addEventListener("input", updateRows));
+  updateRows();
+}
+
+function renderExamRow(e) {
+  const s = examScoreSummary(e);
+  return `<tr class="row-link" data-nav="/exam/${esc(e.id)}"><td class="text-gold" style="font-family:var(--font-mono)">${esc(e.id)}</td><td class="text-hi">${esc(e.candidateName)}</td><td class="text-low small">${fmtDate(e.date)}</td><td style="font-family:var(--font-mono)">${s.total} / ${s.max}</td><td style="font-family:var(--font-mono)">${s.pct.toFixed(1)}%</td><td>${e.endedAt ? `<span class="badge ${s.passed ? "badge-green" : "badge-red"}">${s.passed ? "SIKERES" : "SIKERTELEN"}</span>` : `<span class="badge badge-yellow">Folyamatban</span>`}</td><td class="text-low small">${esc(e.examinerName || "—")}</td></tr>`;
 }
 
 function openExamStartForm() {
@@ -200,6 +212,9 @@ function renderSummaryBar(exam) {
       <div><span class="card-title">Teljesítmény</span><div class="card-value" style="font-size:22px">${s.pct.toFixed(1)}%</div></div>
       <div><span class="card-title">Megválaszolva</span><div class="card-value" style="font-size:22px">${s.answered} / ${s.totalQuestions}</div></div>
       <div><span class="card-title">Eredmény</span><div class="mt-1"><span class="badge ${s.passed ? "badge-green" : "badge-red"}" style="font-size:13px">${s.passed ? "SIKERES" : "SIKERTELEN"}</span> <span class="text-low small">${esc(s.tier)}</span></div></div>
+    </div>
+    <div class="grid grid-3 mt-1">
+      ${s.categories.map((cat) => `<div class="exam-category-score"><div class="card-title">${esc(cat.category)}</div><strong>${cat.total} / ${cat.max}</strong><span class="text-low small">${cat.max ? ((cat.total / cat.max) * 100).toFixed(0) : 0}%</span></div>`).join("")}
     </div>
   `;
 }
