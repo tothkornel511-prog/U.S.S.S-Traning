@@ -644,6 +644,11 @@ details.card > summary::after { content: "+"; float: right; font: 18px var(--fon
 details.card[open] > summary::after { content: "−"; }
 [data-critical-q] { accent-color: #d1554a; width: 15px; height: 15px; vertical-align: -3px; margin-right: 5px; }
 .exam-note:focus, [data-competency]:focus, #exam-recommendation:focus { border-color: var(--gold); box-shadow: 0 0 0 2px rgba(198,166,100,.1); }
+.exam-print-btn { float:right; margin-top:-4px; }
+.exam-note-templates { display:flex; flex-wrap:wrap; gap:5px; margin:0 0 10px; }
+.note-template { padding:4px 7px; border:1px solid var(--line-soft); border-radius:3px; color:var(--text-low); font-size:10px; background:rgba(255,255,255,.02); }
+.note-template:hover { color:var(--gold-bright); border-color:var(--gold-dim); background:rgba(198,166,100,.07); }
+@media print { .exam-print-btn, .exam-note-templates { display:none !important; } }
 @media (max-width: 700px) {
   .exam-q-card { padding: 14px 14px 14px 16px; }
   .exam-q-head { font-size: 14px; }

@@ -1,10 +1,12 @@
 import {
   getExams, getExam, createExam, setExamAnswer, setExamFinalComment, setExamCompetency, setExamRecommendation, interruptExam, finishExam, deleteExam,
   getExamQuestions, getExamCategories, examScoreSummary, EXAM_MAX_SCORE, EXAM_PASS_PCT,
-} from "../store.js?v=24";
+} from "../store.js?v=38";
 import { hasRole, actorLabel, currentSession } from "../auth.js?v=20";
 import { esc, fmtDate, fmtDateTime, toast, openModal, closeModal } from "../utils.js?v=20";
 import { navigate } from "../router.js?v=20";
+
+const NOTE_TEMPLATES = ["Jó válasz", "Hiányos válasz", "Bizonytalan válasz", "Jó helyzetfelismerés", "Gyenge helyzetfelismerés", "Jó kommunikáció", "Gyenge kommunikáció", "Jó döntés", "Rossz döntés", "Kritikus hiba"];
 
 export function renderExamList(container, { includeQuestionBank = true } = {}) {
   const canEdit = hasRole("TRAINING");
@@ -110,6 +112,7 @@ export function renderExamDetail(container, id) {
 
   container.innerHTML = `
     <a href="#/exam" class="text-low small">← Vissza a felvételi vizsgákhoz</a>
+    <button class="btn btn-sm exam-print-btn" id="print-exam">Nyomtatható vizsgalap</button>
     <div class="classification-strip mt-2">${esc(exam.id)} · CSAK OKTATÁSVEZETŐI HASZNÁLATRA</div>
 
     <div class="card mt-2 mb-2">
@@ -155,6 +158,7 @@ export function renderExamDetail(container, id) {
   `;
 
   renderSummaryBar(exam);
+  document.getElementById("print-exam")?.addEventListener("click", () => window.print());
 
   container.querySelectorAll("[data-score-q]").forEach((btn) =>
     btn.addEventListener("click", () => {
@@ -173,6 +177,13 @@ export function renderExamDetail(container, id) {
       setExamAnswer(exam.id, ta.getAttribute("data-note-q"), { note: ta.value });
     })
   );
+  container.querySelectorAll("[data-note-template]").forEach((button) => button.addEventListener("click", () => {
+    const questionId = button.getAttribute("data-note-target");
+    const textarea = container.querySelector(`[data-note-q="${questionId}"]`);
+    const text = button.getAttribute("data-note-template");
+    textarea.value = textarea.value.trim() ? `${textarea.value.trim()} · ${text}` : text;
+    setExamAnswer(exam.id, questionId, { note: textarea.value }, actorLabel());
+  }));
 
   container.querySelectorAll("[data-critical-q]").forEach((box) => box.addEventListener("change", () => {
     setExamAnswer(exam.id, box.getAttribute("data-critical-q"), { critical: box.checked }, actorLabel());
@@ -227,6 +238,7 @@ function renderQuestionCard(exam, q, canEdit) {
           ${[0, 1, 2, 3, 4, 5].map((n) => `<button type="button" class="exam-score-btn ${a.score === n ? "active" : ""}" data-score-q="${esc(q.id)}" data-score-val="${n}">${n}</button>`).join("")}
         </div>
         <textarea class="exam-note" rows="2" placeholder="Vizsgáztatói megjegyzés (opcionális)" data-note-q="${esc(q.id)}">${esc(a.note || "")}</textarea>
+        <div class="exam-note-templates">${NOTE_TEMPLATES.map((template) => `<button type="button" class="note-template" data-note-template="${esc(template)}" data-note-target="${esc(q.id)}">${esc(template)}</button>`).join("")}</div>
         <label class="small text-low"><input type="checkbox" data-critical-q="${esc(q.id)}" ${a.critical ? "checked" : ""} /> Kritikus hiba</label>
       ` : `
         <div class="exam-score-row"><span class="badge badge-gold">${a.score === null ? "—" : a.score + " / 5"}</span></div>
