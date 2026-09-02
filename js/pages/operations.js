@@ -40,6 +40,7 @@ export function renderOperations(container, type = "reports") {
       return (includeArchived ? record.archived : !record.archived) && (!query || haystack.includes(query)) && (status === "ALL" || record.status === status) && (priority === "ALL" || record.priority === priority);
     });
     document.getElementById("operation-list").innerHTML = filtered.length ? filtered.map((record) => renderRecord(record, canEdit)).join("") : `<div class="card empty-state"><h3>Nincs rögzített rekord</h3><p>Hozza létre az első ${esc(meta.singular.toLowerCase())} rekordot.</p></div>`;
+    container.querySelectorAll("[data-view]").forEach((button) => button.addEventListener("click", () => openRecordView(records.find((record) => record.id === button.dataset.view))));
     container.querySelectorAll("[data-archive]").forEach((button) => button.addEventListener("click", () => {
       archiveOperationRecord(button.dataset.archive, button.dataset.value !== "true", actorLabel());
       toast(button.dataset.value === "true" ? "Rekord archiválva" : "Rekord visszaállítva");
@@ -57,8 +58,15 @@ function renderRecord(record, canEdit) {
     <h3>${esc(record.title)}</h3><div class="record-meta"><span>${esc(record.date)}</span><span>${esc(record.location || "Helyszín nincs megadva")}</span></div>
     <p>${esc(record.description || "Nincs leírás rögzítve.")}</p>
     <div class="record-footer"><span>${esc(record.owner || "Felelős nincs kijelölve")}</span><span>${esc(record.protectee || "Nincs védett személy")}</span></div>
-    ${canEdit ? `<div class="record-actions"><button class="btn btn-sm" data-archive="${esc(record.id)}" data-value="${record.archived}">${record.archived ? "Visszaállítás" : "Archiválás"}</button></div>` : ""}
+    <div class="record-actions"><button class="btn btn-sm" data-view="${esc(record.id)}">Részletek</button>${canEdit ? `<button class="btn btn-sm" data-archive="${esc(record.id)}" data-value="${record.archived}">${record.archived ? "Visszaállítás" : "Archiválás"}</button>` : ""}</div>
   </article>`;
+}
+
+function openRecordView(record) {
+  if (!record) return;
+  openModal(`<div class="modal-head"><h3>${esc(record.title)}</h3><button class="modal-close" data-close-modal>×</button></div>
+    <div class="record-detail-grid"><div><span class="card-title">Azonosító</span><strong>${esc(record.id)}</strong></div><div><span class="card-title">Státusz</span><strong>${esc(record.status)}</strong></div><div><span class="card-title">Prioritás</span><strong>${esc(record.priority)}</strong></div><div><span class="card-title">Dátum</span><strong>${esc(fmtDate(record.date))}</strong></div><div><span class="card-title">Felelős</span><strong>${esc(record.owner || "—")}</strong></div><div><span class="card-title">Helyszín</span><strong>${esc(record.location || "—")}</strong></div></div>
+    <div class="field mt-2"><label>Leírás</label><div class="record-detail-text">${esc(record.description || "—")}</div></div><div class="field"><label>Intézkedés / eredmény</label><div class="record-detail-text">${esc(record.action || "—")}</div></div><div class="field"><label>Előzmények</label>${(record.history || []).slice().reverse().map((item) => `<div class="history-item"><span>${esc(item.action)}</span><span class="text-low small">${esc(item.by)} · ${fmtDate(item.at)}</span></div>`).join("")}</div>`);
 }
 
 function openOperationForm(type, meta) {

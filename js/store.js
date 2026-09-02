@@ -790,6 +790,20 @@ export const OPERATION_TYPES = {
   recommendations: { label: "Biztonsági javaslatok", singular: "Javaslat", icon: "◇" },
   fleet: { label: "Járműflotta", singular: "Jármű", icon: "▰" },
   advance: { label: "Advance Work", singular: "Advance", icon: "⌖" },
+  "protection-levels": { label: "Protection Levels", singular: "Védelmi fokozat", icon: "◉" },
+  "protective-plans": { label: "Protective Plans", singular: "Védelmi terv", icon: "⬡" },
+  intelligence: { label: "Protective Intelligence", singular: "Védelmi információ", icon: "⌁" },
+  "after-action": { label: "After Action Review", singular: "Utólagos értékelés", icon: "↻" },
+  certifications: { label: "Certifications", singular: "Minősítés", icon: "✦" },
+  documents: { label: "Documents", singular: "Dokumentum", icon: "▧" },
+  discipline: { label: "Discipline", singular: "Fegyelmi ügy", icon: "⚖" },
+  recognition: { label: "Recognition", singular: "Elismerés", icon: "★" },
+  government: { label: "Government Directory", singular: "Kormányzati bejegyzés", icon: "⌂" },
+  succession: { label: "Presidential Succession", singular: "Öröklési sorrend", icon: "Ⅰ" },
+  calendar: { label: "Calendar", singular: "Naptári esemény", icon: "▦" },
+  notifications: { label: "Notifications", singular: "Értesítés", icon: "◌" },
+  analytics: { label: "Analytics", singular: "Elemzés", icon: "▥" },
+  settings: { label: "Settings", singular: "Beállítás", icon: "⚙" },
 };
 
 export function getOperationRecords(type = "") {
@@ -801,7 +815,7 @@ export function createOperationRecord(type, fields, actorLabel) {
   if (!meta) return null;
   const now = new Date().toISOString();
   const record = {
-    id: `${type.slice(0, 3).toUpperCase()}-${Date.now().toString(36).toUpperCase()}`,
+    id: `${type.slice(0, 3).toUpperCase()}-${Date.now().toString(36).toUpperCase()}-${Math.random().toString(36).slice(2, 6).toUpperCase()}`,
     type,
     title: (fields.title || meta.singular).trim(),
     status: fields.status || "OPEN",
