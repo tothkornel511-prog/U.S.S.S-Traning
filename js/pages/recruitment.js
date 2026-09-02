@@ -6,6 +6,7 @@ import {
 import { hasRole, actorLabel } from "../auth.js?v=20";
 import { esc, fmtDateTime, toast, openModal, closeModal } from "../utils.js?v=20";
 import { navigate } from "../router.js?v=20";
+import { renderExamList } from "./exam.js?v=22";
 
 const STATUS_META = {
   review: { c: "badge-yellow", t: "Elbírálás alatt" },
@@ -64,6 +65,14 @@ export function renderRecruitmentList(container) {
       renderRecruitmentList(document.getElementById("content"));
     })
   );
+}
+
+export function renderRecruitmentHub(container) {
+  renderRecruitmentList(container);
+  const examPanel = document.createElement("section");
+  examPanel.className = "mt-2";
+  container.appendChild(examPanel);
+  renderExamList(examPanel, { includeQuestionBank: false });
 }
 
 function openQuestionForm() {

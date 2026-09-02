@@ -6,7 +6,7 @@ import { hasRole, actorLabel, currentSession } from "../auth.js?v=20";
 import { esc, fmtDate, fmtDateTime, toast, openModal, closeModal } from "../utils.js?v=20";
 import { navigate } from "../router.js?v=20";
 
-export function renderExamList(container) {
+export function renderExamList(container, { includeQuestionBank = true } = {}) {
   const canEdit = hasRole("TRAINING");
   const exams = getExams();
   const questions = getExamQuestions();
@@ -27,7 +27,7 @@ export function renderExamList(container) {
       <thead><tr><th>ID</th><th>Jelölt</th><th>Dátum</th><th>Pontszám</th><th>%</th><th>Eredmény</th><th>Vizsgáztató</th></tr></thead>
       <tbody id="exam-rows"></tbody>
     </table></div>
-    <details class="card mt-2" open>
+    ${includeQuestionBank ? `<details class="card mt-2" open>
       <summary class="card-title" style="cursor:pointer">U.S.S.S. IC kérdésbank · ${questions.length} kérdés</summary>
       <p class="text-low small mt-1">A kérdéseket a vizsgáztató szóban, IC-ben teszi fel. A jelentkező a weboldalt nem használja.</p>
       ${getExamCategories().map((category) => `
@@ -36,7 +36,7 @@ export function renderExamList(container) {
           ${questions.filter((q) => q.category === category).map((q) => `<div class="history-item"><span class="module-code">Q${String(q.num).padStart(2, "0")}</span><span>${esc(q.text)}</span></div>`).join("")}
         </div>
       `).join("")}
-    </details>
+    </details>` : ""}
   `;
 
   container.querySelectorAll("[data-nav]").forEach((n) => n.addEventListener("click", () => navigate(n.getAttribute("data-nav"))));

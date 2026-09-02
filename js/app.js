@@ -14,7 +14,7 @@ import { renderMatrix } from "./pages/matrix.js?v=20";
 import { renderProtocolsList, renderProtocolDetail } from "./pages/protocols.js?v=20";
 import { renderLocationsList, renderLocationDetail } from "./pages/locations.js?v=20";
 import { renderMapPage } from "./pages/map.js?v=20";
-import { renderRecruitmentList, renderApplicantDetail } from "./pages/recruitment.js?v=22";
+import { renderRecruitmentHub, renderApplicantDetail } from "./pages/recruitment.js?v=23";
 import { renderExamList, renderExamDetail } from "./pages/exam.js?v=22";
 import { renderAdmin } from "./pages/admin.js?v=20";
 
@@ -42,7 +42,6 @@ const NAV = [
     { path: "/matrix", label: "Kiképzési Áttekintés", icon: "▦" },
     { path: "/protocols", label: "Jegyzőkönyvek", icon: "▤" },
     { path: "/recruitment", label: "Felvételi", icon: "✎" },
-    { path: "/exam", label: "Felvételi Vizsga", icon: "◉", minRole: "TRAINING" },
   ]},
   { group: "Objektumok", items: [
     { path: "/locations", label: "Védett helyszínek", icon: "◆" },
@@ -180,7 +179,7 @@ registerRoute("/personnel/:id", (p) => renderProfile(document.getElementById("co
 registerRoute("/matrix", () => renderMatrix(document.getElementById("content")));
 registerRoute("/protocols", () => renderProtocolsList(document.getElementById("content")));
 registerRoute("/protocols/:id", (p) => renderProtocolDetail(document.getElementById("content"), p.id));
-registerRoute("/recruitment", () => renderRecruitmentList(document.getElementById("content")));
+registerRoute("/recruitment", () => renderRecruitmentHub(document.getElementById("content")));
 registerRoute("/recruitment/:id", (p) => renderApplicantDetail(document.getElementById("content"), p.id));
 registerRoute("/exam", () => renderExamList(document.getElementById("content")));
 registerRoute("/exam/:id", (p) => renderExamDetail(document.getElementById("content"), p.id));
