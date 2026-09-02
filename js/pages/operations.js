@@ -11,6 +11,12 @@ import { navigate } from "../router.js?v=20";
 
 const STATUS = ["OPEN", "IN REVIEW", "APPROVED", "REJECTED", "COMPLETED"];
 const PRIORITIES = ["LOW", "NORMAL", "HIGH", "CRITICAL"];
+const TEMPLATES = {
+  reports: { label: "Általános szolgálati jelentés", description: "Mi történt?\nMikor és hol történt?\nKik voltak jelen?\nMilyen intézkedés történt?\nMi lett az eredmény?", action: "További intézkedés / ajánlás:" },
+  incidents: { label: "Incidensjelentés", description: "Esemény tényei és kiváltó oka:\nÉszlelt veszély:\nÉrintett személyek:\nSérülés vagy kár:", action: "Azonnali intézkedés:\nTovábbi szükséges intézkedés:" },
+  advance: { label: "Advance Report", description: "Megközelítési lehetőségek:\nBejáratok és kijáratok:\nBiztonsági hiányosságok:\nTömeg és környezeti kockázatok:", action: "Javasolt intézkedések:\nEgyüttműködő szervek:" },
+  threats: { label: "Threat Assessment", description: "Fenyegetés forrása:\nÉrintett védett személy vagy esemény:\nLeírás és hitelesség:\nSürgősség:", action: "Kockázatcsökkentő intézkedés:\nFelelős és felülvizsgálat:" },
+};
 
 export function renderOperations(container, type = "reports") {
   const meta = OPERATION_TYPES[type] || OPERATION_TYPES.reports;
@@ -72,12 +78,20 @@ function openRecordView(record) {
 function openOperationForm(type, meta) {
   openModal(`<div class="modal-head"><h3>${esc(meta.singular)} rögzítése</h3><button class="modal-close" data-close-modal>×</button></div>
     <form id="operation-form"><div class="field"><label>Megnevezés</label><input id="op-title" required autofocus /></div>
-    <div class="grid grid-2"><div class="field"><label>Dátum</label><input id="op-date" type="date" value="${new Date().toISOString().slice(0, 10)}" /></div><div class="field"><label>Felelős</label><input id="op-owner" /></div><div class="field"><label>Helyszín</label><input id="op-location" /></div><div class="field"><label>Védett személy / érintett</label><input id="op-protectee" /></div><div class="field"><label>Státusz</label><select id="op-status">${STATUS.map((value) => `<option>${value}</option>`).join("")}</select></div><div class="field"><label>Prioritás</label><select id="op-priority">${PRIORITIES.map((value) => `<option>${value}</option>`).join("")}</select></div></div>
-    <div class="field"><label>Leírás</label><textarea id="op-description" rows="4" required></textarea></div><div class="field"><label>Intézkedés / eredmény / ajánlás</label><textarea id="op-action" rows="3"></textarea></div>
+    <div class="grid grid-2"><div class="field"><label>Dátum</label><input id="op-date" type="date" value="${new Date().toISOString().slice(0, 10)}" /></div><div class="field"><label>Felelős</label><input id="op-owner" /></div><div class="field"><label>Helyszín</label><input id="op-location" /></div><div class="field"><label>Védett személy / érintett</label><input id="op-protectee" /></div><div class="field"><label>Státusz</label><select id="op-status">${STATUS.map((value) => `<option>${value}</option>`).join("")}</select></div><div class="field"><label>Prioritás</label><select id="op-priority">${PRIORITIES.map((value) => `<option>${value}</option>`).join("")}</select></div><div class="field"><label>Kockázati szint</label><select id="op-risk">${PRIORITIES.map((value) => `<option>${value}</option>`).join("")}</select></div></div>
+    ${TEMPLATES[type] ? `<div class="field"><label>Sablon</label><select id="op-template"><option value="">Üres rekord</option><option value="default">${esc(TEMPLATES[type].label)}</option></select></div>` : ""}
+    <div class="field"><label>Leírás</label><textarea id="op-description" rows="5" required></textarea></div><div class="field"><label>Intézkedés / eredmény / ajánlás</label><textarea id="op-action" rows="4"></textarea></div>
     <div class="flex justify-between"><button type="button" class="btn" data-close-modal>Mégse</button><button class="btn btn-gold">Mentés és auditálás</button></div></form>`);
   document.getElementById("operation-form").addEventListener("submit", (event) => {
     event.preventDefault();
-    createOperationRecord(type, { title: document.getElementById("op-title").value, date: document.getElementById("op-date").value, owner: document.getElementById("op-owner").value, location: document.getElementById("op-location").value, protectee: document.getElementById("op-protectee").value, status: document.getElementById("op-status").value, priority: document.getElementById("op-priority").value, description: document.getElementById("op-description").value, action: document.getElementById("op-action").value }, actorLabel());
+    createOperationRecord(type, { title: document.getElementById("op-title").value, date: document.getElementById("op-date").value, owner: document.getElementById("op-owner").value, location: document.getElementById("op-location").value, protectee: document.getElementById("op-protectee").value, status: document.getElementById("op-status").value, priority: document.getElementById("op-priority").value, risk: document.getElementById("op-risk").value, description: document.getElementById("op-description").value, action: document.getElementById("op-action").value }, actorLabel());
     closeModal(); toast("Rekord mentve és auditálva"); renderOperations(document.getElementById("content"), type);
+  });
+  document.getElementById("op-template")?.addEventListener("change", (event) => {
+    const template = TEMPLATES[type];
+    if (event.target.value && template) {
+      document.getElementById("op-description").value = template.description;
+      document.getElementById("op-action").value = template.action;
+    }
   });
 }
