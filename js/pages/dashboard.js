@@ -1,5 +1,4 @@
-import { getPersonnel, getProtocols, getLocations, getOperationRecords, readinessPercent, ref } from "../store.js?v=30";
-import { getPersonnel, getProtocols, getLocations, getOperationRecords, getReadinessState, READINESS_LEVELS, readinessPercent, ref } from "../store.js?v=32";
+import { getPersonnel, getProtocols, getLocations, getOperationRecords, getReadinessState, READINESS_LEVELS, readinessPercent, ref } from "../store.js?v=33";
 import { hasRole } from "../auth.js?v=20";
 import { esc, initials } from "../utils.js?v=20";
 import { navigate } from "../router.js?v=20";
@@ -12,6 +11,10 @@ export function renderDashboard(container) {
   const openOperations = operations.filter((record) => !record.archived && record.status !== "COMPLETED" && record.status !== "REJECTED");
   const criticalOperations = openOperations.filter((record) => record.priority === "CRITICAL" || record.risk === "CRITICAL");
   const readiness = getReadinessState();
+  const today = new Date().toISOString().slice(0, 10);
+  const todayOperations = openOperations.filter((record) => record.date === today);
+  const openReports = openOperations.filter((record) => record.type === "reports").length;
+  const activeProtectees = operations.filter((record) => record.type === "protectees" && !record.archived && record.status !== "REJECTED").length;
 
   const active = personnel.filter((p) => p.status === "Aktív").length;
   const probationers = personnel.filter((p) => p.level === "0" && !p.probationLifted).length;
@@ -50,8 +53,13 @@ export function renderDashboard(container) {
         <div><span class="card-title">Kritikus figyelmeztetések</span><strong class="command-alert">${criticalOperations.length}</strong><span class="text-low small">Azonnali vezetői áttekintést igényel</span></div>
         <div><span class="card-title">Összes operációs rekord</span><strong>${operations.length}</strong><span class="text-low small">Archivált rekordok nélkül is visszakereshető</span></div>
         <div><span class="card-title">Belső készültség</span><strong class="readiness-text-${readiness.level}">${esc(READINESS_LEVELS[readiness.level].label.split(" · ")[0])}</strong><span class="text-low small">${esc(READINESS_LEVELS[readiness.level].description)}</span></div>
+        <div><span class="card-title">Nyitott jelentések</span><strong>${openReports}</strong><span class="text-low small">Vezetői feldolgozásra vár</span></div>
+        <div><span class="card-title">Aktív védett személyek</span><strong>${activeProtectees}</strong><span class="text-low small">Folyamatos védelmi nyilvántartás</span></div>
+        <div><span class="card-title">Mai műveleti rekordok</span><strong>${todayOperations.length}</strong><span class="text-low small">A mai napra rögzített nyitott feladatok</span></div>
       </div>
     </div>
+
+    ${criticalOperations.length ? `<div class="card command-alert-panel section"><div class="flex justify-between items-center mb-1"><div><div class="eyebrow">AZONNALI VEZETŐI FIGYELEM</div><h2>Kiemelt kockázatok</h2></div><a href="#/operations/incidents" class="btn btn-sm">Incidensek megnyitása</a></div>${criticalOperations.slice(0, 5).map((record) => `<div class="history-item"><span><strong class="text-hi">${esc(record.title)}</strong><span class="text-low small"> · ${esc(record.id)} · ${esc(record.location || "Helyszín nincs megadva")}</span></span><span class="badge badge-red">${esc(record.priority === "CRITICAL" ? "KRITIKUS" : "MAGAS KOCKÁZAT")}</span></div>`).join("")}</div>` : ""}
 
     <div class="grid grid-2 section">
       <div class="card">
