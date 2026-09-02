@@ -111,6 +111,7 @@ export function seedIfNeeded() {
   applyLocationIdFixPatch();
   applyCommandCenterSeedPatch();
   applyGovernmentHierarchySeedPatch();
+  applyCommandCenterCatalogSeedPatch();
 }
 
 /* Célzott, egyszeri pozíció-javítás — csak a felsorolt személyek "position"
@@ -844,6 +845,18 @@ export const GOVERNMENT_HIERARCHY = [
   ["Secretary of Transportation", "Közlekedési miniszter", "Közlekedési projektek és fejlesztési javaslatok koordinálása a rendvédelemmel és városi szolgáltatókkal együttműködésben."],
   ["U.S.S.S. Director", "U.S.S.S. műveleti parancsnok / oktatásvezető", "Az U.S.S.S. műveleti irányítása, az állomány koordinálása, a vizsgák és képzések vezetése, valamint a szolgálati fegyelem felügyelete."],
 ];
+export const SUCCESSION_ORDER = [
+  [1, "President", "Elnök"],
+  [2, "Vice President", "Alelnök"],
+  [3, "Chief Of Staff", "Kabinettfőnök"],
+  [4, "Secretary of Defense", "Védelmi miniszter"],
+  [5, "Secretary of Homeland Security", "Belbiztonsági miniszter"],
+  [6, "Secretary of Development", "Fejlődési és pénzügyi miniszter"],
+  [7, "Secretary of Public Relations", "Kommunikációs miniszter"],
+  [8, "Campaign Manager", "Kampánymenedzser"],
+  [9, "Secretary of Health", "Egészségügyi miniszter"],
+  [10, "Secretary of Transportation", "Közlekedési miniszter"],
+];
 
 function applyGovernmentHierarchySeedPatch() {
   const patchKey = NS + "government_hierarchy_seed_2026_09_02";
@@ -875,6 +888,26 @@ function applyGovernmentHierarchySeedPatch() {
       updatedAt: now,
       history: [{ at: now, by: "Rendszer", action: "Önkormányzati hierarchia rögzítve" }],
     });
+  });
+  write(KEYS.operations, records);
+  write(patchKey, true);
+}
+
+function applyCommandCenterCatalogSeedPatch() {
+  const patchKey = NS + "command_center_catalog_seed_2026_09_02";
+  if (read(patchKey, false)) return;
+  const records = read(KEYS.operations, []);
+  const existing = new Set(records.map((record) => `${record.type}:${record.title}`));
+  const now = new Date().toISOString();
+  SUCCESSION_ORDER.forEach(([order, position, title]) => {
+    const key = `succession:${title}`;
+    if (existing.has(key)) return;
+    records.push({ id: `SUC-${String(order).padStart(3, "0")}`, type: "succession", title, status: "APPROVED", priority: order <= 2 ? "CRITICAL" : "HIGH", risk: "LOW", protectionLevel: order <= 2 ? "LEVEL 4" : "LEVEL 2", owner: "Önkormányzati vezetés", location: "Önkormányzati központ", protectee: "", date: now.slice(0, 10), description: `${position}\nÖröklési sorrend: ${order}. hely`, action: "A sorrend vezetői jóváhagyással és auditált módosítással kezelendő.", recommendation: "A tisztség aktuális betöltőjét és helyettesét rendszeresen felül kell vizsgálni.", tags: "government, succession, protected-office", archived: false, createdAt: now, createdBy: "Rendszer", updatedAt: now, history: [{ at: now, by: "Rendszer", action: "Öröklési sorrend rögzítve" }] });
+  });
+  PROTECTION_LEVELS.forEach((level) => {
+    const key = `protection-levels:${level.label}`;
+    if (existing.has(key)) return;
+    records.push({ id: `LVL-${level.id.replace("LEVEL ", "")}`, type: "protection-levels", title: level.label, status: "APPROVED", priority: "HIGH", risk: level.id === "LEVEL 4" ? "CRITICAL" : "LOW", protectionLevel: level.id, owner: "U.S.S.S. Command", location: "U.S.S.S. belső szabályzat", protectee: "", date: now.slice(0, 10), description: level.description, action: "A szint hozzárendelése védett személyhez, eseményhez vagy helyszínhez vezetői felülvizsgálattal történik.", recommendation: "Minden kiemelt esemény előtt a szintet felül kell vizsgálni.", tags: "protection-level, policy", archived: false, createdAt: now, createdBy: "Rendszer", updatedAt: now, history: [{ at: now, by: "Rendszer", action: "Védelmi fokozat rögzítve" }] });
   });
   write(KEYS.operations, records);
   write(patchKey, true);
