@@ -720,6 +720,13 @@ details.card[open] > summary::after { content: "−"; }
 .operation-breakdown { margin-bottom:16px; }
 .notification-banner { margin:16px 0; border-left:3px solid var(--yellow); }
 .notification-banner h3 { margin:4px 0; font-size:21px; }
+.satcom-head { border-left-color:#5aa9ff; }
+.satcom-status { padding:9px 12px; border:1px solid rgba(90,169,255,.45); color:#9fcaff; background:rgba(90,169,255,.08); font:10px var(--font-mono); letter-spacing:.12em; white-space:nowrap; }
+.satcom-endpoint { padding:13px; border:1px solid var(--line-soft); background:rgba(6,7,10,.45); color:#9fcaff; font:12px var(--font-mono); overflow-wrap:anywhere; }
+.satcom-rule { display:flex; gap:12px; padding:11px 0; border-bottom:1px solid var(--line-soft); color:var(--text-mid); font-size:12.5px; }
+.satcom-rule:last-child { border-bottom:0; }
+.satcom-rule strong { color:#9fcaff; font:12px var(--font-mono); }
+.satcom-note { max-width:900px; color:var(--text-mid); line-height:1.7; }
 .record-detail-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; }
 .record-detail-grid > div { padding:11px; border:1px solid var(--line-soft); background:rgba(6,7,10,.3); }
 .record-detail-grid strong { display:block; color:var(--text-hi); font-size:13px; margin-top:4px; }

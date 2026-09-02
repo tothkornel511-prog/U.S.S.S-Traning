@@ -19,6 +19,7 @@ import { renderExamList, renderExamDetail } from "./pages/exam.js?v=38";
 import { renderAdmin } from "./pages/admin.js?v=20";
 import { renderOperations } from "./pages/operations.js?v=36";
 import { renderReadiness } from "./pages/readiness.js?v=32";
+import { renderSatcom } from "./pages/satcom.js?v=41";
 
 seedIfNeeded();
 applyCustomCss();
@@ -51,6 +52,7 @@ const NAV = [
   ]},
   { group: "Vezetői irányítás", items: [
     { path: "/readiness", label: "Készültségi rendszer", icon: "◉", minRole: "TRAINING" },
+    { path: "/satcom", label: "Blue Dragon 2 SATCOM", icon: "⌁", minRole: "TRAINING" },
   ]},
   { group: "Parancsnoki Központ", items: [
     { path: "/operations/reports", label: "Jelentések", icon: "▤", minRole: "TRAINING" },
@@ -222,6 +224,7 @@ registerRoute("/map", () => renderMapPage(document.getElementById("content")));
 registerRoute("/map/:mapId", (p) => renderMapPage(document.getElementById("content"), p.mapId));
 registerRoute("/admin", () => renderAdmin(document.getElementById("content")));
 registerRoute("/readiness", () => renderReadiness(document.getElementById("content")));
+registerRoute("/satcom", () => renderSatcom(document.getElementById("content")));
 registerRoute("/operations/:type", (p) => renderOperations(document.getElementById("content"), p.type));
 
 function onRouteChange() {
