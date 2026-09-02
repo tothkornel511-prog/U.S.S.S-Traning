@@ -791,7 +791,11 @@ export function createExam({ candidateName, candidateDiscord, examinerName, exam
     date: new Date().toISOString().slice(0, 10),
     startedAt: new Date().toISOString(),
     endedAt: null,
-    answers: [], // [{questionId, score: 0-5|null, note}]
+    answers: [], // [{questionId, score: 0-5|null, note, critical}]
+    competencies: {},
+    recommendation: "",
+    interruptionReason: "",
+    interruptedAt: null,
     finalComment: "",
     createdBy: actorLabel,
     createdAt: new Date().toISOString(),
@@ -803,16 +807,46 @@ export function createExam({ candidateName, candidateDiscord, examinerName, exam
   logAudit(actorLabel, "Felvételi vizsga indítva", `${id} — ${exam.candidateName}`);
   return exam;
 }
-export function setExamAnswer(examId, questionId, patch) {
+export function setExamAnswer(examId, questionId, patch, actorLabel) {
   const list = getExams();
   const exam = list.find((e) => e.id === examId);
   if (!exam) return;
   exam.answers = exam.answers || [];
   let a = exam.answers.find((x) => x.questionId === questionId);
-  if (!a) { a = { questionId, score: null, note: "" }; exam.answers.push(a); }
+  if (!a) { a = { questionId, score: null, note: "", critical: false }; exam.answers.push(a); }
+  const previousScore = a.score;
   if (patch.score !== undefined) a.score = patch.score;
   if (patch.note !== undefined) a.note = patch.note;
+  if (patch.critical !== undefined) a.critical = Boolean(patch.critical);
   write(KEYS.exams, list);
+  if (actorLabel && patch.score !== undefined && previousScore !== patch.score) {
+    logAudit(actorLabel, "Vizsgapont módosítva", `${examId} · ${questionId}: ${previousScore ?? "—"} → ${patch.score}`);
+  }
+}
+export function setExamCompetency(examId, name, score) {
+  const list = getExams();
+  const exam = list.find((e) => e.id === examId);
+  if (!exam) return;
+  exam.competencies = exam.competencies || {};
+  exam.competencies[name] = Math.max(1, Math.min(5, Number(score)));
+  write(KEYS.exams, list);
+}
+export function setExamRecommendation(examId, recommendation) {
+  const list = getExams();
+  const exam = list.find((e) => e.id === examId);
+  if (!exam) return;
+  exam.recommendation = recommendation || "";
+  write(KEYS.exams, list);
+}
+export function interruptExam(examId, reason, actorLabel) {
+  const list = getExams();
+  const exam = list.find((e) => e.id === examId);
+  if (!exam) return;
+  exam.interruptionReason = reason || "Egyéb";
+  exam.interruptedAt = new Date().toISOString();
+  exam.endedAt = exam.interruptedAt;
+  write(KEYS.exams, list);
+  logAudit(actorLabel, "Felvételi vizsga megszakítva", `${examId} — ${exam.interruptionReason}`);
 }
 export function setExamFinalComment(examId, comment) {
   const list = getExams();
@@ -863,7 +897,8 @@ export function examScoreSummary(exam) {
       answered: categoryAnswers.filter((a) => typeof a.score === "number").length,
     };
   });
-  return { total, max, pct, passed, tier, answered, totalQuestions: EXAM_QUESTIONS.length, categories };
+  const criticalErrors = (exam.answers || []).filter((a) => a.critical).length;
+  return { total, max, pct, passed, tier, answered, totalQuestions: EXAM_QUESTIONS.length, categories, criticalErrors };
 }
 
 /* ---------- Global search ------------------------------------------------*/

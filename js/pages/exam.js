@@ -1,5 +1,5 @@
 import {
-  getExams, getExam, createExam, setExamAnswer, setExamFinalComment, finishExam, deleteExam,
+  getExams, getExam, createExam, setExamAnswer, setExamFinalComment, setExamCompetency, setExamRecommendation, interruptExam, finishExam, deleteExam,
   getExamQuestions, getExamCategories, examScoreSummary, EXAM_MAX_SCORE, EXAM_PASS_PCT,
 } from "../store.js?v=22";
 import { hasRole, actorLabel, currentSession } from "../auth.js?v=20";
@@ -127,6 +127,7 @@ export function renderExamDetail(container, id) {
         <div><div class="card-title">Kezdés / Befejezés</div><div class="text-hi">${fmtDateTime(exam.startedAt)}${exam.endedAt ? ` → ${fmtDateTime(exam.endedAt)}` : " → folyamatban"}</div></div>
       </div>
       <div id="exam-summary"></div>
+      ${canEdit && !exam.endedAt ? `<button class="btn btn-sm btn-danger mt-1" id="interrupt-exam">Vizsga megszakítása</button>` : ""}
       ${canEdit && !exam.endedAt ? `<button class="btn btn-gold btn-sm mt-2" id="finish-exam">Vizsga lezárása</button>` : ""}
     </div>
 
@@ -153,7 +154,7 @@ export function renderExamDetail(container, id) {
     btn.addEventListener("click", () => {
       const qid = btn.getAttribute("data-score-q");
       const score = Number(btn.getAttribute("data-score-val"));
-      setExamAnswer(exam.id, qid, { score });
+      setExamAnswer(exam.id, qid, { score }, actorLabel());
       container.querySelectorAll(`[data-score-q="${qid}"]`).forEach((b) =>
         b.classList.toggle("active", b === btn)
       );
@@ -167,10 +168,25 @@ export function renderExamDetail(container, id) {
     })
   );
 
+  container.querySelectorAll("[data-critical-q]").forEach((box) => box.addEventListener("change", () => {
+    setExamAnswer(exam.id, box.getAttribute("data-critical-q"), { critical: box.checked }, actorLabel());
+    renderSummaryBar(getExam(exam.id));
+  }));
+  container.querySelectorAll("[data-competency]").forEach((select) => select.addEventListener("change", () => setExamCompetency(exam.id, select.getAttribute("data-competency"), select.value)));
+  document.getElementById("exam-recommendation")?.addEventListener("change", (event) => setExamRecommendation(exam.id, event.target.value));
+
   document.getElementById("finish-exam")?.addEventListener("click", () => {
     if (!confirm("Lezárja a vizsgát? A pontszámok utána is módosíthatók maradnak.")) return;
     finishExam(exam.id, actorLabel());
     toast("Vizsga lezárva");
+    renderExamDetail(container, exam.id);
+  });
+
+  document.getElementById("interrupt-exam")?.addEventListener("click", () => {
+    const reason = prompt("A megszakítás indoka:", "");
+    if (!reason?.trim()) return;
+    interruptExam(exam.id, reason.trim(), actorLabel());
+    toast("Vizsga megszakítva");
     renderExamDetail(container, exam.id);
   });
 
@@ -188,7 +204,7 @@ export function renderExamDetail(container, id) {
 }
 
 function renderQuestionCard(exam, q, canEdit) {
-  const a = (exam.answers || []).find((x) => x.questionId === q.id) || { score: null, note: "" };
+  const a = (exam.answers || []).find((x) => x.questionId === q.id) || { score: null, note: "", critical: false };
   return `
     <div class="exam-q-card">
       <div class="exam-q-head">
@@ -205,10 +221,15 @@ function renderQuestionCard(exam, q, canEdit) {
           ${[0, 1, 2, 3, 4, 5].map((n) => `<button type="button" class="exam-score-btn ${a.score === n ? "active" : ""}" data-score-q="${esc(q.id)}" data-score-val="${n}">${n}</button>`).join("")}
         </div>
         <textarea class="exam-note" rows="2" placeholder="Vizsgáztatói megjegyzés (opcionális)" data-note-q="${esc(q.id)}">${esc(a.note || "")}</textarea>
+        <label class="small text-low"><input type="checkbox" data-critical-q="${esc(q.id)}" ${a.critical ? "checked" : ""} /> Kritikus hiba</label>
       ` : `
         <div class="exam-score-row"><span class="badge badge-gold">${a.score === null ? "—" : a.score + " / 5"}</span></div>
         ${a.note ? `<div class="text-low small">${esc(a.note)}</div>` : ""}
       `}
+      <div class="grid grid-3 mt-2">
+        ${["Kommunikáció", "Döntéshozatal", "Fegyelem", "Helyzetfelismerés", "Védett személy kezelése", "Stresszhelyzet kezelése", "Csapatmunka"].map((name) => `<label class="field"><span>${name}</span><select data-competency="${esc(name)}" ${canEdit && !exam.endedAt ? "" : "disabled"}><option value="">— / 5</option>${[1, 2, 3, 4, 5].map((n) => `<option value="${n}" ${exam.competencies?.[name] === n ? "selected" : ""}>${n} / 5</option>`).join("")}</select></label>`).join("")}
+      </div>
+      <label class="field mt-1"><span>FELVÉTELI AJÁNLÁS</span><select id="exam-recommendation" ${canEdit && !exam.endedAt ? "" : "disabled"}><option value="">Nincs kiválasztva</option>${[["recommended", "Felvételre ajánlott"], ["conditional", "Feltételesen ajánlott"], ["rejected", "Nem ajánlott"], ["retest", "Újravizsga javasolt"]].map(([value, label]) => `<option value="${value}" ${exam.recommendation === value ? "selected" : ""}>${label}</option>`).join("")}</select></label>
     </div>
   `;
 }
@@ -223,6 +244,7 @@ function renderSummaryBar(exam) {
       <div><span class="card-title">Teljesítmény</span><div class="card-value" style="font-size:22px">${s.pct.toFixed(1)}%</div></div>
       <div><span class="card-title">Megválaszolva</span><div class="card-value" style="font-size:22px">${s.answered} / ${s.totalQuestions}</div></div>
       <div><span class="card-title">Eredmény</span><div class="mt-1"><span class="badge ${s.passed ? "badge-green" : "badge-red"}" style="font-size:13px">${s.passed ? "SIKERES" : "SIKERTELEN"}</span> <span class="text-low small">${esc(s.tier)}</span></div></div>
+      <div><span class="card-title">Kritikus hibák</span><div class="card-value" style="font-size:22px">${s.criticalErrors}</div></div>
     </div>
     <div class="grid grid-3 mt-1">
       ${s.categories.map((cat) => `<div class="exam-category-score"><div class="card-title">${esc(cat.category)}</div><strong>${cat.total} / ${cat.max}</strong><span class="text-low small">${cat.max ? ((cat.total / cat.max) * 100).toFixed(0) : 0}%</span></div>`).join("")}
