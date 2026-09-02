@@ -1,8 +1,8 @@
 import {
   getApplicants, getApplicant, createApplicant, setApplicantStatus, setApplicantNotes,
   deleteApplicant, promoteApplicant, getRecruitmentQuestions, addRecruitmentQuestion,
-  removeRecruitmentQuestion, getPositions,
-} from "../store.js?v=20";
+  removeRecruitmentQuestion, getPositions, getExamQuestions,
+} from "../store.js?v=22";
 import { hasRole, actorLabel } from "../auth.js?v=20";
 import { esc, fmtDateTime, toast, openModal, closeModal } from "../utils.js?v=20";
 import { navigate } from "../router.js?v=20";
@@ -16,7 +16,8 @@ const STATUS_META = {
 export function renderRecruitmentList(container) {
   const canEdit = hasRole("TRAINING");
   const applicants = getApplicants();
-  const questions = getRecruitmentQuestions();
+  const questions = getExamQuestions();
+  const applicantQuestions = getRecruitmentQuestions();
 
   container.innerHTML = `
     <div class="classification-strip">FELVÉTELI ELJÁRÁS · U.S.S.S. TOBORZÁS</div>
@@ -40,20 +41,20 @@ export function renderRecruitmentList(container) {
 
     <div class="card mt-2">
       <div class="flex justify-between items-center mb-1">
-        <div class="card-title" style="margin:0">Felvételi kérdésbank</div>
-        ${canEdit ? `<button class="btn btn-sm" id="new-question">+ Kérdés</button>` : ""}
+        <div class="card-title" style="margin:0">U.S.S.S. felvételi vizsgakérdések</div>
+        <a class="btn btn-sm" href="#/exam">Vizsgamodul</a>
       </div>
-      <p class="text-low small mb-1">Ezek jelennek meg egy új jelentkező felvételekor. Bővíthető/törölhető kód nélkül.</p>
+      <p class="text-low small mb-1">A vizsgáztató ezeket a komoly, IC-alapú kérdéseket szóban teszi fel. A jelentkező nem használja a weboldalt.</p>
       ${questions.length ? questions.map((q) => `
         <div class="history-item">
+          <span class="module-code">Q${String(q.num).padStart(2, "0")}</span>
           <span>${esc(q.text)}</span>
-          ${canEdit ? `<button class="btn btn-sm btn-danger" data-remove-q="${esc(q.id)}">×</button>` : ""}
         </div>`).join("") : `<div class="text-low small">Nincs rögzített kérdés.</div>`}
     </div>
   `;
 
   container.querySelectorAll("[data-nav]").forEach((n) => n.addEventListener("click", () => navigate(n.getAttribute("data-nav"))));
-  document.getElementById("new-applicant")?.addEventListener("click", () => openApplicantForm(questions));
+  document.getElementById("new-applicant")?.addEventListener("click", () => openApplicantForm(applicantQuestions));
   document.getElementById("new-question")?.addEventListener("click", () => openQuestionForm());
   container.querySelectorAll("[data-remove-q]").forEach((b) =>
     b.addEventListener("click", () => {
