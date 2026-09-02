@@ -1,7 +1,7 @@
-import { getPersonnel, upsertPerson, deletePerson, readinessPercent, ref, probationInfo, getPositions } from "../store.js?v=19";
-import { hasRole, actorLabel } from "../auth.js?v=19";
-import { esc, initials, toast, openModal, closeModal } from "../utils.js?v=19";
-import { navigate } from "../router.js?v=19";
+import { getPersonnel, upsertPerson, deletePerson, readinessPercent, ref, probationInfo, getPositions } from "../store.js?v=20";
+import { hasRole, actorLabel } from "../auth.js?v=20";
+import { esc, initials, toast, openModal, closeModal } from "../utils.js?v=20";
+import { navigate } from "../router.js?v=20";
 
 let state = { search: "", position: "", level: "", status: "" };
 

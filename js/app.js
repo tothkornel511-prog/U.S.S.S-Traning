@@ -2,20 +2,21 @@
    U.S.S.S. ELITE TRAINING SYSTEM — APP ENTRY
    ========================================================================== */
 
-import { seedIfNeeded, globalSearch, getCustomCss } from "./store.js?v=19";
-import { isAuthenticated, currentSession, logout, hasRole, ROLES } from "./auth.js?v=19";
-import { registerRoute, resolve, startRouter, navigate, currentPath } from "./router.js?v=19";
-import { esc, sealMark } from "./utils.js?v=19";
-import { renderLogin } from "./pages/login.js?v=19";
-import { renderDashboard } from "./pages/dashboard.js?v=19";
-import { renderPersonnelList } from "./pages/personnel.js?v=19";
-import { renderProfile } from "./pages/profile.js?v=19";
-import { renderMatrix } from "./pages/matrix.js?v=19";
-import { renderProtocolsList, renderProtocolDetail } from "./pages/protocols.js?v=19";
-import { renderLocationsList, renderLocationDetail } from "./pages/locations.js?v=19";
-import { renderMapPage } from "./pages/map.js?v=19";
-import { renderRecruitmentList, renderApplicantDetail } from "./pages/recruitment.js?v=19";
-import { renderAdmin } from "./pages/admin.js?v=19";
+import { seedIfNeeded, globalSearch, getCustomCss } from "./store.js?v=20";
+import { isAuthenticated, currentSession, logout, hasRole, ROLES } from "./auth.js?v=20";
+import { registerRoute, resolve, startRouter, navigate, currentPath } from "./router.js?v=20";
+import { esc, sealMark } from "./utils.js?v=20";
+import { renderLogin } from "./pages/login.js?v=20";
+import { renderDashboard } from "./pages/dashboard.js?v=20";
+import { renderPersonnelList } from "./pages/personnel.js?v=20";
+import { renderProfile } from "./pages/profile.js?v=20";
+import { renderMatrix } from "./pages/matrix.js?v=20";
+import { renderProtocolsList, renderProtocolDetail } from "./pages/protocols.js?v=20";
+import { renderLocationsList, renderLocationDetail } from "./pages/locations.js?v=20";
+import { renderMapPage } from "./pages/map.js?v=20";
+import { renderRecruitmentList, renderApplicantDetail } from "./pages/recruitment.js?v=20";
+import { renderExamList, renderExamDetail } from "./pages/exam.js?v=20";
+import { renderAdmin } from "./pages/admin.js?v=20";
 
 seedIfNeeded();
 applyCustomCss();
@@ -41,6 +42,7 @@ const NAV = [
     { path: "/matrix", label: "Kiképzési Áttekintés", icon: "▦" },
     { path: "/protocols", label: "Jegyzőkönyvek", icon: "▤" },
     { path: "/recruitment", label: "Felvételi", icon: "✎" },
+    { path: "/exam", label: "Felvételi Vizsga", icon: "◉", minRole: "TRAINING" },
   ]},
   { group: "Objektumok", items: [
     { path: "/locations", label: "Védett helyszínek", icon: "◆" },
@@ -55,6 +57,7 @@ function pageTitleFor(path) {
   if (path.startsWith("/personnel/")) return { crumb: "Állomány", title: "Személyi profil" };
   if (path.startsWith("/protocols/")) return { crumb: "Jegyzőkönyvek", title: "Jegyzőkönyv részletei" };
   if (path.startsWith("/recruitment/")) return { crumb: "Felvételi", title: "Jelentkező részletei" };
+  if (path.startsWith("/exam/")) return { crumb: "Felvételi Vizsga", title: "Vizsga részletei" };
   if (path.startsWith("/locations/")) return { crumb: "Objektumok", title: "Helyszín részletei" };
   if (path.startsWith("/map")) return { crumb: "Objektumok", title: "Térkép" };
   const flat = NAV.flatMap((g) => g.items);
@@ -179,6 +182,8 @@ registerRoute("/protocols", () => renderProtocolsList(document.getElementById("c
 registerRoute("/protocols/:id", (p) => renderProtocolDetail(document.getElementById("content"), p.id));
 registerRoute("/recruitment", () => renderRecruitmentList(document.getElementById("content")));
 registerRoute("/recruitment/:id", (p) => renderApplicantDetail(document.getElementById("content"), p.id));
+registerRoute("/exam", () => renderExamList(document.getElementById("content")));
+registerRoute("/exam/:id", (p) => renderExamDetail(document.getElementById("content"), p.id));
 registerRoute("/locations", () => renderLocationsList(document.getElementById("content")));
 registerRoute("/locations/:id", (p) => renderLocationDetail(document.getElementById("content"), p.id));
 registerRoute("/map", () => renderMapPage(document.getElementById("content")));

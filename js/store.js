@@ -9,8 +9,8 @@
 import {
   LEVELS, SERVICE_STATUSES, POSITIONS, MODULES, LEVEL_MODULE_ORDER,
   PERSONNEL, ACCESS_CODES, PROTECTED_LOCATIONS, AUDIT_LOG_SEED, MAPS, DISTRICTS,
-  RECRUITMENT_QUESTIONS,
-} from "./data.js?v=19";
+  RECRUITMENT_QUESTIONS, EXAM_QUESTIONS, EXAM_CATEGORIES,
+} from "./data.js?v=20";
 
 /* v7: Roxwood/Cayo Perico eltávolítva, csak Los Santos térkép maradt. */
 const NS = "usss_ets_v7_";
@@ -26,6 +26,8 @@ const KEYS = {
   nextProtocol: NS + "next_protocol_seq",
   recruitmentQuestions: NS + "recruitment_questions",
   applicants: NS + "applicants",
+  exams: NS + "exams",
+  nextExamSeq: NS + "next_exam_seq",
 };
 
 /* Elméleti vizsgánál ez alatt a százalék alatt a modul nem számít teljesítettnek. */
@@ -219,6 +221,10 @@ function applyRecruitmentSeedPatch() {
   }
   if (read(KEYS.applicants, null) === null) {
     write(KEYS.applicants, []);
+  }
+  if (read(KEYS.exams, null) === null) {
+    write(KEYS.exams, []);
+    write(KEYS.nextExamSeq, 0);
   }
 }
 
@@ -750,6 +756,102 @@ export function promoteApplicant(id, usssId, position, actorLabel) {
   if (idx >= 0) list[idx].promotedTo = usssId;
   write(KEYS.applicants, list);
   logAudit(actorLabel, "Jelentkező felvéve az állományba", `${a.name} → ${usssId}`);
+}
+
+/* ---------- Felvételi vizsga (IC szóbeli, oktatásvezető pontozza) --------*/
+export const EXAM_MAX_SCORE = EXAM_QUESTIONS.length * 5; // 150
+export const EXAM_PASS_PCT = 80;
+
+export function getExamQuestions() {
+  return EXAM_QUESTIONS;
+}
+export function getExamCategories() {
+  return EXAM_CATEGORIES;
+}
+
+function nextExamId() {
+  const seq = read(KEYS.nextExamSeq, 0);
+  return { id: `USSS-${String(seq).padStart(3, "0")}`, seq };
+}
+
+export function getExams() {
+  return read(KEYS.exams, []);
+}
+export function getExam(id) {
+  return getExams().find((e) => e.id === id);
+}
+export function createExam({ candidateName, candidateDiscord, examinerName, examinerRank }, actorLabel) {
+  const { id, seq } = nextExamId();
+  const exam = {
+    id,
+    candidateName: (candidateName || "").trim(),
+    candidateDiscord: (candidateDiscord || "").trim(),
+    examinerName: (examinerName || "").trim(),
+    examinerRank: (examinerRank || "").trim(),
+    date: new Date().toISOString().slice(0, 10),
+    startedAt: new Date().toISOString(),
+    endedAt: null,
+    answers: [], // [{questionId, score: 0-5|null, note}]
+    finalComment: "",
+    createdBy: actorLabel,
+    createdAt: new Date().toISOString(),
+  };
+  const list = getExams();
+  list.unshift(exam);
+  write(KEYS.exams, list);
+  write(KEYS.nextExamSeq, seq + 1);
+  logAudit(actorLabel, "Felvételi vizsga indítva", `${id} — ${exam.candidateName}`);
+  return exam;
+}
+export function setExamAnswer(examId, questionId, patch) {
+  const list = getExams();
+  const exam = list.find((e) => e.id === examId);
+  if (!exam) return;
+  exam.answers = exam.answers || [];
+  let a = exam.answers.find((x) => x.questionId === questionId);
+  if (!a) { a = { questionId, score: null, note: "" }; exam.answers.push(a); }
+  if (patch.score !== undefined) a.score = patch.score;
+  if (patch.note !== undefined) a.note = patch.note;
+  write(KEYS.exams, list);
+}
+export function setExamFinalComment(examId, comment) {
+  const list = getExams();
+  const exam = list.find((e) => e.id === examId);
+  if (!exam) return;
+  exam.finalComment = comment || "";
+  write(KEYS.exams, list);
+}
+export function finishExam(examId, actorLabel) {
+  const list = getExams();
+  const exam = list.find((e) => e.id === examId);
+  if (!exam) return;
+  exam.endedAt = new Date().toISOString();
+  write(KEYS.exams, list);
+  const s = examScoreSummary(exam);
+  logAudit(actorLabel, "Felvételi vizsga lezárva",
+    `${exam.id} — ${exam.candidateName}: ${s.total}/${s.max} (${s.pct.toFixed(1)}%) — ${s.passed ? "SIKERES" : "SIKERTELEN"}`);
+}
+export function deleteExam(id, actorLabel) {
+  const exam = getExam(id);
+  write(KEYS.exams, getExams().filter((e) => e.id !== id));
+  logAudit(actorLabel, "Felvételi vizsga törölve", exam ? `${id} — ${exam.candidateName}` : id);
+}
+
+/* Pontszám, százalék, min. 80% eredmény és minőségi sáv kiszámítása. */
+export function examScoreSummary(exam) {
+  const total = (exam.answers || []).reduce((sum, a) => sum + (typeof a.score === "number" ? a.score : 0), 0);
+  const answered = (exam.answers || []).filter((a) => typeof a.score === "number").length;
+  const max = EXAM_MAX_SCORE;
+  const pct = max ? (total / max) * 100 : 0;
+  const passed = pct >= EXAM_PASS_PCT;
+  let tier;
+  if (pct < 60) tier = "Súlyosan nem megfelelő";
+  else if (pct < 70) tier = "Nem megfelelő";
+  else if (pct < 80) tier = "Közel megfelelő, de sikertelen";
+  else if (pct < 90) tier = "Sikeres";
+  else if (pct < 95) tier = "Kiemelkedő";
+  else tier = "Kiváló";
+  return { total, max, pct, passed, tier, answered, totalQuestions: EXAM_QUESTIONS.length };
 }
 
 /* ---------- Global search ------------------------------------------------*/

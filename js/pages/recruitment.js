@@ -2,10 +2,10 @@ import {
   getApplicants, getApplicant, createApplicant, setApplicantStatus, setApplicantNotes,
   deleteApplicant, promoteApplicant, getRecruitmentQuestions, addRecruitmentQuestion,
   removeRecruitmentQuestion, getPositions,
-} from "../store.js?v=19";
-import { hasRole, actorLabel } from "../auth.js?v=19";
-import { esc, fmtDateTime, toast, openModal, closeModal } from "../utils.js?v=19";
-import { navigate } from "../router.js?v=19";
+} from "../store.js?v=20";
+import { hasRole, actorLabel } from "../auth.js?v=20";
+import { esc, fmtDateTime, toast, openModal, closeModal } from "../utils.js?v=20";
+import { navigate } from "../router.js?v=20";
 
 const STATUS_META = {
   review: { c: "badge-yellow", t: "Elbírálás alatt" },

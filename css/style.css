@@ -547,3 +547,44 @@ tbody tr:hover { background: rgba(198,166,100,0.04); }
   .search-wrap { display: none; }
 }
 .menu-toggle { display: none; background: var(--bg-panel-2); border: 1px solid var(--line-soft); color: var(--text-hi); width: 36px; height: 36px; border-radius: var(--radius-sm); align-items: center; justify-content: center; flex: none; }
+
+/* ---------- Felvételi Vizsga (Recruitment Exam) ---------- */
+.exam-summary-bar {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px;
+  padding: 16px 0; border-top: 1px solid var(--line-soft); border-bottom: 1px solid var(--line-soft);
+  margin: 14px 0;
+}
+@media (max-width: 700px) { .exam-summary-bar { grid-template-columns: 1fr 1fr; } }
+
+.exam-q-card {
+  background: rgba(18,20,27,0.5); border: 1px solid var(--line-soft); border-radius: var(--radius-md);
+  padding: 16px 18px; margin-bottom: 12px; backdrop-filter: blur(8px);
+}
+.exam-q-head { display: flex; gap: 10px; align-items: baseline; margin-bottom: 10px; font-size: 14.5px; line-height: 1.5; }
+.exam-q-tips {
+  background: rgba(198,166,100,0.05); border: 1px solid var(--line); border-radius: var(--radius-sm);
+  padding: 10px 14px; margin-bottom: 12px;
+}
+.exam-tip-list { margin: 0; padding-left: 18px; color: var(--text-mid); font-size: 12.5px; line-height: 1.7; }
+.exam-tip-list li { margin-bottom: 2px; }
+.exam-q-watch {
+  margin-top: 8px; padding-top: 8px; border-top: 1px dashed var(--line-soft);
+  font-size: 12px; color: var(--gold-bright); font-style: italic;
+}
+
+.exam-score-row { display: flex; gap: 8px; margin-bottom: 10px; flex-wrap: wrap; }
+.exam-score-btn {
+  width: 38px; height: 38px; border-radius: var(--radius-sm); border: 1px solid var(--line-soft);
+  background: var(--bg-panel-2); color: var(--text-mid); font-family: var(--font-mono); font-size: 15px;
+  font-weight: 600; display: flex; align-items: center; justify-content: center;
+}
+.exam-score-btn:hover { border-color: var(--gold-dim); color: var(--text-hi); }
+.exam-score-btn.active {
+  background: rgba(198,166,100,0.16); border-color: var(--gold); color: var(--gold-bright);
+  box-shadow: var(--glow-gold);
+}
+.exam-note {
+  width: 100%; background: var(--bg-base); border: 1px solid var(--line-soft); border-radius: var(--radius-sm);
+  color: var(--text-hi); padding: 8px 12px; font-size: 12.5px; font-family: var(--font-body); resize: vertical;
+}
+.exam-note:focus { border-color: var(--gold-dim); outline: none; }
