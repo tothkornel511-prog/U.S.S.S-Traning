@@ -2,7 +2,7 @@
    U.S.S.S. ELITE TRAINING SYSTEM — APP ENTRY
    ========================================================================== */
 
-import { seedIfNeeded, globalSearch, getCustomCss } from "./store.js?v=38";
+import { seedIfNeeded, globalSearch, getCustomCss, getOperationRecords } from "./store.js?v=39";
 import { isAuthenticated, currentSession, logout, hasRole, ROLES } from "./auth.js?v=20";
 import { registerRoute, resolve, startRouter, navigate, currentPath } from "./router.js?v=20";
 import { esc, sealMark } from "./utils.js?v=20";
@@ -190,6 +190,7 @@ function renderSearchResults(results, container) {
 function renderNav() {
   const navRoot = document.getElementById("nav-root");
   const path = currentPath();
+  const alertCount = getOperationRecords().filter((record) => !record.archived && record.status !== "COMPLETED" && (record.priority === "CRITICAL" || record.priority === "HIGH" || record.risk === "CRITICAL")).length;
   navRoot.innerHTML = NAV.map((group) => {
     const items = group.items.filter((i) => !i.minRole || hasRole(i.minRole));
     if (!items.length) return "";
@@ -198,7 +199,7 @@ function renderNav() {
         <div class="nav-group-label">${esc(group.group)}</div>
         ${items.map((i) => `
           <a href="#${i.path}" class="nav-link ${(path === i.path || path.startsWith(i.path + "/")) ? "active" : ""}">
-            <span class="ic">${i.icon}</span>${esc(i.label)}
+            <span class="ic">${i.icon}</span>${esc(i.label)}${i.path === "/operations/notifications" && alertCount ? `<span class="nav-alert-count">${alertCount}</span>` : ""}
           </a>`).join("")}
       </div>`;
   }).join("");
