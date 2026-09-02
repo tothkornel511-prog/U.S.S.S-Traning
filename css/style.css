@@ -588,3 +588,38 @@ tbody tr:hover { background: rgba(198,166,100,0.04); }
   color: var(--text-hi); padding: 8px 12px; font-size: 12.5px; font-family: var(--font-body); resize: vertical;
 }
 .exam-note:focus { border-color: var(--gold-dim); outline: none; }
+
+/* Recruitment desk: dense, deliberate controls for live oral examinations. */
+.exam-q-card {
+  position: relative; overflow: hidden;
+  background: linear-gradient(135deg, rgba(23,25,33,.9), rgba(12,14,19,.82));
+  border-color: rgba(198,166,100,.18);
+  box-shadow: 0 12px 28px rgba(0,0,0,.18);
+  transition: border-color .18s ease, transform .18s ease, box-shadow .18s ease;
+}
+.exam-q-card:hover { border-color: rgba(198,166,100,.42); box-shadow: 0 16px 36px rgba(0,0,0,.28), 0 0 22px rgba(198,166,100,.08); transform: translateY(-1px); }
+.exam-q-card::before { content: ""; position: absolute; inset: 0 auto 0 0; width: 3px; background: var(--gold-dim); opacity: .75; }
+.exam-q-head { align-items: flex-start; font-weight: 600; color: var(--text-hi); }
+.exam-q-head .module-code { flex: none; min-width: 46px; padding: 4px 6px; text-align: center; border: 1px solid rgba(198,166,100,.38); border-radius: 3px; color: var(--gold-bright); background: rgba(198,166,100,.08); font-family: var(--font-mono); font-size: 11px; letter-spacing: .06em; }
+.exam-q-tips { background: rgba(198,166,100,.045); border-color: rgba(198,166,100,.16); }
+.exam-score-row { align-items: center; }
+.exam-score-row::before { content: "PONT"; color: var(--text-low); font: 10px var(--font-mono); letter-spacing: .12em; margin-right: 2px; }
+.exam-score-btn { width: 42px; height: 42px; border-radius: 3px; }
+.exam-score-btn[data-score-val="0"].active { background: rgba(209,85,74,.16); border-color: rgba(209,85,74,.7); color: #f0a29b; box-shadow: 0 0 16px rgba(209,85,74,.16); }
+.exam-score-btn[data-score-val="5"].active { background: rgba(78,158,111,.16); border-color: rgba(78,158,111,.7); color: #9be0b2; box-shadow: 0 0 16px rgba(78,158,111,.16); }
+.exam-category-score { min-height: 62px; padding: 11px 13px; border: 1px solid var(--line-soft); border-radius: var(--radius-sm); background: rgba(18,20,27,.55); }
+.exam-category-score strong { display: block; color: var(--text-hi); font-family: var(--font-mono); font-size: 13px; margin-bottom: 4px; }
+.exam-category-score .card-title { margin-bottom: 5px; line-height: 1.35; }
+details.card { border-color: rgba(198,166,100,.22); }
+details.card > summary { color: var(--gold-bright); list-style: none; }
+details.card > summary::-webkit-details-marker { display: none; }
+details.card > summary::after { content: "+"; float: right; font: 18px var(--font-mono); color: var(--gold); }
+details.card[open] > summary::after { content: "−"; }
+[data-critical-q] { accent-color: #d1554a; width: 15px; height: 15px; vertical-align: -3px; margin-right: 5px; }
+.exam-note:focus, [data-competency]:focus, #exam-recommendation:focus { border-color: var(--gold); box-shadow: 0 0 0 2px rgba(198,166,100,.1); }
+@media (max-width: 700px) {
+  .exam-q-card { padding: 14px 14px 14px 16px; }
+  .exam-q-head { font-size: 14px; }
+  .exam-score-row::before { width: 100%; margin-bottom: 1px; }
+  .exam-category-score { min-height: auto; }
+}
