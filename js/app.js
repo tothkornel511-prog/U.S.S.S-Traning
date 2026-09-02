@@ -2,12 +2,12 @@
    U.S.S.S. ELITE TRAINING SYSTEM — APP ENTRY
    ========================================================================== */
 
-import { seedIfNeeded, globalSearch, getCustomCss } from "./store.js?v=21";
+import { seedIfNeeded, globalSearch, getCustomCss } from "./store.js?v=27";
 import { isAuthenticated, currentSession, logout, hasRole, ROLES } from "./auth.js?v=20";
 import { registerRoute, resolve, startRouter, navigate, currentPath } from "./router.js?v=20";
 import { esc, sealMark } from "./utils.js?v=20";
 import { renderLogin } from "./pages/login.js?v=20";
-import { renderDashboard } from "./pages/dashboard.js?v=20";
+import { renderDashboard } from "./pages/dashboard.js?v=27";
 import { renderPersonnelList } from "./pages/personnel.js?v=20";
 import { renderProfile } from "./pages/profile.js?v=20";
 import { renderMatrix } from "./pages/matrix.js?v=20";
@@ -17,6 +17,7 @@ import { renderMapPage } from "./pages/map.js?v=20";
 import { renderRecruitmentHub, renderApplicantDetail } from "./pages/recruitment.js?v=25";
 import { renderExamList, renderExamDetail } from "./pages/exam.js?v=22";
 import { renderAdmin } from "./pages/admin.js?v=20";
+import { renderOperations } from "./pages/operations.js?v=27";
 
 seedIfNeeded();
 applyCustomCss();
@@ -47,6 +48,15 @@ const NAV = [
     { path: "/locations", label: "Védett helyszínek", icon: "◆" },
     { path: "/map", label: "Térkép", icon: "🗺" },
   ]},
+  { group: "Command Center", items: [
+    { path: "/operations/reports", label: "Jelentések", icon: "▤", minRole: "TRAINING" },
+    { path: "/operations/incidents", label: "Incidensek", icon: "!", minRole: "TRAINING" },
+    { path: "/operations/threats", label: "Threat Assessment", icon: "△", minRole: "TRAINING" },
+    { path: "/operations/events", label: "Események", icon: "◈", minRole: "TRAINING" },
+    { path: "/operations/assignments", label: "Feladatok", icon: "▣", minRole: "TRAINING" },
+    { path: "/operations/protectees", label: "Védett személyek", icon: "◆", minRole: "TRAINING" },
+    { path: "/operations/fleet", label: "Járműflotta", icon: "▰", minRole: "TRAINING" },
+  ]},
   { group: "Rendszer", items: [
     { path: "/admin", label: "Adminisztráció", icon: "⚙", minRole: "TRAINING" },
   ]},
@@ -58,6 +68,7 @@ function pageTitleFor(path) {
   if (path.startsWith("/recruitment/")) return { crumb: "Felvételi", title: "Jelentkező részletei" };
   if (path.startsWith("/exam/")) return { crumb: "Felvételi Vizsga", title: "Vizsga részletei" };
   if (path.startsWith("/locations/")) return { crumb: "Objektumok", title: "Helyszín részletei" };
+  if (path.startsWith("/operations/")) return { crumb: "Command Center", title: "Operációs központ" };
   if (path.startsWith("/map")) return { crumb: "Objektumok", title: "Térkép" };
   const flat = NAV.flatMap((g) => g.items);
   const found = flat.find((i) => i.path === path);
@@ -127,7 +138,7 @@ function renderShell() {
 }
 
 function renderSearchResults(results, container) {
-  const total = results.personnel.length + results.modules.length + results.protocols.length + results.locations.length;
+  const total = results.personnel.length + results.modules.length + results.protocols.length + results.locations.length + (results.operations || []).length;
   if (!total) {
     container.innerHTML = `<div class="search-results"><div class="sr-empty">Nincs találat.</div></div>`;
     container.style.display = "block";
@@ -144,6 +155,7 @@ function renderSearchResults(results, container) {
     ${block("Modulok", results.modules, (m) => `<div class="sr-item" data-nav="/matrix"><span>${esc(m.code)} — ${esc(m.name)}</span></div>`)}
     ${block("Jegyzőkönyvek", results.protocols, (p) => `<div class="sr-item" data-nav="/protocols/${esc(p.id)}"><span>${esc(p.id)}</span><span class="text-low small">${esc(p.moduleCode)}</span></div>`)}
     ${block("Helyszínek", results.locations, (l) => `<div class="sr-item" data-nav="/locations/${esc(l.id)}"><span>${esc(l.name)}</span></div>`)}
+    ${block("Command Center", results.operations || [], (r) => `<div class="sr-item" data-nav="/operations/${esc(r.type)}"><span>${esc(r.title)}</span><span class="text-low small">${esc(r.id)}</span></div>`)}
   </div>`;
   container.style.display = "block";
   container.querySelectorAll("[data-nav]").forEach((it) =>
@@ -188,6 +200,7 @@ registerRoute("/locations/:id", (p) => renderLocationDetail(document.getElementB
 registerRoute("/map", () => renderMapPage(document.getElementById("content")));
 registerRoute("/map/:mapId", (p) => renderMapPage(document.getElementById("content"), p.mapId));
 registerRoute("/admin", () => renderAdmin(document.getElementById("content")));
+registerRoute("/operations/:type", (p) => renderOperations(document.getElementById("content"), p.type));
 
 function onRouteChange() {
   if (!isAuthenticated()) { boot(); return; }

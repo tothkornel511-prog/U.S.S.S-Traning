@@ -1,4 +1,4 @@
-import { getPersonnel, getProtocols, getLocations, readinessPercent, ref } from "../store.js?v=20";
+import { getPersonnel, getProtocols, getLocations, getOperationRecords, readinessPercent, ref } from "../store.js?v=27";
 import { hasRole } from "../auth.js?v=20";
 import { esc, initials } from "../utils.js?v=20";
 import { navigate } from "../router.js?v=20";
@@ -7,6 +7,9 @@ export function renderDashboard(container) {
   const personnel = getPersonnel();
   const protocols = getProtocols();
   const locations = getLocations();
+  const operations = getOperationRecords();
+  const openOperations = operations.filter((record) => !record.archived && record.status !== "COMPLETED" && record.status !== "REJECTED");
+  const criticalOperations = openOperations.filter((record) => record.priority === "CRITICAL" || record.risk === "CRITICAL");
 
   const active = personnel.filter((p) => p.status === "Aktív").length;
   const probationers = personnel.filter((p) => p.level === "0" && !p.probationLifted).length;
@@ -35,6 +38,15 @@ export function renderDashboard(container) {
         <div class="card-title">🛡️ Védett helyszínek</div>
         <div class="card-value">${locations.length}</div>
         <div class="card-sub">Nyilvántartott objektum</div>
+      </div>
+    </div>
+
+    <div class="card command-overview section">
+      <div class="flex justify-between items-center mb-1 flex-wrap"><div><div class="eyebrow">EXECUTIVE CONTROL / LIVE STATUS</div><h2>COMMAND OVERVIEW</h2></div><a href="#/operations/incidents" class="btn btn-sm">Operációs központ →</a></div>
+      <div class="grid grid-3 command-overview-stats">
+        <div><span class="card-title">Nyitott rekordok</span><strong>${openOperations.length}</strong><span class="text-low small">Jelentések, feladatok és műveletek</span></div>
+        <div><span class="card-title">Kritikus figyelmeztetések</span><strong class="command-alert">${criticalOperations.length}</strong><span class="text-low small">Azonnali vezetői áttekintést igényel</span></div>
+        <div><span class="card-title">Összes operációs rekord</span><strong>${operations.length}</strong><span class="text-low small">Archivált rekordok nélkül is visszakereshető</span></div>
       </div>
     </div>
 

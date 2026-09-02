@@ -28,6 +28,7 @@ const KEYS = {
   applicants: NS + "applicants",
   exams: NS + "exams",
   nextExamSeq: NS + "next_exam_seq",
+  operations: NS + "operations",
 };
 
 /* Elméleti vizsgánál ez alatt a százalék alatt a modul nem számít teljesítettnek. */
@@ -777,6 +778,73 @@ function nextExamId() {
 export function getExams() {
   return read(KEYS.exams, []);
 }
+
+export const OPERATION_TYPES = {
+  protectees: { label: "Védett személyek", singular: "Védett személy", icon: "◆" },
+  events: { label: "Események", singular: "Esemény", icon: "◈" },
+  escorts: { label: "Kísérések", singular: "Kísérés", icon: "↗" },
+  assignments: { label: "Feladatok", singular: "Feladat", icon: "▣" },
+  reports: { label: "Jelentések", singular: "Jelentés", icon: "▤" },
+  incidents: { label: "Incidensek", singular: "Incidens", icon: "!" },
+  threats: { label: "Threat Assessment", singular: "Fenyegetés", icon: "△" },
+  recommendations: { label: "Biztonsági javaslatok", singular: "Javaslat", icon: "◇" },
+  fleet: { label: "Járműflotta", singular: "Jármű", icon: "▰" },
+  advance: { label: "Advance Work", singular: "Advance", icon: "⌖" },
+};
+
+export function getOperationRecords(type = "") {
+  return read(KEYS.operations, []).filter((record) => !type || record.type === type);
+}
+
+export function createOperationRecord(type, fields, actorLabel) {
+  const meta = OPERATION_TYPES[type];
+  if (!meta) return null;
+  const now = new Date().toISOString();
+  const record = {
+    id: `${type.slice(0, 3).toUpperCase()}-${Date.now().toString(36).toUpperCase()}`,
+    type,
+    title: (fields.title || meta.singular).trim(),
+    status: fields.status || "OPEN",
+    priority: fields.priority || "NORMAL",
+    risk: fields.risk || "LOW",
+    owner: (fields.owner || "").trim(),
+    location: (fields.location || "").trim(),
+    protectee: (fields.protectee || "").trim(),
+    date: fields.date || now.slice(0, 10),
+    description: (fields.description || "").trim(),
+    action: (fields.action || "").trim(),
+    recommendation: (fields.recommendation || "").trim(),
+    tags: (fields.tags || "").trim(),
+    archived: false,
+    createdAt: now,
+    createdBy: actorLabel || "Rendszer",
+    updatedAt: now,
+    history: [{ at: now, by: actorLabel || "Rendszer", action: "Létrehozva" }],
+  };
+  const list = read(KEYS.operations, []);
+  list.unshift(record);
+  write(KEYS.operations, list);
+  logAudit(actorLabel, `${meta.singular} létrehozva`, `${record.id} — ${record.title}`);
+  return record;
+}
+
+export function updateOperationRecord(id, patch, actorLabel) {
+  const list = read(KEYS.operations, []);
+  const record = list.find((item) => item.id === id);
+  if (!record) return null;
+  const changes = Object.entries(patch).filter(([key, value]) => value !== undefined && record[key] !== value);
+  changes.forEach(([key, value]) => { record[key] = value; });
+  record.updatedAt = new Date().toISOString();
+  record.history = record.history || [];
+  record.history.push({ at: record.updatedAt, by: actorLabel || "Rendszer", action: changes.map(([key]) => key).join(", ") + " módosítva" });
+  write(KEYS.operations, list);
+  if (changes.length) logAudit(actorLabel, "Operációs rekord módosítva", `${id} — ${changes.map(([key]) => key).join(", ")}`);
+  return record;
+}
+
+export function archiveOperationRecord(id, archived, actorLabel) {
+  return updateOperationRecord(id, { archived: Boolean(archived) }, actorLabel);
+}
 export function getExam(id) {
   return getExams().find((e) => e.id === id);
 }
@@ -904,7 +972,7 @@ export function examScoreSummary(exam) {
 /* ---------- Global search ------------------------------------------------*/
 export function globalSearch(query) {
   const q = query.trim().toLowerCase();
-  if (!q) return { personnel: [], modules: [], protocols: [], locations: [] };
+  if (!q) return { personnel: [], modules: [], protocols: [], locations: [], operations: [] };
 
   const personnel = getPersonnel().filter(
     (p) =>
@@ -925,5 +993,8 @@ export function globalSearch(query) {
   const locations = getLocations().filter(
     (l) => l.name.toLowerCase().includes(q) || l.place.toLowerCase().includes(q)
   );
-  return { personnel, modules, protocols, locations };
+  const operations = getOperationRecords().filter((record) =>
+    [record.id, record.title, record.type, record.owner, record.location, record.protectee, record.description].join(" ").toLowerCase().includes(q)
+  );
+  return { personnel, modules, protocols, locations, operations };
 }
