@@ -2,19 +2,20 @@
    U.S.S.S. ELITE TRAINING SYSTEM — APP ENTRY
    ========================================================================== */
 
-import { seedIfNeeded, globalSearch, getCustomCss } from "./store.js?v=18";
-import { isAuthenticated, currentSession, logout, hasRole, ROLES } from "./auth.js?v=18";
-import { registerRoute, resolve, startRouter, navigate, currentPath } from "./router.js?v=18";
-import { esc, sealMark } from "./utils.js?v=18";
-import { renderLogin } from "./pages/login.js?v=18";
-import { renderDashboard } from "./pages/dashboard.js?v=18";
-import { renderPersonnelList } from "./pages/personnel.js?v=18";
-import { renderProfile } from "./pages/profile.js?v=18";
-import { renderMatrix } from "./pages/matrix.js?v=18";
-import { renderProtocolsList, renderProtocolDetail } from "./pages/protocols.js?v=18";
-import { renderLocationsList, renderLocationDetail } from "./pages/locations.js?v=18";
-import { renderMapPage } from "./pages/map.js?v=18";
-import { renderAdmin } from "./pages/admin.js?v=18";
+import { seedIfNeeded, globalSearch, getCustomCss } from "./store.js?v=19";
+import { isAuthenticated, currentSession, logout, hasRole, ROLES } from "./auth.js?v=19";
+import { registerRoute, resolve, startRouter, navigate, currentPath } from "./router.js?v=19";
+import { esc, sealMark } from "./utils.js?v=19";
+import { renderLogin } from "./pages/login.js?v=19";
+import { renderDashboard } from "./pages/dashboard.js?v=19";
+import { renderPersonnelList } from "./pages/personnel.js?v=19";
+import { renderProfile } from "./pages/profile.js?v=19";
+import { renderMatrix } from "./pages/matrix.js?v=19";
+import { renderProtocolsList, renderProtocolDetail } from "./pages/protocols.js?v=19";
+import { renderLocationsList, renderLocationDetail } from "./pages/locations.js?v=19";
+import { renderMapPage } from "./pages/map.js?v=19";
+import { renderRecruitmentList, renderApplicantDetail } from "./pages/recruitment.js?v=19";
+import { renderAdmin } from "./pages/admin.js?v=19";
 
 seedIfNeeded();
 applyCustomCss();
@@ -39,6 +40,7 @@ const NAV = [
     { path: "/personnel", label: "Állomány", icon: "☰" },
     { path: "/matrix", label: "Kiképzési Áttekintés", icon: "▦" },
     { path: "/protocols", label: "Jegyzőkönyvek", icon: "▤" },
+    { path: "/recruitment", label: "Felvételi", icon: "✎" },
   ]},
   { group: "Objektumok", items: [
     { path: "/locations", label: "Védett helyszínek", icon: "◆" },
@@ -52,6 +54,7 @@ const NAV = [
 function pageTitleFor(path) {
   if (path.startsWith("/personnel/")) return { crumb: "Állomány", title: "Személyi profil" };
   if (path.startsWith("/protocols/")) return { crumb: "Jegyzőkönyvek", title: "Jegyzőkönyv részletei" };
+  if (path.startsWith("/recruitment/")) return { crumb: "Felvételi", title: "Jelentkező részletei" };
   if (path.startsWith("/locations/")) return { crumb: "Objektumok", title: "Helyszín részletei" };
   if (path.startsWith("/map")) return { crumb: "Objektumok", title: "Térkép" };
   const flat = NAV.flatMap((g) => g.items);
@@ -174,6 +177,8 @@ registerRoute("/personnel/:id", (p) => renderProfile(document.getElementById("co
 registerRoute("/matrix", () => renderMatrix(document.getElementById("content")));
 registerRoute("/protocols", () => renderProtocolsList(document.getElementById("content")));
 registerRoute("/protocols/:id", (p) => renderProtocolDetail(document.getElementById("content"), p.id));
+registerRoute("/recruitment", () => renderRecruitmentList(document.getElementById("content")));
+registerRoute("/recruitment/:id", (p) => renderApplicantDetail(document.getElementById("content"), p.id));
 registerRoute("/locations", () => renderLocationsList(document.getElementById("content")));
 registerRoute("/locations/:id", (p) => renderLocationDetail(document.getElementById("content"), p.id));
 registerRoute("/map", () => renderMapPage(document.getElementById("content")));

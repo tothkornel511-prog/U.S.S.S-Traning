@@ -9,7 +9,8 @@
 import {
   LEVELS, SERVICE_STATUSES, POSITIONS, MODULES, LEVEL_MODULE_ORDER,
   PERSONNEL, ACCESS_CODES, PROTECTED_LOCATIONS, AUDIT_LOG_SEED, MAPS, DISTRICTS,
-} from "./data.js?v=18";
+  RECRUITMENT_QUESTIONS,
+} from "./data.js?v=19";
 
 /* v7: Roxwood/Cayo Perico eltávolítva, csak Los Santos térkép maradt. */
 const NS = "usss_ets_v7_";
@@ -23,6 +24,8 @@ const KEYS = {
   auditLog: NS + "audit_log",
   seeded: NS + "seeded",
   nextProtocol: NS + "next_protocol_seq",
+  recruitmentQuestions: NS + "recruitment_questions",
+  applicants: NS + "applicants",
 };
 
 /* Elméleti vizsgánál ez alatt a százalék alatt a modul nem számít teljesítettnek. */
@@ -93,11 +96,14 @@ export function seedIfNeeded() {
     write(KEYS.protocols, []);
     write(KEYS.auditLog, AUDIT_LOG_SEED);
     write(KEYS.nextProtocol, 1);
+    write(KEYS.recruitmentQuestions, RECRUITMENT_QUESTIONS);
+    write(KEYS.applicants, []);
     write(KEYS.seeded, true);
   }
   applyPositionPatch();
   applyHijSplitPatch();
   applyTheoryFillPatch();
+  applyRecruitmentSeedPatch();
   applyLocationIdFixPatch();
 }
 
@@ -201,6 +207,19 @@ function applyLocationIdFixPatch() {
   });
   if (changed) write(KEYS.locations, list);
   write(LOCATION_ID_FIX_PATCH_KEY, true);
+}
+
+/* Célzott seedelés: a Felvételi modul (kérdésbank + jelentkezők) új
+   localStorage-kulcsokat vezet be, amiket egy már korábban seedelt
+   böngésző még nem ismer — ez a patch pótolja őket, minden mást
+   érintetlenül hagyva. */
+function applyRecruitmentSeedPatch() {
+  if (read(KEYS.recruitmentQuestions, null) === null) {
+    write(KEYS.recruitmentQuestions, RECRUITMENT_QUESTIONS);
+  }
+  if (read(KEYS.applicants, null) === null) {
+    write(KEYS.applicants, []);
+  }
 }
 
 export function resetAllData() {
@@ -650,6 +669,87 @@ export function logAudit(actor, action, detail) {
     detail,
   });
   write(KEYS.auditLog, list.slice(0, 500));
+}
+
+/* ---------- Felvételi (kérdésbank + jelentkezők) --------------------------*/
+export function getRecruitmentQuestions() {
+  return read(KEYS.recruitmentQuestions, []);
+}
+export function addRecruitmentQuestion(text, actorLabel) {
+  const trimmed = (text || "").trim();
+  if (!trimmed) return;
+  const list = getRecruitmentQuestions();
+  list.push({ id: uid("Q"), text: trimmed });
+  write(KEYS.recruitmentQuestions, list);
+  logAudit(actorLabel, "Felvételi kérdés hozzáadva", trimmed);
+}
+export function removeRecruitmentQuestion(id, actorLabel) {
+  write(KEYS.recruitmentQuestions, getRecruitmentQuestions().filter((q) => q.id !== id));
+  logAudit(actorLabel, "Felvételi kérdés törölve", id);
+}
+
+export function getApplicants() {
+  return read(KEYS.applicants, []);
+}
+export function getApplicant(id) {
+  return getApplicants().find((a) => a.id === id);
+}
+export function createApplicant({ name, contact, answers }, actorLabel) {
+  const list = getApplicants();
+  const applicant = {
+    id: uid("APP"),
+    name: (name || "").trim(),
+    contact: (contact || "").trim(),
+    answers: answers || [], // [{questionId, questionText, answer}]
+    status: "review", // review | accepted | rejected
+    notes: "",
+    promotedTo: null,
+    createdBy: actorLabel,
+    createdAt: new Date().toISOString(),
+  };
+  list.unshift(applicant);
+  write(KEYS.applicants, list);
+  logAudit(actorLabel, "Jelentkező felvéve", applicant.name);
+  return applicant;
+}
+export function setApplicantStatus(id, status, actorLabel) {
+  const list = getApplicants();
+  const a = list.find((x) => x.id === id);
+  if (!a) return;
+  const prev = a.status;
+  a.status = status;
+  a.decidedBy = actorLabel;
+  a.decidedAt = new Date().toISOString();
+  write(KEYS.applicants, list);
+  logAudit(actorLabel, "Jelentkező elbírálva", `${a.name}: ${prev} → ${status}`);
+}
+export function setApplicantNotes(id, notes, actorLabel) {
+  const list = getApplicants();
+  const a = list.find((x) => x.id === id);
+  if (!a) return;
+  a.notes = notes || "";
+  write(KEYS.applicants, list);
+  logAudit(actorLabel, "Jelentkező megjegyzés frissítve", a.name);
+}
+export function deleteApplicant(id, actorLabel) {
+  const a = getApplicant(id);
+  write(KEYS.applicants, getApplicants().filter((x) => x.id !== id));
+  logAudit(actorLabel, "Jelentkező törölve", a ? a.name : id);
+}
+/* Elfogadott jelentkezőből valódi állomány-tag lesz: 0. szint, Újonc
+   státusz — ugyanaz a kiindulópont, mint bárki másnak a rendszerben. */
+export function promoteApplicant(id, usssId, position, actorLabel) {
+  const a = getApplicant(id);
+  if (!a) return;
+  upsertPerson({
+    usssId, name: a.name, position: position || "U.S.S.S Agent",
+    level: "0", status: "Újonc", probationStart: new Date().toISOString().slice(0, 10),
+  }, actorLabel);
+  const list = getApplicants();
+  const idx = list.findIndex((x) => x.id === id);
+  if (idx >= 0) list[idx].promotedTo = usssId;
+  write(KEYS.applicants, list);
+  logAudit(actorLabel, "Jelentkező felvéve az állományba", `${a.name} → ${usssId}`);
 }
 
 /* ---------- Global search ------------------------------------------------*/

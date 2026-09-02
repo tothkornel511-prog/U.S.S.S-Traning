@@ -185,3 +185,14 @@ export const PROTECTED_LOCATIONS = [
 
 /* Teljes visszaállítás: nincs korábbi vizsga- vagy szintlépés-esemény. */
 export const AUDIT_LOG_SEED = [];
+
+/* Felvételi kérdésbank — admin felületről bővíthető/törölhető
+   (Felvételi oldal). Kezdeti, általános interjúkérdések. */
+export const RECRUITMENT_QUESTIONS = [
+  { id: "Q-001", text: "Miért szeretnél csatlakozni az U.S.S.S.-hez?" },
+  { id: "Q-002", text: "Van korábbi tapasztalatod rendvédelmi vagy katonai jellegű szerepjátékban?" },
+  { id: "Q-003", text: "Hogyan reagálnál egy váratlan konfliktushelyzetre szolgálat közben?" },
+  { id: "Q-004", text: "Mennyi időt tudsz aktívan a szolgálatra fordítani hetente?" },
+  { id: "Q-005", text: "Miért gondolod, hogy alkalmas vagy erre a pozícióra?" },
+  { id: "Q-006", text: "Volt már fegyelmi problémád korábbi szervezetnél / frakciónál? Ha igen, mi történt?" },
+];

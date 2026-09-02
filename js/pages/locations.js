@@ -1,9 +1,9 @@
-import { getLocations, getLocation, upsertLocation, deleteLocation, ref, mapById } from "../store.js?v=18";
-import { hasRole, actorLabel } from "../auth.js?v=18";
-import { esc, fmtDateTime, toast, openModal, closeModal } from "../utils.js?v=18";
-import { navigate } from "../router.js?v=18";
-import { createPanZoomMap } from "../mapview.js?v=18";
-import { openOnMap } from "./map.js?v=18";
+import { getLocations, getLocation, upsertLocation, deleteLocation, ref, mapById } from "../store.js?v=19";
+import { hasRole, actorLabel } from "../auth.js?v=19";
+import { esc, fmtDateTime, toast, openModal, closeModal } from "../utils.js?v=19";
+import { navigate } from "../router.js?v=19";
+import { createPanZoomMap } from "../mapview.js?v=19";
+import { openOnMap } from "./map.js?v=19";
 
 export function renderLocationsList(container) {
   const canEdit = hasRole("TRAINING");
