@@ -109,6 +109,7 @@ export function seedIfNeeded() {
   applyRecruitmentSeedPatch();
   applyLocationIdFixPatch();
   applyCommandCenterSeedPatch();
+  applyGovernmentHierarchySeedPatch();
 }
 
 /* Célzott, egyszeri pozíció-javítás — csak a felsorolt személyek "position"
@@ -812,6 +813,54 @@ export const PROTECTION_LEVELS = [
   { id: "LEVEL 3", label: "3. szint · Magas", description: "Kiemelt védelmi terv, kijelölt detail és folyamatos vezetői kontroll." },
   { id: "LEVEL 4", label: "4. szint · Kritikus", description: "Teljes körű, kiemelt védelem közvetlen fenyegetés esetén." },
 ];
+export const GOVERNMENT_HIERARCHY = [
+  ["President", "Elnök", "Az önkormányzat legfőbb vezetője és végső döntéshozója."],
+  ["Vice President", "Alelnök", "Az elnök helyettese, az önkormányzati működés vezetői felügyelete."],
+  ["Chief Of Staff", "Kabinettfőnök", "Az összes miniszteri munka koordinálása; közvetlen elszámolás az elnök és az alelnök felé."],
+  ["Secretary of Defense", "Védelmi miniszter", "A teljes rendvédelem koordinálása, beleértve a Sheriffséget, az LSPD-t és az U.S.S.S.-t; közvetlen beosztottjai az U.S.S.S. Directorok."],
+  ["Secretary of Homeland Security", "Belbiztonsági miniszter", "Terrorveszélyek, nagy kaliberű szervezetek és egyéb kiemelt veszélyek feltárása; a védelmi miniszter helyettese."],
+  ["Secretary of Development", "Fejlődési és pénzügyi miniszter", "Az államkassza vezetése, támogatási döntések előkészítése és városi partnerségek ápolása."],
+  ["Secretary of Public Relations", "Kommunikációs miniszter", "Sajtótájékoztatók, újságcikkek, nyilvános hirdetések és önkormányzati kommunikáció koordinálása."],
+  ["Campaign Manager", "Kampánymenedzser", "Az elnöki kampány megtervezése, koordinálása, üzenetei, rendezvényei és stratégiai javaslatai."],
+  ["Secretary of Health", "Egészségügyi miniszter", "Az egészségügy korszerűsítése, folyamatok átvilágítása és fejlesztési javaslatok előkészítése."],
+  ["Secretary of Transportation", "Közlekedési miniszter", "Közlekedési projektek és fejlesztési javaslatok koordinálása a rendvédelemmel és városi szolgáltatókkal együttműködésben."],
+  ["U.S.S.S. Director", "U.S.S.S. műveleti parancsnok / oktatásvezető", "Az U.S.S.S. műveleti irányítása, az állomány koordinálása, a vizsgák és képzések vezetése, valamint a szolgálati fegyelem felügyelete."],
+];
+
+function applyGovernmentHierarchySeedPatch() {
+  const patchKey = NS + "government_hierarchy_seed_2026_09_02";
+  if (read(patchKey, false)) return;
+  const records = read(KEYS.operations, []);
+  const existing = new Set(records.filter((record) => record.type === "government").map((record) => record.title));
+  const now = new Date().toISOString();
+  GOVERNMENT_HIERARCHY.forEach(([position, title, description], index) => {
+    if (existing.has(title)) return;
+    records.push({
+      id: `GOV-${String(index + 1).padStart(3, "0")}`,
+      type: "government",
+      title,
+      status: "APPROVED",
+      priority: index < 2 ? "CRITICAL" : "HIGH",
+      risk: "LOW",
+      protectionLevel: index < 2 ? "LEVEL 4" : "LEVEL 2",
+      owner: "Önkormányzati vezetés",
+      location: "Önkormányzati központ",
+      protectee: "",
+      date: now.slice(0, 10),
+      description: `${position}\n\n${description}`,
+      action: "A tisztséghez kapcsolódó U.S.S.S. védelmi és koordinációs feladatok nyilvántartva.",
+      recommendation: "A beosztás és az aktuális személy kijelölése vezetői jóváhagyással frissítendő.",
+      tags: "government, hierarchy, protected-office",
+      archived: false,
+      createdAt: now,
+      createdBy: "Rendszer",
+      updatedAt: now,
+      history: [{ at: now, by: "Rendszer", action: "Önkormányzati hierarchia rögzítve" }],
+    });
+  });
+  write(KEYS.operations, records);
+  write(patchKey, true);
+}
 
 function applyCommandCenterSeedPatch() {
   const patchKey = NS + "command_center_seed_2026_09_02";

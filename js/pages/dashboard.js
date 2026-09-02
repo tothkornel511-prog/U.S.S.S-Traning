@@ -1,4 +1,4 @@
-import { getPersonnel, getProtocols, getLocations, getOperationRecords, readinessPercent, ref } from "../store.js?v=29";
+import { getPersonnel, getProtocols, getLocations, getOperationRecords, readinessPercent, ref } from "../store.js?v=30";
 import { hasRole } from "../auth.js?v=20";
 import { esc, initials } from "../utils.js?v=20";
 import { navigate } from "../router.js?v=20";
