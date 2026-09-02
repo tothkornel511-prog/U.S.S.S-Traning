@@ -2,7 +2,7 @@
    U.S.S.S. ELITE TRAINING SYSTEM — APP ENTRY
    ========================================================================== */
 
-import { seedIfNeeded, globalSearch, getCustomCss } from "./store.js?v=20";
+import { seedIfNeeded, globalSearch, getCustomCss } from "./store.js?v=21";
 import { isAuthenticated, currentSession, logout, hasRole, ROLES } from "./auth.js?v=20";
 import { registerRoute, resolve, startRouter, navigate, currentPath } from "./router.js?v=20";
 import { esc, sealMark } from "./utils.js?v=20";
@@ -15,7 +15,7 @@ import { renderProtocolsList, renderProtocolDetail } from "./pages/protocols.js?
 import { renderLocationsList, renderLocationDetail } from "./pages/locations.js?v=20";
 import { renderMapPage } from "./pages/map.js?v=20";
 import { renderRecruitmentList, renderApplicantDetail } from "./pages/recruitment.js?v=20";
-import { renderExamList, renderExamDetail } from "./pages/exam.js?v=20";
+import { renderExamList, renderExamDetail } from "./pages/exam.js?v=21";
 import { renderAdmin } from "./pages/admin.js?v=20";
 
 seedIfNeeded();

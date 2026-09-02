@@ -10,7 +10,7 @@ import {
   LEVELS, SERVICE_STATUSES, POSITIONS, MODULES, LEVEL_MODULE_ORDER,
   PERSONNEL, ACCESS_CODES, PROTECTED_LOCATIONS, AUDIT_LOG_SEED, MAPS, DISTRICTS,
   RECRUITMENT_QUESTIONS, EXAM_QUESTIONS, EXAM_CATEGORIES,
-} from "./data.js?v=20";
+} from "./data.js?v=21";
 
 /* v7: Roxwood/Cayo Perico eltávolítva, csak Los Santos térkép maradt. */
 const NS = "usss_ets_v7_";
