@@ -4,7 +4,7 @@ import {
   createOperationRecord,
   updateOperationRecord,
   archiveOperationRecord,
-} from "../store.js?v=27";
+} from "../store.js?v=29";
 import { actorLabel, hasRole } from "../auth.js?v=20";
 import { esc, fmtDate, toast, openModal, closeModal } from "../utils.js?v=20";
 import { navigate } from "../router.js?v=20";
@@ -46,7 +46,7 @@ export function renderOperations(container, type = "reports") {
       return (includeArchived ? record.archived : !record.archived) && (!query || haystack.includes(query)) && (status === "ALL" || record.status === status) && (priority === "ALL" || record.priority === priority);
     });
     document.getElementById("operation-list").innerHTML = filtered.length ? filtered.map((record) => renderRecord(record, canEdit)).join("") : `<div class="card empty-state"><h3>Nincs rögzített rekord</h3><p>Hozza létre az első ${esc(meta.singular.toLowerCase())} rekordot.</p></div>`;
-    container.querySelectorAll("[data-view]").forEach((button) => button.addEventListener("click", () => openRecordView(records.find((record) => record.id === button.dataset.view))));
+    container.querySelectorAll("[data-view]").forEach((button) => button.addEventListener("click", () => openRecordView(records.find((record) => record.id === button.dataset.view), canEdit)));
     container.querySelectorAll("[data-archive]").forEach((button) => button.addEventListener("click", () => {
       archiveOperationRecord(button.dataset.archive, button.dataset.value !== "true", actorLabel());
       toast(button.dataset.value === "true" ? "Rekord archiválva" : "Rekord visszaállítva");
@@ -68,11 +68,17 @@ function renderRecord(record, canEdit) {
   </article>`;
 }
 
-function openRecordView(record) {
+function openRecordView(record, canEdit) {
   if (!record) return;
   openModal(`<div class="modal-head"><h3>${esc(record.title)}</h3><button class="modal-close" data-close-modal>×</button></div>
     <div class="record-detail-grid"><div><span class="card-title">Azonosító</span><strong>${esc(record.id)}</strong></div><div><span class="card-title">Státusz</span><strong>${esc(record.status)}</strong></div><div><span class="card-title">Prioritás</span><strong>${esc(record.priority)}</strong></div><div><span class="card-title">Dátum</span><strong>${esc(fmtDate(record.date))}</strong></div><div><span class="card-title">Felelős</span><strong>${esc(record.owner || "—")}</strong></div><div><span class="card-title">Helyszín</span><strong>${esc(record.location || "—")}</strong></div></div>
-    <div class="field mt-2"><label>Leírás</label><div class="record-detail-text">${esc(record.description || "—")}</div></div><div class="field"><label>Intézkedés / eredmény</label><div class="record-detail-text">${esc(record.action || "—")}</div></div><div class="field"><label>Előzmények</label>${(record.history || []).slice().reverse().map((item) => `<div class="history-item"><span>${esc(item.action)}</span><span class="text-low small">${esc(item.by)} · ${fmtDate(item.at)}</span></div>`).join("")}</div>`);
+    <div class="field mt-2"><label>Leírás</label>${canEdit ? `<textarea id="record-description" rows="5">${esc(record.description || "")}</textarea>` : `<div class="record-detail-text">${esc(record.description || "—")}</div>`}</div><div class="field"><label>Intézkedés / eredmény</label>${canEdit ? `<textarea id="record-action" rows="4">${esc(record.action || "")}</textarea>` : `<div class="record-detail-text">${esc(record.action || "—")}</div>`}</div>${canEdit ? `<div class="grid grid-2"><label class="field"><span>Státusz</span><select id="record-status">${STATUS.map((value) => `<option ${record.status === value ? "selected" : ""}>${value}</option>`).join("")}</select></label><label class="field"><span>Prioritás</span><select id="record-priority">${PRIORITIES.map((value) => `<option ${record.priority === value ? "selected" : ""}>${value}</option>`).join("")}</select></label></div><button class="btn btn-gold" id="save-record">Módosítások mentése</button>` : ""}<div class="field mt-2"><label>Előzmények</label>${(record.history || []).slice().reverse().map((item) => `<div class="history-item"><span>${esc(item.action)}</span><span class="text-low small">${esc(item.by)} · ${fmtDate(item.at)}</span></div>`).join("")}</div>`);
+  document.getElementById("save-record")?.addEventListener("click", () => {
+    updateOperationRecord(record.id, { description: document.getElementById("record-description").value, action: document.getElementById("record-action").value, status: document.getElementById("record-status").value, priority: document.getElementById("record-priority").value }, actorLabel());
+    closeModal();
+    toast("Rekord módosítva és auditálva");
+    renderOperations(document.getElementById("content"), record.type);
+  });
 }
 
 function openOperationForm(type, meta) {
