@@ -386,12 +386,21 @@ const EXAM_QUESTION_TEXTS = [
   ]],
 ];
 
+const EXAM_CATEGORY_CRITERIA = {
+  "I. SZEMÉLYES / MOTIVÁCIÓ": ["felelősségtudat", "önismeret és fejlődési készség", "fegyelem", "nyugodt kommunikáció", "szolgálati motiváció"],
+  "II. VÉDETT SZEMÉLY MELLETT": ["előzetes környezetfelmérés", "a védett személy elsőbbsége", "távolság és hozzáférés kontrollja", "diszkrét kommunikáció", "alternatív terv"],
+  "III. KOMOLYABB SZITUÁCIÓK": ["azonnali védelem és kivonás", "veszélyforrás felismerése", "segítség és csapat koordinálása", "arányos intézkedés", "nem üldözéssel kezdi"],
+  "IV. GÉPJÁRMŰVES SZOLGÁLAT": ["jármű és környezet ellenőrzése", "útvonal- és kockázatterv", "biztonságos beszállás", "rádiókommunikáció", "konvoj együtt tartása"],
+  "V. RENDEZVÉNY / TÖMEG": ["bejárat és kijárat felmérése", "tömeg mozgásának felismerése", "védett személy elkülönítése", "csapatpozíciók és kommunikáció", "deeszkaláció"],
+  "VI. CSAPATMUNKA / DÖNTÉSHOZATAL": ["önálló, felelős döntés", "parancsnoki lánc tisztelete", "egyértelmű kommunikáció", "együttműködés", "hiba vállalása és jelentése"],
+};
+
 export const EXAM_QUESTIONS = EXAM_QUESTION_TEXTS.flatMap(([category, texts]) =>
   texts.map((text, index) => ({
     id: `Q${String(EXAM_QUESTION_TEXTS.slice(0, EXAM_QUESTION_TEXTS.findIndex(([name]) => name === category)).reduce((sum, [, items]) => sum + items.length, 0) + index + 1).padStart(2, "0")}`,
     num: EXAM_QUESTION_TEXTS.slice(0, EXAM_QUESTION_TEXTS.findIndex(([name]) => name === category)).reduce((sum, [, items]) => sum + items.length, 0) + index + 1,
     category,
     text,
-    tips: ["helyzet felismerése", "védett személy prioritása", "arányos döntés", "kommunikáció", "együttműködés"],
+    tips: EXAM_CATEGORY_CRITERIA[category],
   }))
 );

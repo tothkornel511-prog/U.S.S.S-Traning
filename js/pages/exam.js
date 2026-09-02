@@ -1,7 +1,7 @@
 import {
   getExams, getExam, createExam, setExamAnswer, setExamFinalComment, setExamCompetency, setExamRecommendation, interruptExam, finishExam, deleteExam,
   getExamQuestions, getExamCategories, examScoreSummary, EXAM_MAX_SCORE, EXAM_PASS_PCT,
-} from "../store.js?v=22";
+} from "../store.js?v=24";
 import { hasRole, actorLabel, currentSession } from "../auth.js?v=20";
 import { esc, fmtDate, fmtDateTime, toast, openModal, closeModal } from "../utils.js?v=20";
 import { navigate } from "../router.js?v=20";
@@ -127,6 +127,12 @@ export function renderExamDetail(container, id) {
         <div><div class="card-title">Kezdés / Befejezés</div><div class="text-hi">${fmtDateTime(exam.startedAt)}${exam.endedAt ? ` → ${fmtDateTime(exam.endedAt)}` : " → folyamatban"}</div></div>
       </div>
       <div id="exam-summary"></div>
+      <details class="card mt-1">
+        <summary class="card-title" style="cursor:pointer">Vizsgáztatói pontozási standard</summary>
+        <div class="grid grid-3 mt-1">
+          ${[[5, "Kiváló", "Teljes veszélyfelmérés, helyes prioritás, határozott kommunikáció és arányos döntés."], [4, "Jó", "Szakmailag helyes válasz, legfeljebb egy kisebb hiányossággal."], [3, "Elfogadható", "Érti a helyzet lényegét, de a sorrend, kommunikáció vagy a kivitelezés hiányos."], [2, "Gyenge", "Felismer egy részletet, de a védett személy prioritása vagy az intézkedési terv bizonytalan."], [1, "Nagyon gyenge", "Komoly szakmai hiba, indokolatlan eszkaláció vagy rossz prioritás."], [0, "Elfogadhatatlan", "Figyelmen kívül hagyja a védett személy biztonságát, vagy súlyosan veszélyes döntést ad."]].map(([score, title, text]) => `<div class="exam-category-score"><strong>${score} · ${title}</strong><div class="text-low small">${text}</div></div>`).join("")}
+        </div>
+      </details>
       ${canEdit && !exam.endedAt ? `<button class="btn btn-sm btn-danger mt-1" id="interrupt-exam">Vizsga megszakítása</button>` : ""}
       ${canEdit && !exam.endedAt ? `<button class="btn btn-gold btn-sm mt-2" id="finish-exam">Vizsga lezárása</button>` : ""}
     </div>
