@@ -1,4 +1,5 @@
 import { getPersonnel, getProtocols, getLocations, getOperationRecords, readinessPercent, ref } from "../store.js?v=30";
+import { getPersonnel, getProtocols, getLocations, getOperationRecords, getReadinessState, READINESS_LEVELS, readinessPercent, ref } from "../store.js?v=32";
 import { hasRole } from "../auth.js?v=20";
 import { esc, initials } from "../utils.js?v=20";
 import { navigate } from "../router.js?v=20";
@@ -10,6 +11,7 @@ export function renderDashboard(container) {
   const operations = getOperationRecords();
   const openOperations = operations.filter((record) => !record.archived && record.status !== "COMPLETED" && record.status !== "REJECTED");
   const criticalOperations = openOperations.filter((record) => record.priority === "CRITICAL" || record.risk === "CRITICAL");
+  const readiness = getReadinessState();
 
   const active = personnel.filter((p) => p.status === "Aktív").length;
   const probationers = personnel.filter((p) => p.level === "0" && !p.probationLifted).length;
@@ -47,6 +49,7 @@ export function renderDashboard(container) {
         <div><span class="card-title">Nyitott rekordok</span><strong>${openOperations.length}</strong><span class="text-low small">Jelentések, feladatok és műveletek</span></div>
         <div><span class="card-title">Kritikus figyelmeztetések</span><strong class="command-alert">${criticalOperations.length}</strong><span class="text-low small">Azonnali vezetői áttekintést igényel</span></div>
         <div><span class="card-title">Összes operációs rekord</span><strong>${operations.length}</strong><span class="text-low small">Archivált rekordok nélkül is visszakereshető</span></div>
+        <div><span class="card-title">Belső készültség</span><strong class="readiness-text-${readiness.level}">${esc(READINESS_LEVELS[readiness.level].label.split(" · ")[0])}</strong><span class="text-low small">${esc(READINESS_LEVELS[readiness.level].description)}</span></div>
       </div>
     </div>
 

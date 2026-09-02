@@ -29,6 +29,7 @@ const KEYS = {
   exams: NS + "exams",
   nextExamSeq: NS + "next_exam_seq",
   operations: NS + "operations",
+  readiness: NS + "readiness",
 };
 
 /* Elméleti vizsgánál ez alatt a százalék alatt a modul nem számít teljesítettnek. */
@@ -813,6 +814,23 @@ export const PROTECTION_LEVELS = [
   { id: "LEVEL 3", label: "3. szint · Magas", description: "Kiemelt védelmi terv, kijelölt detail és folyamatos vezetői kontroll." },
   { id: "LEVEL 4", label: "4. szint · Kritikus", description: "Teljes körű, kiemelt védelem közvetlen fenyegetés esetén." },
 ];
+export const READINESS_LEVELS = {
+  green: { label: "Zöld · Alapkészültség", color: "green", description: "Normál szolgálati állapot, nincs ismert kiemelt fenyegetés." },
+  yellow: { label: "Sárga · Fokozott készültség", color: "yellow", description: "Fokozott figyelem, megerősíthető védelem és értesíthető állomány." },
+  red: { label: "Vörös · Teljes készültség", color: "red", description: "Teljes U.S.S.S. készültség, kiemelt védelem és vezetői koordináció." },
+};
+
+export function getReadinessState() {
+  return read(KEYS.readiness, { level: "green", reason: "Normál szolgálati állapot.", changedAt: null, changedBy: "Rendszer" });
+}
+
+export function setReadinessState(level, reason, actorLabel) {
+  if (!READINESS_LEVELS[level]) return false;
+  const state = { level, reason: (reason || "").trim(), changedAt: new Date().toISOString(), changedBy: actorLabel || "Rendszer" };
+  write(KEYS.readiness, state);
+  logAudit(actorLabel, "Készültségi szint módosítva", `${READINESS_LEVELS[level].label} — ${state.reason}`);
+  return true;
+}
 export const GOVERNMENT_HIERARCHY = [
   ["President", "Elnök", "Az önkormányzat legfőbb vezetője és végső döntéshozója."],
   ["Vice President", "Alelnök", "Az elnök helyettese, az önkormányzati működés vezetői felügyelete."],
