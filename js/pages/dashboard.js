@@ -1,4 +1,4 @@
-import { getPersonnel, getProtocols, getLocations, getOperationRecords, getReadinessState, READINESS_LEVELS, readinessPercent, ref } from "../store.js?v=36";
+import { getPersonnel, getProtocols, getLocations, getOperationRecords, getReadinessState, READINESS_LEVELS, readinessPercent, ref } from "../store.js?v=37";
 import { hasRole } from "../auth.js?v=20";
 import { esc, initials } from "../utils.js?v=20";
 import { navigate } from "../router.js?v=20";
@@ -15,6 +15,7 @@ export function renderDashboard(container) {
   const todayOperations = openOperations.filter((record) => record.date === today);
   const openReports = openOperations.filter((record) => record.type === "reports").length;
   const activeProtectees = operations.filter((record) => record.type === "protectees" && !record.archived && record.status !== "REJECTED").length;
+  const commandBrief = buildCommandBrief(readiness, openOperations, criticalOperations, activeProtectees);
 
   const active = personnel.filter((p) => p.status === "Aktív").length;
   const probationers = personnel.filter((p) => p.level === "0" && !p.probationLifted).length;
@@ -60,6 +61,8 @@ export function renderDashboard(container) {
     </div>
 
     ${criticalOperations.length ? `<div class="card command-alert-panel section"><div class="flex justify-between items-center mb-1"><div><div class="eyebrow">AZONNALI VEZETŐI FIGYELEM</div><h2>Kiemelt kockázatok</h2></div><a href="#/operations/incidents" class="btn btn-sm">Incidensek megnyitása</a></div>${criticalOperations.slice(0, 5).map((record) => `<div class="history-item"><span><strong class="text-hi">${esc(record.title)}</strong><span class="text-low small"> · ${esc(record.id)} · ${esc(record.location || "Helyszín nincs megadva")}</span></span><span class="badge badge-red">${esc(record.priority === "CRITICAL" ? "KRITIKUS" : "MAGAS KOCKÁZAT")}</span></div>`).join("")}</div>` : ""}
+
+    <div class="card command-brief section"><div class="flex justify-between items-center mb-1"><div><div class="eyebrow">AUTOMATIKUS DÖNTÉSTÁMOGATÁS</div><h2>Vezetői helyzetértékelés</h2></div><span class="badge badge-gold">HELYI ELEMZÉS</span></div><p>${esc(commandBrief.summary)}</p><div class="brief-actions">${commandBrief.actions.map((action) => `<div class="brief-action"><span class="brief-index">${action.level}</span><span>${esc(action.text)}</span></div>`).join("")}</div><div class="text-low small mt-1">Az összefoglaló a rendszerben mentett rekordokból készül, külső adatot nem használ.</div></div>
 
     <div class="grid grid-2 section">
       <div class="card">
@@ -107,6 +110,17 @@ export function renderDashboard(container) {
   container.querySelectorAll("[data-nav]").forEach((n) =>
     n.addEventListener("click", () => navigate(n.getAttribute("data-nav")))
   );
+}
+
+function buildCommandBrief(readiness, openOperations, criticalOperations, activeProtectees) {
+  const level = readiness.level === "red" ? "Vörös készültség mellett" : readiness.level === "yellow" ? "Sárga készültség mellett" : "Zöld készültség mellett";
+  const summary = `${level} jelenleg ${activeProtectees} védett személy és ${openOperations.length} nyitott operációs rekord tartozik a parancsnoki áttekintéshez.`;
+  const actions = [];
+  if (criticalOperations.length) actions.push({ level: "01", text: `${criticalOperations.length} kritikus rekord azonnali vezetői ellenőrzése szükséges.` });
+  if (readiness.level !== "green") actions.push({ level: "02", text: "A kijelölt állomány és a védelmi tervek felülvizsgálata javasolt." });
+  if (openOperations.length > 5) actions.push({ level: "03", text: "A nyitott ügyek felelőseinek és határidőinek áttekintése szükséges." });
+  if (!actions.length) actions.push({ level: "01", text: "Nincs automatikusan kiemelt kockázat; a normál vezetői ellenőrzési rend fenntartása javasolt." });
+  return { summary, actions };
 }
 
 function statusPill(status) {

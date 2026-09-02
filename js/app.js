@@ -2,12 +2,12 @@
    U.S.S.S. ELITE TRAINING SYSTEM — APP ENTRY
    ========================================================================== */
 
-import { seedIfNeeded, globalSearch, getCustomCss } from "./store.js?v=36";
+import { seedIfNeeded, globalSearch, getCustomCss } from "./store.js?v=37";
 import { isAuthenticated, currentSession, logout, hasRole, ROLES } from "./auth.js?v=20";
 import { registerRoute, resolve, startRouter, navigate, currentPath } from "./router.js?v=20";
 import { esc, sealMark } from "./utils.js?v=20";
 import { renderLogin } from "./pages/login.js?v=20";
-import { renderDashboard } from "./pages/dashboard.js?v=33";
+import { renderDashboard } from "./pages/dashboard.js?v=37";
 import { renderPersonnelList } from "./pages/personnel.js?v=20";
 import { renderProfile } from "./pages/profile.js?v=20";
 import { renderMatrix } from "./pages/matrix.js?v=20";

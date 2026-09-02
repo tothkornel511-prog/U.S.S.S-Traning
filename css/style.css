@@ -671,6 +671,13 @@ details.card[open] > summary::after { content: "−"; }
 .command-alert-panel { border-color:rgba(209,85,74,.35); border-left:3px solid var(--red); }
 .command-alert-panel h2 { font-size:22px; }
 .command-alert-panel .history-item { padding:11px 8px; }
+.command-brief { border-left:3px solid var(--gold); }
+.command-brief h2 { font-size:22px; }
+.command-brief p { max-width:900px; color:var(--text-mid); line-height:1.7; }
+.brief-actions { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-top:14px; }
+.brief-action { display:flex; gap:10px; align-items:flex-start; min-height:52px; padding:12px; border:1px solid var(--line-soft); background:rgba(6,7,10,.3); color:var(--text-mid); font-size:12px; }
+.brief-index { color:var(--gold-bright); font:11px var(--font-mono); }
+@media (max-width:760px) { .brief-actions { grid-template-columns:1fr; } }
 .readiness-text-green { color:#7fd19c !important; }
 .readiness-text-yellow { color:var(--yellow) !important; }
 .readiness-text-red { color:#f0a29b !important; text-shadow:var(--glow-red); }
