@@ -4,7 +4,7 @@ import {
   createOperationRecord,
   updateOperationRecord,
   archiveOperationRecord,
-} from "../store.js?v=30";
+} from "../store.js?v=31";
 import { actorLabel, hasRole } from "../auth.js?v=20";
 import { esc, fmtDate, toast, openModal, closeModal } from "../utils.js?v=20";
 import { navigate } from "../router.js?v=20";
@@ -26,7 +26,7 @@ export function renderOperations(container, type = "reports") {
     <div class="classification-strip">U.S.S.S. PARANCSNOKI KÖZPONT · ${esc(meta.label)}</div>
     <div class="command-page-head">
       <div><div class="eyebrow">MŰVELETI OSZTÁLY / ELLENŐRZÖTT NYILVÁNTARTÁS</div><h2>${esc(meta.label)}</h2><p class="text-low small">Strukturált védelmi nyilvántartás · minden módosítás auditálva.</p></div>
-      ${canEdit ? `<button class="btn btn-gold" id="new-operation">+ ${esc(meta.singular)}</button>` : ""}
+      <div class="operation-head-actions"><button class="btn btn-sm" id="export-operations">Adatok exportálása</button>${canEdit ? `<button class="btn btn-gold" id="new-operation">+ ${esc(meta.singular)}</button>` : ""}</div>
     </div>
     <div class="filters operation-filters">
       <input id="operation-search" placeholder="Keresés azonosító, cím, személy, helyszín alapján" />
@@ -55,7 +55,18 @@ export function renderOperations(container, type = "reports") {
   };
   ["operation-search", "operation-status", "operation-priority", "operation-archive"].forEach((id) => document.getElementById(id).addEventListener("input", render));
   document.getElementById("new-operation")?.addEventListener("click", () => openOperationForm(type, meta));
+  document.getElementById("export-operations")?.addEventListener("click", () => exportOperations(records, meta.label));
   render();
+}
+
+function exportOperations(records, label) {
+  const blob = new Blob([JSON.stringify({ title: label, exportedAt: new Date().toISOString(), records }, null, 2)], { type: "application/json" });
+  const link = document.createElement("a");
+  link.href = URL.createObjectURL(blob);
+  link.download = `usss-${label.toLowerCase().replace(/[^a-z0-9]+/g, "-")}.json`;
+  link.click();
+  URL.revokeObjectURL(link.href);
+  toast("Adatok exportálva");
 }
 
 function renderRecord(record, canEdit) {
@@ -72,6 +83,7 @@ function openRecordView(record, canEdit) {
   if (!record) return;
   openModal(`<div class="modal-head"><h3>${esc(record.title)}</h3><button class="modal-close" data-close-modal>×</button></div>
     <div class="record-detail-grid"><div><span class="card-title">Azonosító</span><strong>${esc(record.id)}</strong></div><div><span class="card-title">Státusz</span><strong>${esc(record.status)}</strong></div><div><span class="card-title">Prioritás</span><strong>${esc(record.priority)}</strong></div><div><span class="card-title">Dátum</span><strong>${esc(fmtDate(record.date))}</strong></div><div><span class="card-title">Felelős</span><strong>${esc(record.owner || "—")}</strong></div><div><span class="card-title">Helyszín</span><strong>${esc(record.location || "—")}</strong></div></div>
+    <div class="record-actions record-detail-actions"><button class="btn btn-sm" id="print-record">Nyomtatás</button></div>
     <div class="field mt-2"><label>Leírás</label>${canEdit ? `<textarea id="record-description" rows="5">${esc(record.description || "")}</textarea>` : `<div class="record-detail-text">${esc(record.description || "—")}</div>`}</div><div class="field"><label>Intézkedés / eredmény</label>${canEdit ? `<textarea id="record-action" rows="4">${esc(record.action || "")}</textarea>` : `<div class="record-detail-text">${esc(record.action || "—")}</div>`}</div>${canEdit ? `<div class="grid grid-2"><label class="field"><span>Státusz</span><select id="record-status">${STATUS.map((value) => `<option ${record.status === value ? "selected" : ""}>${value}</option>`).join("")}</select></label><label class="field"><span>Prioritás</span><select id="record-priority">${PRIORITIES.map((value) => `<option ${record.priority === value ? "selected" : ""}>${value}</option>`).join("")}</select></label></div><button class="btn btn-gold" id="save-record">Módosítások mentése</button>` : ""}<div class="field mt-2"><label>Előzmények</label>${(record.history || []).slice().reverse().map((item) => `<div class="history-item"><span>${esc(item.action)}</span><span class="text-low small">${esc(item.by)} · ${fmtDate(item.at)}</span></div>`).join("")}</div>`);
   document.getElementById("save-record")?.addEventListener("click", () => {
     updateOperationRecord(record.id, { description: document.getElementById("record-description").value, action: document.getElementById("record-action").value, status: document.getElementById("record-status").value, priority: document.getElementById("record-priority").value }, actorLabel());
@@ -79,6 +91,7 @@ function openRecordView(record, canEdit) {
     toast("Rekord módosítva és auditálva");
     renderOperations(document.getElementById("content"), record.type);
   });
+  document.getElementById("print-record")?.addEventListener("click", () => window.print());
 }
 
 function openOperationForm(type, meta) {
