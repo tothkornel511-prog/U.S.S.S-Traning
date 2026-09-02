@@ -108,6 +108,7 @@ export function seedIfNeeded() {
   applyTheoryFillPatch();
   applyRecruitmentSeedPatch();
   applyLocationIdFixPatch();
+  applyCommandCenterSeedPatch();
 }
 
 /* Célzott, egyszeri pozíció-javítás — csak a felsorolt személyek "position"
@@ -805,6 +806,47 @@ export const OPERATION_TYPES = {
   analytics: { label: "Elemzések", singular: "Elemzés", icon: "▥" },
   settings: { label: "Beállítások", singular: "Beállítás", icon: "⚙" },
 };
+export const PROTECTION_LEVELS = [
+  { id: "LEVEL 1", label: "1. szint · Standard", description: "Alapvető védelmi jelenlét és előzetes kockázatfelmérés." },
+  { id: "LEVEL 2", label: "2. szint · Emelt", description: "Fokozott figyelem, megerősített biztosítás és részletesebb terv." },
+  { id: "LEVEL 3", label: "3. szint · Magas", description: "Kiemelt védelmi terv, kijelölt detail és folyamatos vezetői kontroll." },
+  { id: "LEVEL 4", label: "4. szint · Kritikus", description: "Teljes körű, kiemelt védelem közvetlen fenyegetés esetén." },
+];
+
+function applyCommandCenterSeedPatch() {
+  const patchKey = NS + "command_center_seed_2026_09_02";
+  if (read(patchKey, false)) return;
+  const records = read(KEYS.operations, []);
+  const existingProtectees = new Set(records.filter((record) => record.type === "protectees").map((record) => record.protectee));
+  const now = new Date().toISOString();
+  getPersonnel().forEach((person) => {
+    if (existingProtectees.has(person.name)) return;
+    records.push({
+      id: `PTC-${person.usssId}`,
+      type: "protectees",
+      title: `${person.name} · ${person.position}`,
+      status: "APPROVED",
+      priority: "HIGH",
+      risk: "MODERATE",
+      protectionLevel: "LEVEL 2",
+      owner: "U.S.S.S. Command",
+      location: "Kormányzati védelmi körzet",
+      protectee: person.name,
+      date: now.slice(0, 10),
+      description: `${person.position} · ${person.usssId}\nAlapértelmezett U.S.S.S. védelmi nyilvántartás. A védelmi terv vezetői felülvizsgálatra kijelölhető.`,
+      action: "Védelem aktív · kijelölt állomány és részletes terv szerint.",
+      recommendation: "A védelmi szintet minden kiemelt esemény előtt felül kell vizsgálni.",
+      tags: "government, protectee, standing-detail",
+      archived: false,
+      createdAt: now,
+      createdBy: "Rendszer",
+      updatedAt: now,
+      history: [{ at: now, by: "Rendszer", action: "Alap védelmi rekord létrehozva" }],
+    });
+  });
+  write(KEYS.operations, records);
+  write(patchKey, true);
+}
 
 export function getOperationRecords(type = "") {
   return read(KEYS.operations, []).filter((record) => !type || record.type === type);
