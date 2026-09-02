@@ -56,6 +56,22 @@ const NAV = [
     { path: "/operations/assignments", label: "Feladatok", icon: "▣", minRole: "TRAINING" },
     { path: "/operations/protectees", label: "Védett személyek", icon: "◆", minRole: "TRAINING" },
     { path: "/operations/fleet", label: "Járműflotta", icon: "▰", minRole: "TRAINING" },
+    { path: "/operations/escorts", label: "Kísérések", icon: "↗", minRole: "TRAINING" },
+    { path: "/operations/advance", label: "Advance Work", icon: "⌖", minRole: "TRAINING" },
+    { path: "/operations/protection-levels", label: "Protection Levels", icon: "◉", minRole: "TRAINING" },
+    { path: "/operations/protective-plans", label: "Protective Plans", icon: "⬡", minRole: "TRAINING" },
+    { path: "/operations/recommendations", label: "Security Recommendations", icon: "◇", minRole: "TRAINING" },
+    { path: "/operations/intelligence", label: "Protective Intelligence", icon: "⌁", minRole: "TRAINING" },
+    { path: "/operations/after-action", label: "After Action Review", icon: "↻", minRole: "TRAINING" },
+    { path: "/operations/certifications", label: "Certifications", icon: "✦", minRole: "TRAINING" },
+    { path: "/operations/documents", label: "Documents", icon: "▧", minRole: "TRAINING" },
+    { path: "/operations/discipline", label: "Discipline", icon: "⚖", minRole: "TRAINING" },
+    { path: "/operations/recognition", label: "Recognition", icon: "★", minRole: "TRAINING" },
+    { path: "/operations/government", label: "Government Directory", icon: "⌂", minRole: "TRAINING" },
+    { path: "/operations/succession", label: "Presidential Succession", icon: "Ⅰ", minRole: "TRAINING" },
+    { path: "/operations/calendar", label: "Calendar", icon: "▦", minRole: "TRAINING" },
+    { path: "/operations/notifications", label: "Notifications", icon: "◌", minRole: "TRAINING" },
+    { path: "/operations/analytics", label: "Analytics", icon: "▥", minRole: "TRAINING" },
   ]},
   { group: "Rendszer", items: [
     { path: "/admin", label: "Adminisztráció", icon: "⚙", minRole: "TRAINING" },
@@ -83,8 +99,8 @@ function renderShell() {
         <div class="brand">
           <div class="brand-seal">${sealMark(34)}</div>
           <div>
-            <div class="brand-name">U.S.S.S. ELITE</div>
-            <div class="brand-sub">Kiképzési Rendszer</div>
+            <div class="brand-name">U.S.S.S. COMMAND</div>
+            <div class="brand-sub">Protective Operations</div>
           </div>
         </div>
         <nav id="nav-root" style="flex:1; overflow-y:auto;"></nav>
