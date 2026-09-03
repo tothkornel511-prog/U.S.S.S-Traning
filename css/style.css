@@ -172,9 +172,10 @@ button {
   font-size: 13px;
   font-weight: 600;
   box-shadow: var(--bevel);
-  transition: all .15s ease;
+  transition: border-color .15s ease, background-color .15s ease, box-shadow .15s ease, transform .1s ease;
 }
 .btn:hover { border-color: var(--gold-dim); background: #1b1e28; box-shadow: var(--bevel), 0 0 14px rgba(198,166,100,0.12); }
+.btn:active { transform: scale(.97); }
 .btn-gold {
   background: linear-gradient(180deg, var(--gold-bright), var(--gold));
   color: #1a1406;
@@ -339,7 +340,8 @@ button {
 }
 .badge-green { background: var(--green-bg); color: #7fd19c; border-color: rgba(78,158,111,0.45); box-shadow: 0 0 10px rgba(78,158,111,0.2); }
 .badge-yellow { background: var(--yellow-bg); color: var(--yellow); border-color: rgba(217,165,58,0.45); box-shadow: 0 0 10px rgba(217,165,58,0.2); }
-.badge-red { background: var(--red-bg); color: #f0a29b; border-color: rgba(209,85,74,0.45); box-shadow: 0 0 10px rgba(209,85,74,0.2); }
+.badge-red { background: var(--red-bg); color: #f0a29b; border-color: rgba(209,85,74,0.45); box-shadow: 0 0 10px rgba(209,85,74,0.2); animation: badge-pulse-red 2.4s ease-in-out infinite; }
+@keyframes badge-pulse-red { 0%,100% { box-shadow: 0 0 10px rgba(209,85,74,0.2); } 50% { box-shadow: 0 0 18px rgba(209,85,74,0.5); } }
 .badge-gray { background: rgba(255,255,255,0.05); color: var(--text-low); border-color: var(--line-soft); }
 .badge-gold { background: rgba(198,166,100,0.14); color: var(--gold-bright); border-color: rgba(198,166,100,0.4); }
 
@@ -350,7 +352,7 @@ button {
 .dot-gray { background: var(--text-low); }
 
 .progress { height: 6px; border-radius: 999px; background: rgba(255,255,255,0.08); overflow: hidden; box-shadow: inset 0 1px 2px rgba(0,0,0,0.4); }
-.progress > div { height: 100%; background: linear-gradient(90deg, var(--gold-dim), var(--gold-bright)); box-shadow: var(--glow-gold); }
+.progress > div { height: 100%; background: linear-gradient(90deg, var(--gold-dim), var(--gold-bright)); box-shadow: var(--glow-gold); transition: width .7s cubic-bezier(.16,.8,.3,1); }
 
 /* ---------------- Tables ---------------- */
 .table-wrap { overflow-x: auto; border: 1px solid var(--line-soft); border-radius: var(--radius-lg); background: rgba(18,20,27,0.4); backdrop-filter: blur(10px); }
@@ -363,7 +365,8 @@ thead th {
 }
 tbody td { padding: 12px 14px; border-bottom: 1px solid var(--line-soft); color: var(--text-mid); white-space: nowrap; }
 tbody tr:last-child td { border-bottom: none; }
-tbody tr:hover { background: rgba(198,166,100,0.04); }
+tbody tr { transition: background-color .15s ease; }
+tbody tr:hover { background: rgba(198,166,100,0.05); }
 .row-link { cursor: pointer; }
 
 .person-cell { display: flex; align-items: center; gap: 10px; }
@@ -427,15 +430,19 @@ tbody tr:hover { background: rgba(198,166,100,0.04); }
 .modal-overlay {
   position: fixed; inset: 0; background: rgba(4,5,7,0.7); backdrop-filter: blur(4px);
   display: flex; align-items: center; justify-content: center; z-index: 100; padding: 20px;
+  animation: modal-fade .18s ease both;
 }
+@keyframes modal-fade { from { opacity: 0; } to { opacity: 1; } }
 .modal-panel {
   background: linear-gradient(180deg, rgba(23,26,34,0.75), rgba(11,13,18,0.82)), var(--bg-panel);
   backdrop-filter: blur(20px) saturate(140%);
   -webkit-backdrop-filter: blur(20px) saturate(140%);
   border: 1px solid var(--line); border-radius: var(--radius-lg);
   max-width: 640px; width: 100%; max-height: 88vh; overflow-y: auto;
-  box-shadow: 0 40px 100px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.03); padding: 26px;
+  box-shadow: 0 40px 100px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.03), 0 0 60px rgba(198,166,100,0.1); padding: 26px;
+  animation: modal-pop .22s cubic-bezier(.2,.8,.3,1.1) both;
 }
+@keyframes modal-pop { from { opacity: 0; transform: translateY(10px) scale(.97); } to { opacity: 1; transform: translateY(0) scale(1); } }
 .modal-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; }
 .modal-close { color: var(--text-low); font-size: 20px; line-height: 1; border: none; background: none; }
 .modal-close:hover { color: var(--gold); }

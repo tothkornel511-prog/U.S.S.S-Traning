@@ -1,4 +1,4 @@
-import { getPersonnel, upsertPerson, deletePerson, readinessPercent, ref, probationInfo, getPositions } from "../store.js?v=41";
+import { getPersonnel, upsertPerson, deletePerson, readinessPercent, ref, probationInfo, getPositions } from "../store.js?v=42";
 import { hasRole, actorLabel } from "../auth.js?v=20";
 import { esc, initials, toast, openModal, closeModal } from "../utils.js?v=21";
 import { navigate } from "../router.js?v=20";

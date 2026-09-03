@@ -1,7 +1,8 @@
 import {
   getExams, getExam, createExam, setExamAnswer, setExamFinalComment, setExamCompetency, setExamRecommendation, interruptExam, finishExam, deleteExam,
   getExamQuestions, getExamCategories, examScoreSummary, EXAM_MAX_SCORE, EXAM_PASS_PCT,
-} from "../store.js?v=41";
+  promoteExamCandidate, getPositions, ref,
+} from "../store.js?v=42";
 import { hasRole, actorLabel, currentSession } from "../auth.js?v=20";
 import { esc, fmtDate, fmtDateTime, toast, openModal, closeModal } from "../utils.js?v=21";
 import { navigate } from "../router.js?v=20";
@@ -109,6 +110,7 @@ export function renderExamDetail(container, id) {
   const canAdmin = hasRole("ADMIN");
   const questions = getExamQuestions();
   const categories = getExamCategories();
+  const summary = examScoreSummary(exam);
 
   container.innerHTML = `
     <a href="#/exam" class="text-low small">← Vissza a felvételi vizsgákhoz</a>
@@ -138,6 +140,8 @@ export function renderExamDetail(container, id) {
       </details>
       ${canEdit && !exam.endedAt ? `<button class="btn btn-sm btn-danger mt-1" id="interrupt-exam">Vizsga megszakítása</button>` : ""}
       ${canEdit && !exam.endedAt ? `<button class="btn btn-gold btn-sm mt-2" id="finish-exam">Vizsga lezárása</button>` : ""}
+      ${canEdit && exam.endedAt && summary.passed && !exam.promotedTo ? `<button class="btn btn-gold btn-sm mt-2" id="promote-exam">★ Felvétel az állományba</button>` : ""}
+      ${exam.promotedTo ? `<a href="#/personnel/${esc(exam.promotedTo)}" class="badge badge-gold mt-2" style="display:inline-flex">Felvéve · ${esc(exam.promotedTo)} →</a>` : ""}
     </div>
 
     ${categories.map((cat) => `
@@ -207,6 +211,8 @@ export function renderExamDetail(container, id) {
     renderExamDetail(container, exam.id);
   });
 
+  document.getElementById("promote-exam")?.addEventListener("click", () => openPromoteForm(exam, container));
+
   document.getElementById("save-final-comment")?.addEventListener("click", () => {
     setExamFinalComment(exam.id, document.getElementById("final-comment").value);
     toast("Értékelés mentve");
@@ -217,6 +223,42 @@ export function renderExamDetail(container, id) {
     deleteExam(exam.id, actorLabel());
     toast("Vizsga törölve");
     navigate("/exam");
+  });
+}
+
+function openPromoteForm(exam, container) {
+  const positions = getPositions();
+  openModal(`
+    <div class="modal-head"><h3>Felvétel az állományba</h3><button class="modal-close" data-close-modal>×</button></div>
+    <p class="text-low small mb-2">A(z) ${esc(exam.id)} vizsgát sikeresen teljesítő jelöltből új személyi profil jön létre, 0. szinten, próbaidős státuszban.</p>
+    <form id="promote-form">
+      <div class="grid grid-2">
+        <div class="field"><label>Teljes név</label><input required id="pf-name" value="${esc(exam.candidateName)}" /></div>
+        <div class="field"><label>USSS azonosító</label><input required id="pf-id" placeholder="USSS-000" autofocus /></div>
+        <div class="field"><label>Pozíció</label><select id="pf-position">${positions.map((p) => `<option value="${esc(p)}">${esc(p)}</option>`).join("")}</select></div>
+        <div class="field"><label>Próbaidő kezdete</label><input type="date" id="pf-prob" value="${new Date().toISOString().slice(0, 10)}" /></div>
+      </div>
+      <div class="flex justify-between mt-2">
+        <button type="button" class="btn" data-close-modal>Mégse</button>
+        <button type="submit" class="btn btn-gold">Felvétel</button>
+      </div>
+    </form>
+  `);
+  document.getElementById("promote-form").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const usssId = document.getElementById("pf-id").value.trim();
+    if (!usssId) return;
+    promoteExamCandidate(exam.id, {
+      usssId,
+      name: document.getElementById("pf-name").value.trim(),
+      position: document.getElementById("pf-position").value,
+      status: ref.SERVICE_STATUSES[0],
+      level: "0",
+      probationStart: document.getElementById("pf-prob").value,
+    }, actorLabel());
+    toast(`${usssId} felvéve az állományba`);
+    closeModal();
+    renderExamDetail(container, exam.id);
   });
 }
 

@@ -1101,6 +1101,21 @@ export function deleteExam(id, actorLabel) {
   write(KEYS.exams, getExams().filter((e) => e.id !== id));
   logAudit(actorLabel, "Felvételi vizsga törölve", exam ? `${id} — ${exam.candidateName}` : id);
 }
+/* Sikeres vizsga → új személyi profil egy lépésben. A profil a szokásos
+   upsertPerson-on megy át (saját auditbejegyzést kap), az exam rekordon
+   csak a visszahivatkozás (promotedTo) marad, hogy a gomb ne jelenjen
+   meg újra és a vizsgalapról egy kattintással el lehessen jutni a
+   profilhoz. */
+export function promoteExamCandidate(examId, personFields, actorLabel) {
+  const list = getExams();
+  const exam = list.find((e) => e.id === examId);
+  if (!exam) return null;
+  upsertPerson({ modules: {}, notes: `Felvéve a(z) ${examId} felvételi vizsga alapján.`, ...personFields }, actorLabel);
+  exam.promotedTo = personFields.usssId;
+  write(KEYS.exams, list);
+  logAudit(actorLabel, "Jelölt felvéve az állományba", `${exam.id} — ${exam.candidateName} → ${personFields.usssId}`);
+  return getPerson(personFields.usssId);
+}
 
 /* Pontszám, százalék, min. 80% eredmény és minőségi sáv kiszámítása. */
 export function examScoreSummary(exam) {
