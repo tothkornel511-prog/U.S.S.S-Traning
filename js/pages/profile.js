@@ -4,7 +4,7 @@ import {
   levelLabel, moduleByCode, examStats, THEORY_PASS_THRESHOLD, deleteHistoryEntry,
 } from "../store.js?v=42";
 import { hasRole, actorLabel } from "../auth.js?v=20";
-import { esc, initials, fmtDate, fmtDateTime, toast, openModal, closeModal } from "../utils.js?v=21";
+import { esc, initials, fmtDate, fmtDateTime, toast, openModal, closeModal } from "../utils.js?v=22";
 import { navigate } from "../router.js?v=20";
 
 let activeTab = "modules";

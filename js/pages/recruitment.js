@@ -4,7 +4,7 @@ import {
   removeRecruitmentQuestion, getPositions, getExamQuestions,
 } from "../store.js?v=42";
 import { hasRole, actorLabel } from "../auth.js?v=20";
-import { esc, fmtDateTime, toast, openModal, closeModal } from "../utils.js?v=21";
+import { esc, fmtDateTime, toast, openModal, closeModal } from "../utils.js?v=22";
 import { navigate } from "../router.js?v=20";
 import { renderExamList } from "./exam.js?v=22";
 

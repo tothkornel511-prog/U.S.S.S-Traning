@@ -5,9 +5,9 @@
 import { seedIfNeeded, globalSearch, getCustomCss, getOperationRecords } from "./store.js?v=42";
 import { isAuthenticated, currentSession, logout, hasRole, ROLES } from "./auth.js?v=20";
 import { registerRoute, resolve, startRouter, navigate, currentPath } from "./router.js?v=20";
-import { esc, sealMark } from "./utils.js?v=21";
+import { esc, sealMark, closeModal } from "./utils.js?v=22";
 import { renderLogin } from "./pages/login.js?v=21";
-import { renderDashboard } from "./pages/dashboard.js?v=38";
+import { renderDashboard } from "./pages/dashboard.js?v=39";
 import { renderPersonnelList } from "./pages/personnel.js?v=20";
 import { renderProfile } from "./pages/profile.js?v=20";
 import { renderMatrix } from "./pages/matrix.js?v=20";
@@ -243,4 +243,22 @@ function boot() {
 boot();
 window.addEventListener("storage", () => {
   if (isAuthenticated()) onRouteChange();
+});
+
+/* Globális gyorsbillentyűk: "/" a kereséshez, Esc a modál/keresés záráshoz. */
+window.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") {
+    if (document.getElementById("modal-overlay")) { closeModal(); return; }
+    const results = document.getElementById("search-results");
+    if (results && results.style.display !== "none") { results.style.display = "none"; document.getElementById("global-search")?.blur(); }
+    return;
+  }
+  if (e.key !== "/") return;
+  const active = document.activeElement;
+  const typing = active && (active.tagName === "INPUT" || active.tagName === "TEXTAREA" || active.tagName === "SELECT" || active.isContentEditable);
+  if (typing) return;
+  const search = document.getElementById("global-search");
+  if (!search) return;
+  e.preventDefault();
+  search.focus();
 });

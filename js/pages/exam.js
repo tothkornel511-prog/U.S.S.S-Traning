@@ -4,7 +4,7 @@ import {
   promoteExamCandidate, getPositions, ref,
 } from "../store.js?v=42";
 import { hasRole, actorLabel, currentSession } from "../auth.js?v=20";
-import { esc, fmtDate, fmtDateTime, toast, openModal, closeModal } from "../utils.js?v=21";
+import { esc, fmtDate, fmtDateTime, toast, openModal, closeModal, sealMark } from "../utils.js?v=22";
 import { navigate } from "../router.js?v=20";
 
 const NOTE_TEMPLATES = ["Jó válasz", "Hiányos válasz", "Bizonytalan válasz", "Jó helyzetfelismerés", "Gyenge helyzetfelismerés", "Jó kommunikáció", "Gyenge kommunikáció", "Jó döntés", "Rossz döntés", "Kritikus hiba"];
@@ -142,6 +142,7 @@ export function renderExamDetail(container, id) {
       ${canEdit && !exam.endedAt ? `<button class="btn btn-gold btn-sm mt-2" id="finish-exam">Vizsga lezárása</button>` : ""}
       ${canEdit && exam.endedAt && summary.passed && !exam.promotedTo ? `<button class="btn btn-gold btn-sm mt-2" id="promote-exam">★ Felvétel az állományba</button>` : ""}
       ${exam.promotedTo ? `<a href="#/personnel/${esc(exam.promotedTo)}" class="badge badge-gold mt-2" style="display:inline-flex">Felvéve · ${esc(exam.promotedTo)} →</a>` : ""}
+      ${exam.endedAt && summary.passed ? `<button class="btn btn-sm mt-2" id="print-cert">🖨 Tanúsítvány nyomtatása</button>` : ""}
     </div>
 
     ${categories.map((cat) => `
@@ -212,6 +213,7 @@ export function renderExamDetail(container, id) {
   });
 
   document.getElementById("promote-exam")?.addEventListener("click", () => openPromoteForm(exam, container));
+  document.getElementById("print-cert")?.addEventListener("click", () => printCertificate(exam, summary));
 
   document.getElementById("save-final-comment")?.addEventListener("click", () => {
     setExamFinalComment(exam.id, document.getElementById("final-comment").value);
@@ -310,4 +312,45 @@ function renderSummaryBar(exam) {
       ${s.categories.map((cat) => `<div class="exam-category-score"><div class="card-title">${esc(cat.category)}</div><strong>${cat.total} / ${cat.max}</strong><span class="text-low small">${cat.max ? ((cat.total / cat.max) * 100).toFixed(0) : 0}%</span></div>`).join("")}
     </div>
   `;
+}
+
+function printCertificate(exam, summary) {
+  let root = document.getElementById("cert-print-root");
+  if (!root) {
+    root = document.createElement("div");
+    root.id = "cert-print-root";
+    document.body.appendChild(root);
+  }
+  const today = fmtDate(new Date().toISOString());
+  root.innerHTML = `
+    <div class="cert-page">
+      <div class="cert-seal">${sealMark(150)}</div>
+      <div class="cert-org">U.S.S.S. · ELIT VÉDELMI SZOLGÁLAT</div>
+      <h1 class="cert-title">Felvételi Tanúsítvány</h1>
+      <p class="cert-lede">Ezennel igazoljuk, hogy</p>
+      <div class="cert-name">${esc(exam.candidateName)}</div>
+      <p class="cert-lede">sikeresen teljesítette az U.S.S.S. felvételi vizsgáját, és alkalmasnak bizonyult a szolgálatra.</p>
+      <div class="cert-stats">
+        <div><span>Vizsgaazonosító</span><strong>${esc(exam.id)}</strong></div>
+        <div><span>Vizsga dátuma</span><strong>${fmtDate(exam.date)}</strong></div>
+        <div><span>Eredmény</span><strong>${summary.total} / ${summary.max} pont · ${summary.pct.toFixed(1)}%</strong></div>
+        <div><span>Minősítés</span><strong>${esc(summary.tier)}</strong></div>
+      </div>
+      <div class="cert-sign">
+        <div class="cert-sign-block">
+          <div class="cert-sign-line">${esc(exam.examinerName || "—")}${exam.examinerRank ? ` · ${esc(exam.examinerRank)}` : ""}</div>
+          <div class="cert-sign-label">Vizsgáztató</div>
+        </div>
+        <div class="cert-sign-block">
+          <div class="cert-sign-line">${today}</div>
+          <div class="cert-sign-label">Kiállítás dátuma</div>
+        </div>
+      </div>
+    </div>
+  `;
+  document.body.classList.add("printing-cert");
+  const cleanup = () => document.body.classList.remove("printing-cert");
+  window.addEventListener("afterprint", cleanup, { once: true });
+  window.print();
+  setTimeout(cleanup, 2000);
 }

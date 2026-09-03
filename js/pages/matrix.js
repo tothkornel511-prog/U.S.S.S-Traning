@@ -1,6 +1,6 @@
 import { getPersonnel, ref, moduleState, moduleByCode, levelLabel } from "../store.js?v=42";
 import { hasRole } from "../auth.js?v=20";
-import { esc, initials } from "../utils.js?v=21";
+import { esc, initials } from "../utils.js?v=22";
 import { navigate } from "../router.js?v=20";
 import { openModuleDetail } from "./profile.js?v=20";
 

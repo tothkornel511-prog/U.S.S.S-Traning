@@ -768,3 +768,30 @@ details.card[open] > summary::after { content: "−"; }
   .operation-record { margin-bottom:14px; }
   .operation-record h3, .operation-record p, .record-footer, .record-meta, .record-id { color:#111; }
 }
+
+/* Felvételi tanúsítvány — csak nyomtatáskor jelenik meg, a teljes
+   alkalmazás felett; a normál nézetben rejtve van. */
+#cert-print-root { display: none; }
+body.printing-cert #root { display: none !important; }
+body.printing-cert #cert-print-root { display: block; }
+.cert-page {
+  max-width: 720px; margin: 60px auto; padding: 60px 56px; text-align: center;
+  border: 2px solid #c6a664; background: #fdfcf9; color: #1a1a1a;
+  font-family: var(--font-body);
+}
+.cert-seal { width: 90px; height: 90px; margin: 0 auto 18px; }
+.cert-seal .seal-svg { width: 100%; height: 100%; }
+.cert-org { font: 11px var(--font-mono); letter-spacing: 0.2em; color: #8a713f; text-transform: uppercase; margin-bottom: 10px; }
+.cert-title { font-family: var(--font-display); font-size: 34px; color: #17140c; margin: 0 0 24px; letter-spacing: 0.02em; }
+.cert-lede { font-size: 14px; color: #4a4a4a; margin: 6px 0; }
+.cert-name { font-family: var(--font-display); font-size: 30px; color: #17140c; margin: 10px 0; font-weight: 600; border-bottom: 1px solid #c6a664; display: inline-block; padding-bottom: 6px; }
+.cert-stats { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin: 32px 0; text-align: left; }
+.cert-stats span { display: block; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: #8a713f; margin-bottom: 3px; }
+.cert-stats strong { font-size: 14px; color: #17140c; }
+.cert-sign { display: flex; justify-content: space-between; margin-top: 56px; padding-top: 0; gap: 40px; }
+.cert-sign-block { flex: 1; }
+.cert-sign-line { border-top: 1px solid #999; padding-top: 8px; font-size: 13px; color: #17140c; }
+.cert-sign-label { font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: #8a713f; margin-top: 4px; }
+@media print {
+  .cert-page { margin: 0 auto; border: 2px solid #c6a664; box-shadow: none; }
+}
