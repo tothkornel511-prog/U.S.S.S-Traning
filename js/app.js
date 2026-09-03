@@ -5,8 +5,8 @@
 import { seedIfNeeded, globalSearch, getCustomCss, getOperationRecords } from "./store.js?v=41";
 import { isAuthenticated, currentSession, logout, hasRole, ROLES } from "./auth.js?v=20";
 import { registerRoute, resolve, startRouter, navigate, currentPath } from "./router.js?v=20";
-import { esc, sealMark } from "./utils.js?v=20";
-import { renderLogin } from "./pages/login.js?v=20";
+import { esc, sealMark } from "./utils.js?v=21";
+import { renderLogin } from "./pages/login.js?v=21";
 import { renderDashboard } from "./pages/dashboard.js?v=38";
 import { renderPersonnelList } from "./pages/personnel.js?v=20";
 import { renderProfile } from "./pages/profile.js?v=20";
@@ -93,7 +93,7 @@ function renderShell() {
     <div class="app-shell">
       <aside class="sidebar" id="sidebar">
         <div class="brand">
-          <div class="brand-seal">${sealMark(34)}</div>
+          <div class="brand-seal">${sealMark(44)}</div>
           <div>
             <div class="brand-name">U.S.S.S. COMMAND</div>
             <div class="brand-sub">Védelmi Műveletek</div>

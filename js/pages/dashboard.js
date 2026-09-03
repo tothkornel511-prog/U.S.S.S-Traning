@@ -1,6 +1,6 @@
 import { getPersonnel, getProtocols, getLocations, getOperationRecords, getReadinessState, READINESS_LEVELS, readinessPercent, ref } from "../store.js?v=41";
 import { hasRole } from "../auth.js?v=20";
-import { esc, initials } from "../utils.js?v=20";
+import { esc, initials } from "../utils.js?v=21";
 import { navigate } from "../router.js?v=20";
 
 export function renderDashboard(container) {

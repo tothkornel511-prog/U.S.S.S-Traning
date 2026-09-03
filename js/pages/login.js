@@ -1,11 +1,12 @@
 import { login } from "../auth.js?v=20";
-import { esc, sealMark } from "../utils.js?v=20";
+import { esc, sealMark } from "../utils.js?v=21";
 
 export function renderLogin(root, onSuccess) {
   root.innerHTML = `
     <div class="login-screen">
+      <div class="login-watermark">${sealMark(1100)}</div>
       <div class="login-card">
-        <div class="login-seal">${sealMark(56)}</div>
+        <div class="login-seal">${sealMark(74)}</div>
         <div class="login-title">U.S.S.S.</div>
         <div class="login-sub">Elit Kiképzési és Személyzeti Rendszer</div>
         <div id="login-error"></div>
