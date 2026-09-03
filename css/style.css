@@ -715,19 +715,8 @@ details.card[open] > summary::after { content: "−"; }
 .record-actions { gap:8px; }
 .operation-kpi-grid { margin:16px 0; }
 .operation-kpi-grid .card { min-height:96px; }
-.operation-kpi-grid strong { display:block; margin-top:6px; color:var(--gold-bright); font:30px var(--font-display); }
-.operation-kpi-grid .command-alert { color:#f0a29b; text-shadow:var(--glow-red); }
-.operation-breakdown { margin-bottom:16px; }
 .notification-banner { margin:16px 0; border-left:3px solid var(--yellow); }
 .notification-banner h3 { margin:4px 0; font-size:21px; }
-.satcom-head { border-left-color:#5aa9ff; }
-.satcom-status { display:inline-flex; align-items:center; gap:8px; padding:9px 12px; border:1px solid rgba(90,169,255,.45); color:#9fcaff; background:rgba(90,169,255,.08); font:10px var(--font-mono); letter-spacing:.12em; white-space:nowrap; }
-.satcom-dot { width:7px; height:7px; border-radius:50%; background:#5aa9ff; box-shadow:0 0 6px 1px rgba(90,169,255,.8); animation:satcom-pulse 1.8s ease-in-out infinite; }
-@keyframes satcom-pulse { 0%,100% { opacity:1; } 50% { opacity:.35; } }
-.satcom-endpoint { padding:13px; border:1px solid var(--line-soft); background:rgba(6,7,10,.45); color:#9fcaff; font:12px var(--font-mono); overflow-wrap:anywhere; }
-.satcom-rule { display:flex; gap:12px; padding:11px 0; border-bottom:1px solid var(--line-soft); color:var(--text-mid); font-size:12.5px; }
-.satcom-rule:last-child { border-bottom:0; }
-.satcom-rule strong { color:#9fcaff; font:12px var(--font-mono); }
 .record-detail-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; }
 .record-detail-grid > div { padding:11px; border:1px solid var(--line-soft); background:rgba(6,7,10,.3); }
 .record-detail-grid strong { display:block; color:var(--text-hi); font-size:13px; margin-top:4px; }

@@ -2,12 +2,12 @@
    U.S.S.S. ELITE TRAINING SYSTEM — APP ENTRY
    ========================================================================== */
 
-import { seedIfNeeded, globalSearch, getCustomCss, getOperationRecords } from "./store.js?v=40";
+import { seedIfNeeded, globalSearch, getCustomCss, getOperationRecords } from "./store.js?v=41";
 import { isAuthenticated, currentSession, logout, hasRole, ROLES } from "./auth.js?v=20";
 import { registerRoute, resolve, startRouter, navigate, currentPath } from "./router.js?v=20";
 import { esc, sealMark } from "./utils.js?v=20";
 import { renderLogin } from "./pages/login.js?v=20";
-import { renderDashboard } from "./pages/dashboard.js?v=37";
+import { renderDashboard } from "./pages/dashboard.js?v=38";
 import { renderPersonnelList } from "./pages/personnel.js?v=20";
 import { renderProfile } from "./pages/profile.js?v=20";
 import { renderMatrix } from "./pages/matrix.js?v=20";
@@ -17,9 +17,8 @@ import { renderMapPage } from "./pages/map.js?v=20";
 import { renderRecruitmentHub, renderApplicantDetail } from "./pages/recruitment.js?v=25";
 import { renderExamList, renderExamDetail } from "./pages/exam.js?v=38";
 import { renderAdmin } from "./pages/admin.js?v=20";
-import { renderOperations } from "./pages/operations.js?v=36";
+import { renderOperations } from "./pages/operations.js?v=37";
 import { renderReadiness } from "./pages/readiness.js?v=32";
-import { renderSatcom } from "./pages/satcom.js?v=42";
 
 seedIfNeeded();
 applyCustomCss();
@@ -52,32 +51,23 @@ const NAV = [
   ]},
   { group: "Vezetői irányítás", items: [
     { path: "/readiness", label: "Készültségi rendszer", icon: "◉", minRole: "TRAINING" },
-    { path: "/satcom", label: "Blue Dragon 2 SATCOM", icon: "⌁", minRole: "TRAINING" },
   ]},
   { group: "Parancsnoki Központ", items: [
     { path: "/operations/reports", label: "Jelentések", icon: "▤", minRole: "TRAINING" },
-    { path: "/operations/incidents", label: "Incidensek", icon: "!", minRole: "TRAINING" },
     { path: "/operations/threats", label: "Fenyegetésértékelés", icon: "△", minRole: "TRAINING" },
     { path: "/operations/events", label: "Események", icon: "◈", minRole: "TRAINING" },
     { path: "/operations/assignments", label: "Feladatok", icon: "▣", minRole: "TRAINING" },
     { path: "/operations/protectees", label: "Védett személyek", icon: "◆", minRole: "TRAINING" },
-    { path: "/operations/fleet", label: "Járműflotta", icon: "▰", minRole: "TRAINING" },
     { path: "/operations/escorts", label: "Kísérések", icon: "↗", minRole: "TRAINING" },
     { path: "/operations/advance", label: "Előzetes helyszínfelmérés", icon: "⌖", minRole: "TRAINING" },
     { path: "/operations/protection-levels", label: "Védelmi fokozatok", icon: "◉", minRole: "TRAINING" },
     { path: "/operations/protective-plans", label: "Védelmi tervek", icon: "⬡", minRole: "TRAINING" },
-    { path: "/operations/recommendations", label: "Biztonsági javaslatok", icon: "◇", minRole: "TRAINING" },
     { path: "/operations/intelligence", label: "Védelmi információk", icon: "⌁", minRole: "TRAINING" },
-    { path: "/operations/after-action", label: "Utólagos értékelések", icon: "↻", minRole: "TRAINING" },
-    { path: "/operations/certifications", label: "Minősítések", icon: "✦", minRole: "TRAINING" },
-    { path: "/operations/documents", label: "Dokumentumok", icon: "▧", minRole: "TRAINING" },
     { path: "/operations/discipline", label: "Fegyelmi ügyek", icon: "⚖", minRole: "TRAINING" },
-    { path: "/operations/recognition", label: "Elismerések", icon: "★", minRole: "TRAINING" },
     { path: "/operations/government", label: "Kormányzati névjegyzék", icon: "⌂", minRole: "TRAINING" },
     { path: "/operations/succession", label: "Elnöki öröklési sorrend", icon: "Ⅰ", minRole: "TRAINING" },
     { path: "/operations/calendar", label: "Naptár", icon: "▦", minRole: "TRAINING" },
     { path: "/operations/notifications", label: "Értesítések", icon: "◌", minRole: "TRAINING" },
-    { path: "/operations/analytics", label: "Elemzések", icon: "▥", minRole: "TRAINING" },
   ]},
   { group: "Rendszer", items: [
     { path: "/admin", label: "Adminisztráció", icon: "⚙", minRole: "TRAINING" },
@@ -224,7 +214,6 @@ registerRoute("/map", () => renderMapPage(document.getElementById("content")));
 registerRoute("/map/:mapId", (p) => renderMapPage(document.getElementById("content"), p.mapId));
 registerRoute("/admin", () => renderAdmin(document.getElementById("content")));
 registerRoute("/readiness", () => renderReadiness(document.getElementById("content")));
-registerRoute("/satcom", () => renderSatcom(document.getElementById("content")));
 registerRoute("/operations/:type", (p) => renderOperations(document.getElementById("content"), p.type));
 
 function onRouteChange() {

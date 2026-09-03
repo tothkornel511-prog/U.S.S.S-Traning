@@ -4,7 +4,7 @@ import {
   createOperationRecord,
   updateOperationRecord,
   archiveOperationRecord,
-} from "../store.js?v=40";
+} from "../store.js?v=41";
 import { actorLabel, hasRole } from "../auth.js?v=20";
 import { esc, fmtDate, toast, openModal, closeModal } from "../utils.js?v=20";
 import { navigate } from "../router.js?v=20";
@@ -13,7 +13,6 @@ const STATUS = ["OPEN", "IN REVIEW", "APPROVED", "REJECTED", "COMPLETED"];
 const PRIORITIES = ["LOW", "NORMAL", "HIGH", "CRITICAL"];
 const TEMPLATES = {
   reports: { label: "Általános szolgálati jelentés", description: "Mi történt?\nMikor és hol történt?\nKik voltak jelen?\nMilyen intézkedés történt?\nMi lett az eredmény?", action: "További intézkedés / ajánlás:" },
-  incidents: { label: "Incidensjelentés", description: "Esemény tényei és kiváltó oka:\nÉszlelt veszély:\nÉrintett személyek:\nSérülés vagy kár:", action: "Azonnali intézkedés:\nTovábbi szükséges intézkedés:" },
   advance: { label: "Advance Report", description: "Megközelítési lehetőségek:\nBejáratok és kijáratok:\nBiztonsági hiányosságok:\nTömeg és környezeti kockázatok:", action: "Javasolt intézkedések:\nEgyüttműködő szervek:" },
   threats: { label: "Threat Assessment", description: "Fenyegetés forrása:\nÉrintett védett személy vagy esemény:\nLeírás és hitelesség:\nSürgősség:", action: "Kockázatcsökkentő intézkedés:\nFelelős és felülvizsgálat:" },
 };
@@ -34,7 +33,7 @@ export function renderOperations(container, type = "reports") {
       <select id="operation-priority"><option value="ALL">Minden prioritás</option>${PRIORITIES.map((value) => `<option>${value}</option>`).join("")}</select>
       <label class="filter-check"><input type="checkbox" id="operation-archive" /> Archiváltak</label>
     </div>
-    ${type === "analytics" ? renderAnalyticsOverview() : type === "notifications" ? renderNotificationsOverview() : ""}
+    ${type === "notifications" ? renderNotificationsOverview() : ""}
     <div class="operation-grid" id="operation-list"></div>
   `;
   const render = () => {
@@ -59,13 +58,6 @@ export function renderOperations(container, type = "reports") {
   document.getElementById("export-operations")?.addEventListener("click", () => exportOperations(records, meta.label));
   document.getElementById("export-csv")?.addEventListener("click", () => exportCsv(records, meta.label));
   render();
-}
-
-function renderAnalyticsOverview() {
-  const records = getOperationRecords();
-  const open = records.filter((record) => !record.archived && record.status !== "COMPLETED" && record.status !== "REJECTED");
-  const critical = records.filter((record) => record.priority === "CRITICAL" || record.risk === "CRITICAL");
-  return `<div class="grid grid-3 operation-kpi-grid"><div class="card"><span class="card-title">Összes rekord</span><strong>${records.length}</strong></div><div class="card"><span class="card-title">Nyitott ügyek</span><strong>${open.length}</strong></div><div class="card"><span class="card-title">Kritikus jelzések</span><strong class="command-alert">${critical.length}</strong></div></div><div class="card operation-breakdown"><div class="card-title">Modul szerinti megoszlás</div>${Object.entries(OPERATION_TYPES).map(([key, meta]) => `<div class="history-item"><span>${esc(meta.label)}</span><span class="record-id">${records.filter((record) => record.type === key).length}</span></div>`).join("")}</div>`;
 }
 
 function renderNotificationsOverview() {

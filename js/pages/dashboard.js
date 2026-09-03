@@ -1,4 +1,4 @@
-import { getPersonnel, getProtocols, getLocations, getOperationRecords, getReadinessState, READINESS_LEVELS, readinessPercent, ref } from "../store.js?v=37";
+import { getPersonnel, getProtocols, getLocations, getOperationRecords, getReadinessState, READINESS_LEVELS, readinessPercent, ref } from "../store.js?v=41";
 import { hasRole } from "../auth.js?v=20";
 import { esc, initials } from "../utils.js?v=20";
 import { navigate } from "../router.js?v=20";
@@ -48,7 +48,7 @@ export function renderDashboard(container) {
     </div>
 
     <div class="card command-overview section">
-      <div class="flex justify-between items-center mb-1 flex-wrap"><div><div class="eyebrow">EXECUTIVE CONTROL / LIVE STATUS</div><h2>COMMAND OVERVIEW</h2></div><a href="#/operations/incidents" class="btn btn-sm">Operációs központ →</a></div>
+      <div class="flex justify-between items-center mb-1 flex-wrap"><div><div class="eyebrow">EXECUTIVE CONTROL / LIVE STATUS</div><h2>COMMAND OVERVIEW</h2></div><a href="#/operations/reports" class="btn btn-sm">Operációs központ →</a></div>
       <div class="grid grid-3 command-overview-stats">
         <div><span class="card-title">Nyitott rekordok</span><strong>${openOperations.length}</strong><span class="text-low small">Jelentések, feladatok és műveletek</span></div>
         <div><span class="card-title">Kritikus figyelmeztetések</span><strong class="command-alert">${criticalOperations.length}</strong><span class="text-low small">Azonnali vezetői áttekintést igényel</span></div>
@@ -60,7 +60,7 @@ export function renderDashboard(container) {
       </div>
     </div>
 
-    ${criticalOperations.length ? `<div class="card command-alert-panel section"><div class="flex justify-between items-center mb-1"><div><div class="eyebrow">AZONNALI VEZETŐI FIGYELEM</div><h2>Kiemelt kockázatok</h2></div><a href="#/operations/incidents" class="btn btn-sm">Incidensek megnyitása</a></div>${criticalOperations.slice(0, 5).map((record) => `<div class="history-item"><span><strong class="text-hi">${esc(record.title)}</strong><span class="text-low small"> · ${esc(record.id)} · ${esc(record.location || "Helyszín nincs megadva")}</span></span><span class="badge badge-red">${esc(record.priority === "CRITICAL" ? "KRITIKUS" : "MAGAS KOCKÁZAT")}</span></div>`).join("")}</div>` : ""}
+    ${criticalOperations.length ? `<div class="card command-alert-panel section"><div class="flex justify-between items-center mb-1"><div><div class="eyebrow">AZONNALI VEZETŐI FIGYELEM</div><h2>Kiemelt kockázatok</h2></div><a href="#/operations/notifications" class="btn btn-sm">Értesítések megnyitása</a></div>${criticalOperations.slice(0, 5).map((record) => `<div class="history-item"><span><strong class="text-hi">${esc(record.title)}</strong><span class="text-low small"> · ${esc(record.id)} · ${esc(record.location || "Helyszín nincs megadva")}</span></span><span class="badge badge-red">${esc(record.priority === "CRITICAL" ? "KRITIKUS" : "MAGAS KOCKÁZAT")}</span></div>`).join("")}</div>` : ""}
 
     <div class="card command-brief section"><div class="flex justify-between items-center mb-1"><div><div class="eyebrow">AUTOMATIKUS DÖNTÉSTÁMOGATÁS</div><h2>Vezetői helyzetértékelés</h2></div><span class="badge badge-gold">HELYI ELEMZÉS</span></div><p>${esc(commandBrief.summary)}</p><div class="brief-actions">${commandBrief.actions.map((action) => `<div class="brief-action"><span class="brief-index">${action.level}</span><span>${esc(action.text)}</span></div>`).join("")}</div><div class="text-low small mt-1">Az összefoglaló a rendszerben mentett rekordokból készül, külső adatot nem használ.</div></div>
 

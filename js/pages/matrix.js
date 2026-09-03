@@ -1,4 +1,4 @@
-import { getPersonnel, ref, moduleState, moduleByCode, levelLabel } from "../store.js?v=20";
+import { getPersonnel, ref, moduleState, moduleByCode, levelLabel } from "../store.js?v=41";
 import { hasRole } from "../auth.js?v=20";
 import { esc, initials } from "../utils.js?v=20";
 import { navigate } from "../router.js?v=20";
