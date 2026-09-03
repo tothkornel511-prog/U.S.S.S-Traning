@@ -19,7 +19,7 @@ import { renderExamList, renderExamDetail } from "./pages/exam.js?v=38";
 import { renderAdmin } from "./pages/admin.js?v=20";
 import { renderOperations } from "./pages/operations.js?v=36";
 import { renderReadiness } from "./pages/readiness.js?v=32";
-import { renderSatcom } from "./pages/satcom.js?v=41";
+import { renderSatcom } from "./pages/satcom.js?v=42";
 
 seedIfNeeded();
 applyCustomCss();
