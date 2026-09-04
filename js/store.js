@@ -30,6 +30,8 @@ const KEYS = {
   nextExamSeq: NS + "next_exam_seq",
   operations: NS + "operations",
   readiness: NS + "readiness",
+  investigations: NS + "investigations",
+  nextInvestigationSeq: NS + "next_investigation_seq",
 };
 
 /* Elméleti vizsgánál ez alatt a százalék alatt a modul nem számít teljesítettnek. */
@@ -113,6 +115,7 @@ export function seedIfNeeded() {
   applyGovernmentHierarchySeedPatch();
   applyCommandCenterCatalogSeedPatch();
   applyProtecteeScopePatch();
+  applyInvestigationSeedPatch();
 }
 
 /* Célzott, egyszeri pozíció-javítás — csak a felsorolt személyek "position"
@@ -231,6 +234,16 @@ function applyRecruitmentSeedPatch() {
   if (read(KEYS.exams, null) === null) {
     write(KEYS.exams, []);
     write(KEYS.nextExamSeq, 0);
+  }
+}
+
+/* Célzott seedelés: a Belső Vizsgálati Rendszer új localStorage-kulcsokat
+   vezet be, amiket egy már korábban seedelt böngésző még nem ismer — ez a
+   patch pótolja őket, minden mást érintetlenül hagyva. */
+function applyInvestigationSeedPatch() {
+  if (read(KEYS.investigations, null) === null) {
+    write(KEYS.investigations, []);
+    write(KEYS.nextInvestigationSeq, 1);
   }
 }
 
@@ -795,7 +808,6 @@ export const OPERATION_TYPES = {
   "protection-levels": { label: "Védelmi fokozatok", singular: "Védelmi fokozat", icon: "◉" },
   "protective-plans": { label: "Védelmi tervek", singular: "Védelmi terv", icon: "⬡" },
   intelligence: { label: "Védelmi információk", singular: "Védelmi információ", icon: "⌁" },
-  discipline: { label: "Fegyelmi ügyek", singular: "Fegyelmi ügy", icon: "⚖" },
   government: { label: "Kormányzati névjegyzék", singular: "Kormányzati bejegyzés", icon: "⌂" },
   succession: { label: "Elnöki öröklési sorrend", singular: "Öröklési bejegyzés", icon: "Ⅰ" },
   calendar: { label: "Naptár", singular: "Naptári esemény", icon: "▦" },
@@ -1145,6 +1157,107 @@ export function examScoreSummary(exam) {
   });
   const criticalErrors = (exam.answers || []).filter((a) => a.critical).length;
   return { total, max, pct, passed, tier, answered, totalQuestions: EXAM_QUESTIONS.length, categories, criticalErrors };
+}
+
+/* ---------- Belső Vizsgálati Rendszer -------------------------------------
+   Formális belső vizsgálat (nem azonos az általános "Fegyelmi ügy"
+   gyorsjegyzettel) — bejelentéstől a lezárásig végigvezetett ügymenet,
+   saját státuszgéppel, kivizsgálóval, megállapításokkal és szankcióval. */
+export const INVESTIGATION_CATEGORIES = ["Szolgálati mulasztás", "Fegyelemsértés", "Hatalommal való visszaélés", "Etikai vétség", "Biztonsági szabályszegés", "Egyéb"];
+export const INVESTIGATION_SEVERITIES = ["Alacsony", "Közepes", "Súlyos", "Kritikus"];
+export const INVESTIGATION_STATUSES = ["Bejelentve", "Vizsgálat alatt", "Felfüggesztve", "Lezárva – megalapozott", "Lezárva – nem megalapozott", "Elutasítva"];
+export const INVESTIGATION_CLOSED_STATUSES = ["Lezárva – megalapozott", "Lezárva – nem megalapozott", "Elutasítva"];
+export const INVESTIGATION_OUTCOMES = ["Nincs szankció", "Szóbeli figyelmeztetés", "Írásbeli figyelmeztetés", "Próbaidő / visszaminősítés", "Felfüggesztés", "Elbocsátás"];
+
+function nextInvestigationId() {
+  const seq = Math.max(1, read(KEYS.nextInvestigationSeq, 1));
+  return { id: `BV-${String(seq).padStart(3, "0")}`, seq };
+}
+export function getInvestigations() {
+  return read(KEYS.investigations, []);
+}
+export function getInvestigation(id) {
+  return getInvestigations().find((i) => i.id === id);
+}
+export function createInvestigation(fields, actorLabel) {
+  const { id, seq } = nextInvestigationId();
+  const now = new Date().toISOString();
+  const investigation = {
+    id,
+    subjectUsssId: (fields.subjectUsssId || "").trim(),
+    subjectName: (fields.subjectName || "").trim(),
+    reportedBy: (fields.reportedBy || "").trim(),
+    investigator: (fields.investigator || "").trim(),
+    category: fields.category || INVESTIGATION_CATEGORIES[0],
+    severity: fields.severity || INVESTIGATION_SEVERITIES[0],
+    status: "Bejelentve",
+    confidential: Boolean(fields.confidential),
+    description: (fields.description || "").trim(),
+    findings: "",
+    outcome: "",
+    openedAt: now,
+    closedAt: null,
+    createdBy: actorLabel || "Rendszer",
+    createdAt: now,
+    updatedAt: now,
+    history: [{ at: now, by: actorLabel || "Rendszer", action: "Bejelentés rögzítve" }],
+  };
+  const list = getInvestigations();
+  list.unshift(investigation);
+  write(KEYS.investigations, list);
+  write(KEYS.nextInvestigationSeq, seq + 1);
+  logAudit(actorLabel, "Belső vizsgálat indítva", `${id} — ${investigation.subjectName || investigation.subjectUsssId || "ismeretlen érintett"}`);
+  return investigation;
+}
+export function updateInvestigation(id, patch, actorLabel) {
+  const list = getInvestigations();
+  const inv = list.find((i) => i.id === id);
+  if (!inv) return null;
+  const changes = Object.entries(patch).filter(([key, value]) => value !== undefined && inv[key] !== value);
+  changes.forEach(([key, value]) => { inv[key] = value; });
+  if (changes.length) {
+    const fieldLabels = { status: "Státusz", investigator: "Kivizsgáló", description: "Bejelentés leírása", findings: "Megállapítások", severity: "Súlyosság", category: "Kategória", confidential: "Bizalmasság", reportedBy: "Bejelentő", subjectName: "Érintett neve", subjectUsssId: "Érintett azonosítója" };
+    const label = changes.map(([key]) => fieldLabels[key] || key).join(", ");
+    inv.updatedAt = new Date().toISOString();
+    inv.history = inv.history || [];
+    inv.history.push({ at: inv.updatedAt, by: actorLabel || "Rendszer", action: `${label} frissítve` });
+    write(KEYS.investigations, list);
+    logAudit(actorLabel, "Belső vizsgálat frissítve", `${id} — ${label}`);
+  }
+  return inv;
+}
+export function closeInvestigation(id, { status, outcome }, actorLabel) {
+  if (!INVESTIGATION_CLOSED_STATUSES.includes(status)) return null;
+  const list = getInvestigations();
+  const inv = list.find((i) => i.id === id);
+  if (!inv) return null;
+  inv.status = status;
+  inv.outcome = outcome || "";
+  inv.closedAt = new Date().toISOString();
+  inv.updatedAt = inv.closedAt;
+  inv.history = inv.history || [];
+  inv.history.push({ at: inv.closedAt, by: actorLabel || "Rendszer", action: `Vizsgálat lezárva — ${status}${outcome ? ` (${outcome})` : ""}` });
+  write(KEYS.investigations, list);
+  logAudit(actorLabel, "Belső vizsgálat lezárva", `${id} — ${status}${outcome ? ` · ${outcome}` : ""}`);
+  return inv;
+}
+export function reopenInvestigation(id, actorLabel) {
+  const list = getInvestigations();
+  const inv = list.find((i) => i.id === id);
+  if (!inv) return null;
+  inv.status = "Vizsgálat alatt";
+  inv.closedAt = null;
+  inv.updatedAt = new Date().toISOString();
+  inv.history = inv.history || [];
+  inv.history.push({ at: inv.updatedAt, by: actorLabel || "Rendszer", action: "Vizsgálat újranyitva" });
+  write(KEYS.investigations, list);
+  logAudit(actorLabel, "Belső vizsgálat újranyitva", id);
+  return inv;
+}
+export function deleteInvestigation(id, actorLabel) {
+  const inv = getInvestigation(id);
+  write(KEYS.investigations, getInvestigations().filter((i) => i.id !== id));
+  logAudit(actorLabel, "Belső vizsgálat törölve", inv ? `${id} — ${inv.subjectName || inv.subjectUsssId}` : id);
 }
 
 /* ---------- Global search ------------------------------------------------*/
