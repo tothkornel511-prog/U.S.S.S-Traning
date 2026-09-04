@@ -1,13 +1,14 @@
 import {
   getInvestigations, getInvestigation, createInvestigation, updateInvestigation, closeInvestigation, reopenInvestigation, deleteInvestigation,
-  getPersonnel,
-  INVESTIGATION_CATEGORIES, INVESTIGATION_SEVERITIES, INVESTIGATION_STATUSES, INVESTIGATION_CLOSED_STATUSES, INVESTIGATION_OUTCOMES,
-} from "../store.js?v=44";
+  getPersonnel, getInvestigationCategories, addInvestigationCategory,
+  INVESTIGATION_SEVERITIES, INVESTIGATION_STATUSES, INVESTIGATION_CLOSED_STATUSES, INVESTIGATION_OUTCOMES, INVESTIGATION_ORIGINS,
+} from "../store.js?v=45";
 import { hasRole, actorLabel } from "../auth.js?v=20";
 import { esc, fmtDate, fmtDateTime, toast, openModal, closeModal } from "../utils.js?v=22";
 import { navigate } from "../router.js?v=20";
 
 const SEVERITY_BADGE = { "Alacsony": "gray", "Közepes": "yellow", "Súlyos": "red", "Kritikus": "red" };
+const ORIGIN_BADGE = { "Belső kezdeményezés": "gray", "Külső panasz": "yellow" };
 const STATUS_BADGE = (status) => {
   if (status === "Bejelentve") return "yellow";
   if (status === "Vizsgálat alatt" || status === "Felfüggesztve") return "gold";
@@ -33,7 +34,7 @@ export function renderInvestigationList(container) {
       <div class="field"><label>Súlyosság</label><select id="inv-severity-filter"><option value="all">Mindegyik</option>${INVESTIGATION_SEVERITIES.map((s) => `<option>${esc(s)}</option>`).join("")}</select></div>
     </div>
     <div class="table-wrap"><table>
-      <thead><tr><th>ID</th><th>Érintett</th><th>Kategória</th><th>Súlyosság</th><th>Státusz</th><th>Kivizsgáló</th><th>Bejelentve</th></tr></thead>
+      <thead><tr><th>ID</th><th>Érintett</th><th>Eredet</th><th>Kategória</th><th>Súlyosság</th><th>Státusz</th><th>Kivizsgáló</th><th>Bejelentve</th></tr></thead>
       <tbody id="inv-rows"></tbody>
     </table></div>
   `;
@@ -49,7 +50,7 @@ export function renderInvestigationList(container) {
         (severity === "all" || inv.severity === severity);
     });
     document.getElementById("inv-rows").innerHTML = filtered.length ? filtered.map(renderInvestigationRow).join("") :
-      `<tr><td colspan="7"><div class="empty-state"><h3>Nincs rögzített vizsgálat</h3><p>Indítsa el az elsőt a fenti gombbal.</p></div></td></tr>`;
+      `<tr><td colspan="8"><div class="empty-state"><h3>Nincs rögzített vizsgálat</h3><p>Indítsa el az elsőt a fenti gombbal.</p></div></td></tr>`;
     container.querySelectorAll("[data-nav]").forEach((n) => n.addEventListener("click", () => navigate(n.getAttribute("data-nav"))));
   };
   ["inv-filter", "inv-status-filter", "inv-severity-filter"].forEach((id) => document.getElementById(id).addEventListener("input", updateRows));
@@ -61,6 +62,7 @@ function renderInvestigationRow(inv) {
   return `<tr class="row-link" data-nav="/investigations/${esc(inv.id)}">
     <td class="text-gold" style="font-family:var(--font-mono)">${esc(inv.id)}${inv.confidential ? ` <span class="badge badge-gold" style="font-size:9px; padding:1px 6px; vertical-align:middle">BIZALMAS</span>` : ""}</td>
     <td class="text-hi">${esc(inv.subjectName || inv.subjectUsssId || "—")}</td>
+    <td><span class="badge badge-${ORIGIN_BADGE[inv.origin] || "gray"}">${esc(inv.origin === "Külső panasz" ? "Külső" : "Belső")}</span></td>
     <td class="text-low small">${esc(inv.category)}</td>
     <td><span class="badge badge-${SEVERITY_BADGE[inv.severity] || "gray"}">${esc(inv.severity)}</span></td>
     <td><span class="badge badge-${STATUS_BADGE(inv.status)}">${esc(inv.status)}</span></td>
@@ -71,6 +73,7 @@ function renderInvestigationRow(inv) {
 
 function openInvestigationForm() {
   const personnel = getPersonnel();
+  const categories = getInvestigationCategories();
   openModal(`
     <div class="modal-head"><h3>Új belső vizsgálat indítása</h3><button class="modal-close" data-close-modal>×</button></div>
     <form id="inv-form">
@@ -81,12 +84,16 @@ function openInvestigationForm() {
       <datalist id="inv-personnel-list">${personnel.map((p) => `<option value="${esc(p.usssId)}">${esc(p.name)}</option>`).join("")}</datalist>
       <div class="grid grid-2">
         <div class="field"><label>Bejelentő</label><input id="if-reporter" placeholder="Név vagy 'Anonim'" /></div>
-        <div class="field"><label>Kivizsgáló</label><input id="if-investigator" /></div>
+        <div class="field"><label>Kivizsgáló</label><select id="if-investigator"><option value="">Nincs kijelölve</option>${personnel.map((p) => `<option value="${esc(p.name)}">${esc(p.name)}</option>`).join("")}</select></div>
       </div>
       <div class="grid grid-2">
-        <div class="field"><label>Kategória</label><select id="if-category">${INVESTIGATION_CATEGORIES.map((c) => `<option>${esc(c)}</option>`).join("")}</select></div>
+        <div class="field"><label>Eredet</label><select id="if-origin">${INVESTIGATION_ORIGINS.map((o) => `<option>${esc(o)}</option>`).join("")}</select></div>
         <div class="field"><label>Súlyosság</label><select id="if-severity">${INVESTIGATION_SEVERITIES.map((s) => `<option>${esc(s)}</option>`).join("")}</select></div>
       </div>
+      <div class="field"><label>Kategória</label>
+        <select id="if-category">${categories.map((c) => `<option>${esc(c)}</option>`).join("")}<option value="__new__">+ Új kategória…</option></select>
+      </div>
+      <div class="field" id="if-new-category-wrap" style="display:none;"><label>Új kategória neve</label><input id="if-new-category" placeholder="pl. Árulás" /></div>
       <div class="field"><label>A bejelentés leírása</label><textarea id="if-description" rows="5" required placeholder="Mi történt, mikor, kik voltak érintve…"></textarea></div>
       <label class="filter-check mb-2"><input type="checkbox" id="if-confidential" checked /> Bizalmas kezelés</label>
       <div class="flex justify-between mt-2">
@@ -99,17 +106,27 @@ function openInvestigationForm() {
     const p = personnel.find((x) => x.usssId === e.target.value.trim());
     if (p) document.getElementById("if-name").value = p.name;
   });
+  document.getElementById("if-category").addEventListener("change", (e) => {
+    document.getElementById("if-new-category-wrap").style.display = e.target.value === "__new__" ? "block" : "none";
+  });
   document.getElementById("inv-form").addEventListener("submit", (e) => {
     e.preventDefault();
     const subjectName = document.getElementById("if-name").value.trim();
     const description = document.getElementById("if-description").value.trim();
     if (!subjectName || !description) return;
+    let category = document.getElementById("if-category").value;
+    if (category === "__new__") {
+      category = document.getElementById("if-new-category").value.trim();
+      if (!category) return;
+      addInvestigationCategory(category, actorLabel());
+    }
     const inv = createInvestigation({
       subjectUsssId: document.getElementById("if-usssid").value.trim(),
       subjectName,
       reportedBy: document.getElementById("if-reporter").value.trim(),
-      investigator: document.getElementById("if-investigator").value.trim(),
-      category: document.getElementById("if-category").value,
+      investigator: document.getElementById("if-investigator").value,
+      origin: document.getElementById("if-origin").value,
+      category,
       severity: document.getElementById("if-severity").value,
       description,
       confidential: document.getElementById("if-confidential").checked,
@@ -148,6 +165,7 @@ export function renderInvestigationDetail(container, id) {
         </div>
       </div>
       <div class="grid grid-3 mb-2">
+        <div><div class="card-title">Eredet</div><div class="text-hi"><span class="badge badge-${ORIGIN_BADGE[inv.origin] || "gray"}">${esc(inv.origin || "—")}</span></div></div>
         <div><div class="card-title">Kategória</div><div class="text-hi">${esc(inv.category)}</div></div>
         <div><div class="card-title">Bejelentő</div><div class="text-hi">${esc(inv.reportedBy || "—")}</div></div>
         <div><div class="card-title">Kivizsgáló</div><div class="text-hi">${esc(inv.investigator || "Nincs kijelölve")}</div></div>

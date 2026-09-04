@@ -32,6 +32,7 @@ const KEYS = {
   readiness: NS + "readiness",
   investigations: NS + "investigations",
   nextInvestigationSeq: NS + "next_investigation_seq",
+  investigationCategories: NS + "investigation_categories",
 };
 
 /* Elméleti vizsgánál ez alatt a százalék alatt a modul nem számít teljesítettnek. */
@@ -1163,11 +1164,30 @@ export function examScoreSummary(exam) {
    Formális belső vizsgálat (nem azonos az általános "Fegyelmi ügy"
    gyorsjegyzettel) — bejelentéstől a lezárásig végigvezetett ügymenet,
    saját státuszgéppel, kivizsgálóval, megállapításokkal és szankcióval. */
-export const INVESTIGATION_CATEGORIES = ["Szolgálati mulasztás", "Fegyelemsértés", "Hatalommal való visszaélés", "Etikai vétség", "Biztonsági szabályszegés", "Egyéb"];
+const DEFAULT_INVESTIGATION_CATEGORIES = ["Szolgálati mulasztás", "Fegyelemsértés", "Hatalommal való visszaélés", "Etikai vétség", "Biztonsági szabályszegés", "Árulás", "Titoksértés", "Korrupció", "Egyéb"];
+/* A kategórialista adminfelületről bővíthető (nem fix kódba égetett
+   lista) — lásd addInvestigationCategory / removeInvestigationCategory. */
+export function getInvestigationCategories() {
+  return read(KEYS.investigationCategories, DEFAULT_INVESTIGATION_CATEGORIES);
+}
+export function addInvestigationCategory(name, actorLabel) {
+  const trimmed = (name || "").trim();
+  if (!trimmed) return;
+  const list = getInvestigationCategories();
+  if (list.some((c) => c.toLowerCase() === trimmed.toLowerCase())) return;
+  list.push(trimmed);
+  write(KEYS.investigationCategories, list);
+  logAudit(actorLabel, "Vizsgálati kategória hozzáadva", trimmed);
+}
+export function removeInvestigationCategory(name, actorLabel) {
+  write(KEYS.investigationCategories, getInvestigationCategories().filter((c) => c !== name));
+  logAudit(actorLabel, "Vizsgálati kategória törölve", name);
+}
 export const INVESTIGATION_SEVERITIES = ["Alacsony", "Közepes", "Súlyos", "Kritikus"];
 export const INVESTIGATION_STATUSES = ["Bejelentve", "Vizsgálat alatt", "Felfüggesztve", "Lezárva – megalapozott", "Lezárva – nem megalapozott", "Elutasítva"];
 export const INVESTIGATION_CLOSED_STATUSES = ["Lezárva – megalapozott", "Lezárva – nem megalapozott", "Elutasítva"];
 export const INVESTIGATION_OUTCOMES = ["Nincs szankció", "Szóbeli figyelmeztetés", "Írásbeli figyelmeztetés", "Próbaidő / visszaminősítés", "Felfüggesztés", "Elbocsátás"];
+export const INVESTIGATION_ORIGINS = ["Belső kezdeményezés", "Külső panasz"];
 
 function nextInvestigationId() {
   const seq = Math.max(1, read(KEYS.nextInvestigationSeq, 1));
@@ -1188,8 +1208,9 @@ export function createInvestigation(fields, actorLabel) {
     subjectName: (fields.subjectName || "").trim(),
     reportedBy: (fields.reportedBy || "").trim(),
     investigator: (fields.investigator || "").trim(),
-    category: fields.category || INVESTIGATION_CATEGORIES[0],
+    category: fields.category || getInvestigationCategories()[0],
     severity: fields.severity || INVESTIGATION_SEVERITIES[0],
+    origin: INVESTIGATION_ORIGINS.includes(fields.origin) ? fields.origin : INVESTIGATION_ORIGINS[0],
     status: "Bejelentve",
     confidential: Boolean(fields.confidential),
     description: (fields.description || "").trim(),
@@ -1216,7 +1237,7 @@ export function updateInvestigation(id, patch, actorLabel) {
   const changes = Object.entries(patch).filter(([key, value]) => value !== undefined && inv[key] !== value);
   changes.forEach(([key, value]) => { inv[key] = value; });
   if (changes.length) {
-    const fieldLabels = { status: "Státusz", investigator: "Kivizsgáló", description: "Bejelentés leírása", findings: "Megállapítások", severity: "Súlyosság", category: "Kategória", confidential: "Bizalmasság", reportedBy: "Bejelentő", subjectName: "Érintett neve", subjectUsssId: "Érintett azonosítója" };
+    const fieldLabels = { status: "Státusz", investigator: "Kivizsgáló", description: "Bejelentés leírása", findings: "Megállapítások", severity: "Súlyosság", category: "Kategória", origin: "Eredet", confidential: "Bizalmasság", reportedBy: "Bejelentő", subjectName: "Érintett neve", subjectUsssId: "Érintett azonosítója" };
     const label = changes.map(([key]) => fieldLabels[key] || key).join(", ");
     inv.updatedAt = new Date().toISOString();
     inv.history = inv.history || [];
