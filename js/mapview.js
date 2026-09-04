@@ -64,14 +64,14 @@ export function createPanZoomMap(container, opts = {}) {
   img.addEventListener("error", () => {
     imgBox.innerHTML = `
       <div class="pz-missing">
-        <div class="pz-missing-ic">🗺️</div>
+        <div class="pz-missing-ic">⛶</div>
         <div>Térképkép hiányzik</div>
         <div class="pz-missing-path">${esc(image || "")}</div>
       </div>`;
     fitToViewport();
   });
   if (image) img.src = image;
-  else imgBox.innerHTML = `<div class="pz-missing"><div class="pz-missing-ic">🗺️</div><div>Nincs kiválasztva térkép</div></div>`;
+  else imgBox.innerHTML = `<div class="pz-missing"><div class="pz-missing-ic">⛶</div><div>Nincs kiválasztva térkép</div></div>`;
 
   function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
 

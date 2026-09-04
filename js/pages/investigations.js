@@ -59,7 +59,7 @@ export function renderInvestigationList(container) {
 
 function renderInvestigationRow(inv) {
   return `<tr class="row-link" data-nav="/investigations/${esc(inv.id)}">
-    <td class="text-gold" style="font-family:var(--font-mono)">${esc(inv.id)}${inv.confidential ? " 🔒" : ""}</td>
+    <td class="text-gold" style="font-family:var(--font-mono)">${esc(inv.id)}${inv.confidential ? ` <span class="badge badge-gold" style="font-size:9px; padding:1px 6px; vertical-align:middle">BIZALMAS</span>` : ""}</td>
     <td class="text-hi">${esc(inv.subjectName || inv.subjectUsssId || "—")}</td>
     <td class="text-low small">${esc(inv.category)}</td>
     <td><span class="badge badge-${SEVERITY_BADGE[inv.severity] || "gray"}">${esc(inv.severity)}</span></td>

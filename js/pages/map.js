@@ -2,7 +2,7 @@ import { ref, mapById, locationsForMap, districtsForMap, upsertDistrict, deleteD
 import { hasRole, actorLabel } from "../auth.js?v=20";
 import { esc, toast, openModal, closeModal } from "../utils.js?v=22";
 import { navigate } from "../router.js?v=20";
-import { createPanZoomMap } from "../mapview.js?v=20";
+import { createPanZoomMap } from "../mapview.js?v=21";
 import { openLocationForm } from "./locations.js?v=20";
 
 let activeMapId = null;
@@ -40,7 +40,7 @@ export function renderMapPage(container, mapId) {
         <div id="map-district-list"></div>
       </div>
     </div>
-    <div class="small text-low mt-2">🔴 Nincs teljesítve · 🟡 Elmélet kész, gyakorlatra vár · 🟢 Teljesítve — a pöttyök a védett helyszíneket jelölik, kattints rájuk a részletekért.</div>
+    <div class="small text-low mt-2 flex items-center gap-1" style="flex-wrap:wrap"><span class="dot dot-red" style="width:7px;height:7px;vertical-align:middle"></span> Nincs teljesítve · <span class="dot dot-yellow" style="width:7px;height:7px;vertical-align:middle"></span> Elmélet kész, gyakorlatra vár · <span class="dot dot-green" style="width:7px;height:7px;vertical-align:middle"></span> Teljesítve — a pöttyök a védett helyszíneket jelölik, kattints rájuk a részletekért.</div>
   `;
 
   container.querySelectorAll(".map-tab-btn").forEach((b) =>

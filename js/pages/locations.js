@@ -2,7 +2,7 @@ import { getLocations, getLocation, upsertLocation, deleteLocation, ref, mapById
 import { hasRole, actorLabel } from "../auth.js?v=20";
 import { esc, fmtDateTime, toast, openModal, closeModal } from "../utils.js?v=22";
 import { navigate } from "../router.js?v=20";
-import { createPanZoomMap } from "../mapview.js?v=20";
+import { createPanZoomMap } from "../mapview.js?v=21";
 import { openOnMap } from "./map.js?v=20";
 
 export function renderLocationsList(container) {
@@ -19,7 +19,7 @@ export function renderLocationsList(container) {
       ${locations.length ? locations.map((l) => `
         <div class="loc-card row-link" data-nav="/locations/${esc(l.id)}">
           <div class="loc-card-img">
-            ${l.image ? `<img src="${esc(l.image)}" style="width:100%;height:100%;object-fit:cover"/>` : `<span class="loc-card-ic">🛡️</span>`}
+            ${l.image ? `<img src="${esc(l.image)}" style="width:100%;height:100%;object-fit:cover"/>` : `<span class="loc-card-ic">◆</span>`}
             <div class="loc-card-scrim"></div>
             <span class="loc-card-id">${esc(l.id)}</span>
           </div>

@@ -33,17 +33,17 @@ export function renderDashboard(container) {
   container.innerHTML = `
     <div class="grid grid-3 section">
       <div class="card row-link" data-nav="/personnel">
-        <div class="card-title">👤 Állomány</div>
+        <div class="card-title">☰ Állomány</div>
         <div class="card-value">${personnel.length}</div>
         <div class="card-sub">${active} aktív szolgálatban · ${probationers} próbaidős</div>
       </div>
       <div class="card row-link" data-nav="/protocols">
-        <div class="card-title">📋 Jegyzőkönyvek</div>
+        <div class="card-title">▤ Jegyzőkönyvek</div>
         <div class="card-value">${protocols.length}</div>
         <div class="card-sub">Rögzített oktatás / vizsga dokumentáció</div>
       </div>
       <div class="card row-link" data-nav="/locations">
-        <div class="card-title">🛡️ Védett helyszínek</div>
+        <div class="card-title">◆ Védett helyszínek</div>
         <div class="card-value">${locations.length}</div>
         <div class="card-sub">Nyilvántartott objektum</div>
       </div>

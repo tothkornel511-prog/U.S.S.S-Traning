@@ -6,7 +6,7 @@ let activeTab = "access";
 
 export function renderAdmin(container) {
   if (!hasRole("TRAINING")) {
-    container.innerHTML = `<div class="denied"><div class="ic">⛔</div><h3>Hozzáférés megtagadva</h3><p class="text-low">Ehhez az oldalhoz Oktatásvezetői vagy Admin jogosultság szükséges.</p></div>`;
+    container.innerHTML = `<div class="denied"><div class="ic">⚠</div><h3>Hozzáférés megtagadva</h3><p class="text-low">Ehhez az oldalhoz Oktatásvezetői vagy Admin jogosultság szükséges.</p></div>`;
     return;
   }
   const isAdmin = hasRole("ADMIN");

@@ -142,7 +142,7 @@ export function renderExamDetail(container, id) {
       ${canEdit && !exam.endedAt ? `<button class="btn btn-gold btn-sm mt-2" id="finish-exam">Vizsga lezárása</button>` : ""}
       ${canEdit && exam.endedAt && summary.passed && !exam.promotedTo ? `<button class="btn btn-gold btn-sm mt-2" id="promote-exam">★ Felvétel az állományba</button>` : ""}
       ${exam.promotedTo ? `<a href="#/personnel/${esc(exam.promotedTo)}" class="badge badge-gold mt-2" style="display:inline-flex">Felvéve · ${esc(exam.promotedTo)} →</a>` : ""}
-      ${exam.endedAt && summary.passed ? `<button class="btn btn-sm mt-2" id="print-cert">🖨 Tanúsítvány nyomtatása</button>` : ""}
+      ${exam.endedAt && summary.passed ? `<button class="btn btn-sm mt-2" id="print-cert">Tanúsítvány nyomtatása</button>` : ""}
     </div>
 
     ${categories.map((cat) => `

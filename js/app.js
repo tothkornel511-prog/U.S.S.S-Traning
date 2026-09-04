@@ -7,19 +7,19 @@ import { isAuthenticated, currentSession, logout, hasRole, ROLES } from "./auth.
 import { registerRoute, resolve, startRouter, navigate, currentPath } from "./router.js?v=20";
 import { esc, sealMark, closeModal } from "./utils.js?v=22";
 import { renderLogin } from "./pages/login.js?v=21";
-import { renderDashboard } from "./pages/dashboard.js?v=39";
+import { renderDashboard } from "./pages/dashboard.js?v=40";
 import { renderPersonnelList } from "./pages/personnel.js?v=20";
 import { renderProfile } from "./pages/profile.js?v=20";
 import { renderMatrix } from "./pages/matrix.js?v=20";
 import { renderProtocolsList, renderProtocolDetail } from "./pages/protocols.js?v=20";
-import { renderLocationsList, renderLocationDetail } from "./pages/locations.js?v=20";
-import { renderMapPage } from "./pages/map.js?v=20";
+import { renderLocationsList, renderLocationDetail } from "./pages/locations.js?v=21";
+import { renderMapPage } from "./pages/map.js?v=21";
 import { renderRecruitmentHub, renderApplicantDetail } from "./pages/recruitment.js?v=25";
-import { renderExamList, renderExamDetail } from "./pages/exam.js?v=39";
-import { renderAdmin } from "./pages/admin.js?v=20";
+import { renderExamList, renderExamDetail } from "./pages/exam.js?v=40";
+import { renderAdmin } from "./pages/admin.js?v=21";
 import { renderOperations } from "./pages/operations.js?v=37";
 import { renderReadiness } from "./pages/readiness.js?v=32";
-import { renderInvestigationList, renderInvestigationDetail } from "./pages/investigations.js?v=1";
+import { renderInvestigationList, renderInvestigationDetail } from "./pages/investigations.js?v=2";
 
 seedIfNeeded();
 applyCustomCss();
@@ -48,7 +48,7 @@ const NAV = [
   ]},
   { group: "Objektumok", items: [
     { path: "/locations", label: "Védett helyszínek", icon: "◆" },
-    { path: "/map", label: "Térkép", icon: "🗺" },
+    { path: "/map", label: "Térkép", icon: "⛶" },
   ]},
   { group: "Vezetői irányítás", items: [
     { path: "/readiness", label: "Készültségi rendszer", icon: "◉", minRole: "TRAINING" },
