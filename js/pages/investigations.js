@@ -3,8 +3,9 @@ import {
   getPersonnel, getInvestigationCategories, addInvestigationCategory,
   getCovertOps, getCovertOp, linkCovertOp, unlinkCovertOp,
   addInvestigationAttachment, removeInvestigationAttachment, formatCodename,
+  isImageAttachment, formatFileSize, ATTACHMENT_MAX_UPLOAD_BYTES,
   INVESTIGATION_SEVERITIES, INVESTIGATION_STATUSES, INVESTIGATION_CLOSED_STATUSES, INVESTIGATION_OUTCOMES, INVESTIGATION_ORIGINS,
-} from "../store.js?v=52";
+} from "../store.js?v=53";
 import { hasRole, actorLabel } from "../auth.js?v=20";
 import { esc, fmtDate, fmtDateTime, toast, openModal, closeModal } from "../utils.js?v=22";
 import { navigate } from "../router.js?v=20";
@@ -201,17 +202,26 @@ export function renderInvestigationDetail(container, id) {
 
     <div class="card mb-2">
       <div class="card-title mb-1">CSATOLMÁNYOK</div>
-      <p class="text-low small mb-1">Bizonyítékok, dokumentumok (.docx, kép stb.) és beszélgetés-linkek — külső helyen tárolva (Discord, Drive, Dropbox), itt csak hivatkozásként.</p>
-      ${(inv.attachments || []).length ? inv.attachments.map((a, i) => `
-        <div class="history-item">
-          <a href="${esc(a.url)}" target="_blank" rel="noopener noreferrer" class="text-gold">${esc(a.label)}</a>
+      <p class="text-low small mb-1">Bizonyítékok, dokumentumok — közvetlenül feltöltve (böngésző helyi tárolójában) vagy külső helyen (Discord, Drive, Dropbox) tárolt hivatkozásként. Kép típusú csatolmányok előnézettel jelennek meg.</p>
+      ${(inv.attachments || []).length ? `<div class="attachment-grid">${inv.attachments.map((a, i) => `
+        <div class="attachment-card">
+          ${isImageAttachment(a) ? `<a href="${esc(a.url)}" target="_blank" rel="noopener noreferrer"><img src="${esc(a.url)}" alt="${esc(a.label)}" class="attachment-thumb" /></a>` : `<div class="attachment-file-icon">📄</div>`}
+          <div class="attachment-meta">
+            <a href="${esc(a.url)}" target="_blank" rel="noopener noreferrer" class="text-gold small">${esc(a.label)}</a>
+            <span class="text-low" style="font-size:11px">${a.kind === "upload" ? `Feltöltve${a.size ? ` · ${formatFileSize(a.size)}` : ""}` : "Külső hivatkozás"}</span>
+          </div>
           ${canEdit ? `<button class="btn btn-sm btn-danger" data-remove-attachment="${i}">×</button>` : ""}
-        </div>`).join("") : `<div class="text-low small">Nincs csatolmány.</div>`}
+        </div>`).join("")}</div>` : `<div class="text-low small">Nincs csatolmány.</div>`}
       ${canEdit ? `
         <div class="grid grid-2 mt-2">
           <input id="inv-attachment-label" placeholder="Megnevezés, pl. Kihallgatási jegyzőkönyv.docx" />
-          <div class="flex gap-1"><input id="inv-attachment-url" placeholder="https://…" style="flex:1" /><button type="button" class="btn btn-sm" id="add-inv-attachment-btn">+ Hozzáadás</button></div>
+          <div class="flex gap-1"><input id="inv-attachment-url" placeholder="https://… (külső hivatkozás)" style="flex:1" /><button type="button" class="btn btn-sm" id="add-inv-attachment-btn">+ Link hozzáadása</button></div>
         </div>
+        <div class="flex gap-1 mt-1 items-center">
+          <label class="btn btn-sm" style="cursor:pointer">Fájl kiválasztása<input type="file" id="inv-attachment-file" style="display:none" /></label>
+          <span class="text-low small" id="inv-attachment-file-name">Nincs fájl kiválasztva.</span>
+        </div>
+        <p class="text-low small mt-1">Feltöltés esetén a fájl a böngésző helyi tárolójában (localStorage) kerül mentésre, max. ${formatFileSize(ATTACHMENT_MAX_UPLOAD_BYTES)} méretig. Nagyobb dokumentumokhoz külső linket használj.</p>
       ` : ""}
     </div>
 
@@ -294,9 +304,29 @@ export function renderInvestigationDetail(container, id) {
     const label = document.getElementById("inv-attachment-label").value.trim();
     const url = document.getElementById("inv-attachment-url").value.trim();
     if (!label || !url) return;
-    addInvestigationAttachment(inv.id, { label, url }, actorLabel());
+    addInvestigationAttachment(inv.id, { label, url, kind: "link" }, actorLabel());
     toast("Csatolmány hozzáadva");
     renderInvestigationDetail(container, inv.id);
+  });
+  document.getElementById("inv-attachment-file")?.addEventListener("change", (e) => {
+    const file = e.target.files && e.target.files[0];
+    if (!file) return;
+    if (file.size > ATTACHMENT_MAX_UPLOAD_BYTES) {
+      toast(`A fájl túl nagy (max. ${formatFileSize(ATTACHMENT_MAX_UPLOAD_BYTES)})`, "error");
+      e.target.value = "";
+      return;
+    }
+    document.getElementById("inv-attachment-file-name").textContent = file.name;
+    const reader = new FileReader();
+    reader.onload = () => {
+      const labelInput = document.getElementById("inv-attachment-label");
+      const label = labelInput.value.trim() || file.name;
+      addInvestigationAttachment(inv.id, { label, url: reader.result, kind: "upload", size: file.size }, actorLabel());
+      toast("Fájl feltöltve");
+      renderInvestigationDetail(container, inv.id);
+    };
+    reader.onerror = () => toast("Nem sikerült beolvasni a fájlt", "error");
+    reader.readAsDataURL(file);
   });
   container.querySelectorAll("[data-remove-attachment]").forEach((b) =>
     b.addEventListener("click", () => {

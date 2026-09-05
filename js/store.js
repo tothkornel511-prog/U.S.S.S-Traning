@@ -1285,9 +1285,25 @@ export function deleteInvestigation(id, actorLabel) {
   write(KEYS.investigations, getInvestigations().filter((i) => i.id !== id));
   logAudit(actorLabel, "Belső vizsgálat törölve", inv ? `${id} — ${inv.subjectName || inv.subjectUsssId}` : id);
 }
-/* Csatolmányok — mivel a rendszernek nincs szervere, nem fájlokat tárol,
-   hanem külső helyen (Discord, Drive, Dropbox stb.) elérhető linkeket,
-   pont úgy, ahogy a személyi profilkép is URL-ként van tárolva. */
+/* Csatolmányok — a rendszernek nincs szervere, ezért kétféle csatolmány létezik:
+   1) "upload": a fájl ténylegesen feltöltve, Base64-ként a böngésző localStorage-ában tárolva
+      (FileReader.readAsDataURL) — méretkorlátozott, mert a localStorage kvóta böngészőnként ~5-10MB.
+   2) "link": külső helyen (Discord, Drive, Dropbox stb.) elérhető hivatkozás,
+      pont úgy, ahogy a személyi profilkép is URL-ként van tárolva.
+   Kép típusú csatolmányok (mindkét fajta) előnézeti miniatűrként jelennek meg. */
+export const ATTACHMENT_MAX_UPLOAD_BYTES = 3 * 1024 * 1024;
+const IMAGE_EXT_RE = /\.(png|jpe?g|gif|webp|avif|svg|bmp)(\?.*)?$/i;
+export function isImageAttachment(a) {
+  if (!a || !a.url) return false;
+  if (a.url.startsWith("data:image/")) return true;
+  return IMAGE_EXT_RE.test(a.url);
+}
+export function formatFileSize(bytes) {
+  if (!bytes && bytes !== 0) return "";
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+}
 export function addInvestigationAttachment(id, attachment, actorLabel) {
   const list = getInvestigations();
   const inv = list.find((i) => i.id === id);
@@ -1296,9 +1312,9 @@ export function addInvestigationAttachment(id, attachment, actorLabel) {
   const url = (attachment.url || "").trim();
   if (!label || !url) return;
   inv.attachments = inv.attachments || [];
-  inv.attachments.push({ label, url });
+  inv.attachments.push({ label, url, kind: attachment.kind === "upload" ? "upload" : "link", size: attachment.size || null });
   inv.updatedAt = new Date().toISOString();
-  inv.history.push({ at: inv.updatedAt, by: actorLabel || "Rendszer", action: `Csatolmány hozzáadva: ${label}` });
+  inv.history.push({ at: inv.updatedAt, by: actorLabel || "Rendszer", action: `Csatolmány hozzáadva: ${label}${attachment.kind === "upload" ? " (feltöltve)" : ""}` });
   write(KEYS.investigations, list);
   logAudit(actorLabel, "Csatolmány hozzáadva belső vizsgálathoz", `${id} — ${label}`);
 }
@@ -1539,9 +1555,9 @@ export function addCovertOpAttachment(id, attachment, actorLabel) {
   const url = (attachment.url || "").trim();
   if (!label || !url) return;
   op.attachments = op.attachments || [];
-  op.attachments.push({ label, url });
+  op.attachments.push({ label, url, kind: attachment.kind === "upload" ? "upload" : "link", size: attachment.size || null });
   op.updatedAt = new Date().toISOString();
-  op.history.push({ at: op.updatedAt, by: actorLabel || "Rendszer", action: `Csatolmány hozzáadva: ${label}` });
+  op.history.push({ at: op.updatedAt, by: actorLabel || "Rendszer", action: `Csatolmány hozzáadva: ${label}${attachment.kind === "upload" ? " (feltöltve)" : ""}` });
   write(KEYS.covertOps, list);
   logAudit(actorLabel, "Csatolmány hozzáadva fedett művelethez", `${id} — ${label}`);
 }
