@@ -33,6 +33,9 @@ const KEYS = {
   investigations: NS + "investigations",
   nextInvestigationSeq: NS + "next_investigation_seq",
   investigationCategories: NS + "investigation_categories",
+  covertOps: NS + "covert_ops",
+  nextCovertOpSeq: NS + "next_covert_op_seq",
+  covertOpClassifications: NS + "covert_op_classifications",
 };
 
 /* Elméleti vizsgánál ez alatt a százalék alatt a modul nem számít teljesítettnek. */
@@ -1279,6 +1282,146 @@ export function deleteInvestigation(id, actorLabel) {
   const inv = getInvestigation(id);
   write(KEYS.investigations, getInvestigations().filter((i) => i.id !== id));
   logAudit(actorLabel, "Belső vizsgálat törölve", inv ? `${id} — ${inv.subjectName || inv.subjectUsssId}` : id);
+}
+
+/* ---------- Fedett Műveletek (Covert Operations) --------------------------
+   Engedélyezett, kódnevesített fedett/nyomozási műveletek — ki rendelte el,
+   ki hajtja végre, mi a cél, milyen minősítésű. Külön a Belső Vizsgálati
+   Rendszertől: az nem az USSS saját állományának fegyelmi ügye, hanem
+   kifelé irányuló, proaktív nyomozati/felderítési tevékenység. */
+const DEFAULT_CO_CLASSIFICATIONS = ["Bizalmas", "Titkos", "Szigorúan titkos"];
+export function getCovertOpClassifications() {
+  return read(KEYS.covertOpClassifications, DEFAULT_CO_CLASSIFICATIONS);
+}
+export function addCovertOpClassification(name, actorLabel) {
+  const trimmed = (name || "").trim();
+  if (!trimmed) return;
+  const list = getCovertOpClassifications();
+  if (list.some((c) => c.toLowerCase() === trimmed.toLowerCase())) return;
+  list.push(trimmed);
+  write(KEYS.covertOpClassifications, list);
+  logAudit(actorLabel, "Fedett műveleti minősítés hozzáadva", trimmed);
+}
+export function removeCovertOpClassification(name, actorLabel) {
+  write(KEYS.covertOpClassifications, getCovertOpClassifications().filter((c) => c !== name));
+  logAudit(actorLabel, "Fedett műveleti minősítés törölve", name);
+}
+
+export const CO_STATUSES = ["Tervezés alatt", "Aktív", "Felfüggesztve", "Lezárva – sikeres", "Lezárva – sikertelen", "Megszakítva"];
+export const CO_CLOSED_STATUSES = ["Lezárva – sikeres", "Lezárva – sikertelen", "Megszakítva"];
+
+function nextCovertOpId() {
+  const seq = Math.max(1, read(KEYS.nextCovertOpSeq, 1));
+  return { id: `OP-${String(seq).padStart(3, "0")}`, seq };
+}
+export function getCovertOps() {
+  return read(KEYS.covertOps, []);
+}
+export function getCovertOp(id) {
+  return getCovertOps().find((o) => o.id === id);
+}
+export function createCovertOp(fields, actorLabel) {
+  const { id, seq } = nextCovertOpId();
+  const now = new Date().toISOString();
+  const op = {
+    id,
+    codename: (fields.codename || "").trim(),
+    objective: (fields.objective || "").trim(),
+    targetSubject: (fields.targetSubject || "").trim(),
+    authorizedBy: (fields.authorizedBy || "").trim(),
+    authorizedByRank: (fields.authorizedByRank || "").trim(),
+    leadOperative: (fields.leadOperative || "").trim(),
+    classification: fields.classification || getCovertOpClassifications()[0],
+    status: "Tervezés alatt",
+    operatives: [],
+    report: "",
+    startDate: fields.startDate || now.slice(0, 10),
+    endDate: null,
+    createdBy: actorLabel || "Rendszer",
+    createdAt: now,
+    updatedAt: now,
+    history: [{ at: now, by: actorLabel || "Rendszer", action: "Művelet létrehozva" }],
+  };
+  const list = getCovertOps();
+  list.unshift(op);
+  write(KEYS.covertOps, list);
+  write(KEYS.nextCovertOpSeq, seq + 1);
+  logAudit(actorLabel, "Fedett művelet létrehozva", `${id} — Operation ${op.codename}`);
+  return op;
+}
+export function updateCovertOp(id, patch, actorLabel) {
+  const list = getCovertOps();
+  const op = list.find((o) => o.id === id);
+  if (!op) return null;
+  const changes = Object.entries(patch).filter(([key, value]) => value !== undefined && op[key] !== value);
+  changes.forEach(([key, value]) => { op[key] = value; });
+  if (changes.length) {
+    const fieldLabels = { status: "Státusz", objective: "Cél", targetSubject: "Célszemély/szervezet", authorizedBy: "Engedélyező", authorizedByRank: "Engedélyező rangja", leadOperative: "Művelet vezetője", classification: "Minősítés", report: "Jelentés", codename: "Fedőnév" };
+    const label = changes.map(([key]) => fieldLabels[key] || key).join(", ");
+    op.updatedAt = new Date().toISOString();
+    op.history = op.history || [];
+    op.history.push({ at: op.updatedAt, by: actorLabel || "Rendszer", action: `${label} frissítve` });
+    write(KEYS.covertOps, list);
+    logAudit(actorLabel, "Fedett művelet frissítve", `${id} — ${label}`);
+  }
+  return op;
+}
+export function addOperative(opId, operative, actorLabel) {
+  const list = getCovertOps();
+  const op = list.find((o) => o.id === opId);
+  if (!op) return;
+  const name = (operative.name || "").trim();
+  if (!name) return;
+  op.operatives = op.operatives || [];
+  op.operatives.push({ usssId: (operative.usssId || "").trim(), name });
+  op.updatedAt = new Date().toISOString();
+  op.history.push({ at: op.updatedAt, by: actorLabel || "Rendszer", action: `Végrehajtó hozzáadva: ${name}` });
+  write(KEYS.covertOps, list);
+  logAudit(actorLabel, "Végrehajtó hozzáadva fedett művelethez", `${opId} — ${name}`);
+}
+export function removeOperative(opId, index, actorLabel) {
+  const list = getCovertOps();
+  const op = list.find((o) => o.id === opId);
+  if (!op || !op.operatives || !op.operatives[index]) return;
+  const removed = op.operatives[index];
+  op.operatives.splice(index, 1);
+  op.updatedAt = new Date().toISOString();
+  op.history.push({ at: op.updatedAt, by: actorLabel || "Rendszer", action: `Végrehajtó eltávolítva: ${removed.name}` });
+  write(KEYS.covertOps, list);
+  logAudit(actorLabel, "Végrehajtó eltávolítva fedett műveletből", `${opId} — ${removed.name}`);
+}
+export function closeCovertOp(id, { status, report }, actorLabel) {
+  if (!CO_CLOSED_STATUSES.includes(status)) return null;
+  const list = getCovertOps();
+  const op = list.find((o) => o.id === id);
+  if (!op) return null;
+  op.status = status;
+  if (report !== undefined) op.report = report;
+  op.endDate = new Date().toISOString().slice(0, 10);
+  op.updatedAt = new Date().toISOString();
+  op.history = op.history || [];
+  op.history.push({ at: op.updatedAt, by: actorLabel || "Rendszer", action: `Művelet lezárva — ${status}` });
+  write(KEYS.covertOps, list);
+  logAudit(actorLabel, "Fedett művelet lezárva", `${id} — ${status}`);
+  return op;
+}
+export function reopenCovertOp(id, actorLabel) {
+  const list = getCovertOps();
+  const op = list.find((o) => o.id === id);
+  if (!op) return null;
+  op.status = "Aktív";
+  op.endDate = null;
+  op.updatedAt = new Date().toISOString();
+  op.history = op.history || [];
+  op.history.push({ at: op.updatedAt, by: actorLabel || "Rendszer", action: "Művelet újranyitva" });
+  write(KEYS.covertOps, list);
+  logAudit(actorLabel, "Fedett művelet újranyitva", id);
+  return op;
+}
+export function deleteCovertOp(id, actorLabel) {
+  const op = getCovertOp(id);
+  write(KEYS.covertOps, getCovertOps().filter((o) => o.id !== id));
+  logAudit(actorLabel, "Fedett művelet törölve", op ? `${id} — Operation ${op.codename}` : id);
 }
 
 /* ---------- Global search ------------------------------------------------*/

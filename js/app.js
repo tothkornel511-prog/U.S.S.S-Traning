@@ -2,7 +2,7 @@
    U.S.S.S. ELITE TRAINING SYSTEM — APP ENTRY
    ========================================================================== */
 
-import { seedIfNeeded, globalSearch, getCustomCss, getOperationRecords } from "./store.js?v=45";
+import { seedIfNeeded, globalSearch, getCustomCss, getOperationRecords } from "./store.js?v=46";
 import { isAuthenticated, currentSession, logout, hasRole, ROLES } from "./auth.js?v=20";
 import { registerRoute, resolve, startRouter, navigate, currentPath } from "./router.js?v=20";
 import { esc, sealMark, closeModal } from "./utils.js?v=22";
@@ -16,10 +16,11 @@ import { renderLocationsList, renderLocationDetail } from "./pages/locations.js?
 import { renderMapPage } from "./pages/map.js?v=21";
 import { renderRecruitmentHub, renderApplicantDetail } from "./pages/recruitment.js?v=25";
 import { renderExamList, renderExamDetail } from "./pages/exam.js?v=40";
-import { renderAdmin } from "./pages/admin.js?v=22";
+import { renderAdmin } from "./pages/admin.js?v=23";
 import { renderOperations } from "./pages/operations.js?v=37";
 import { renderReadiness } from "./pages/readiness.js?v=32";
 import { renderInvestigationList, renderInvestigationDetail } from "./pages/investigations.js?v=3";
+import { renderCovertOpList, renderCovertOpDetail } from "./pages/covert-ops.js?v=1";
 
 seedIfNeeded();
 applyCustomCss();
@@ -65,6 +66,7 @@ const NAV = [
     { path: "/operations/protective-plans", label: "Védelmi tervek", icon: "⬡", minRole: "TRAINING" },
     { path: "/operations/intelligence", label: "Védelmi információk", icon: "⌁", minRole: "TRAINING" },
     { path: "/investigations", label: "Belső Vizsgálatok", icon: "⚖", minRole: "TRAINING" },
+    { path: "/covert-ops", label: "Fedett Műveletek", icon: "◐", minRole: "TRAINING" },
     { path: "/operations/government", label: "Kormányzati névjegyzék", icon: "⌂", minRole: "TRAINING" },
     { path: "/operations/succession", label: "Elnöki öröklési sorrend", icon: "Ⅰ", minRole: "TRAINING" },
     { path: "/operations/calendar", label: "Naptár", icon: "▦", minRole: "TRAINING" },
@@ -83,6 +85,7 @@ function pageTitleFor(path) {
   if (path.startsWith("/locations/")) return { crumb: "Objektumok", title: "Helyszín részletei" };
   if (path.startsWith("/operations/")) return { crumb: "Command Center", title: "Operációs központ" };
   if (path.startsWith("/investigations/")) return { crumb: "Belső Vizsgálatok", title: "Vizsgálat részletei" };
+  if (path.startsWith("/covert-ops/")) return { crumb: "Fedett Műveletek", title: "Művelet részletei" };
   if (path.startsWith("/map")) return { crumb: "Objektumok", title: "Térkép" };
   const flat = NAV.flatMap((g) => g.items);
   const found = flat.find((i) => i.path === path);
@@ -219,6 +222,8 @@ registerRoute("/readiness", () => renderReadiness(document.getElementById("conte
 registerRoute("/operations/:type", (p) => renderOperations(document.getElementById("content"), p.type));
 registerRoute("/investigations", () => renderInvestigationList(document.getElementById("content")));
 registerRoute("/investigations/:id", (p) => renderInvestigationDetail(document.getElementById("content"), p.id));
+registerRoute("/covert-ops", () => renderCovertOpList(document.getElementById("content")));
+registerRoute("/covert-ops/:id", (p) => renderCovertOpDetail(document.getElementById("content"), p.id));
 
 function onRouteChange() {
   if (!isAuthenticated()) { boot(); return; }

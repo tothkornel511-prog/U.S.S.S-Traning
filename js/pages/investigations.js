@@ -2,7 +2,7 @@ import {
   getInvestigations, getInvestigation, createInvestigation, updateInvestigation, closeInvestigation, reopenInvestigation, deleteInvestigation,
   getPersonnel, getInvestigationCategories, addInvestigationCategory,
   INVESTIGATION_SEVERITIES, INVESTIGATION_STATUSES, INVESTIGATION_CLOSED_STATUSES, INVESTIGATION_OUTCOMES, INVESTIGATION_ORIGINS,
-} from "../store.js?v=45";
+} from "../store.js?v=46";
 import { hasRole, actorLabel } from "../auth.js?v=20";
 import { esc, fmtDate, fmtDateTime, toast, openModal, closeModal } from "../utils.js?v=22";
 import { navigate } from "../router.js?v=20";
