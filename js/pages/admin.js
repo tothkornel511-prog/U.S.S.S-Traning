@@ -1,4 +1,4 @@
-import { getAccessCodes, upsertAccessCode, revokeAccessCode, generateCode, getAuditLog, getPersonnel, resetAllData, ref, getPositionEntries, addPosition, removePosition, getCustomCss, setCustomCss, getInvestigationCategories, addInvestigationCategory, removeInvestigationCategory, getCovertOpClassifications, addCovertOpClassification, removeCovertOpClassification } from "../store.js?v=48";
+import { getAccessCodes, upsertAccessCode, revokeAccessCode, generateCode, getAuditLog, getPersonnel, resetAllData, ref, getPositionEntries, addPosition, removePosition, getCustomCss, setCustomCss, getInvestigationCategories, addInvestigationCategory, removeInvestigationCategory, getCovertOpClassifications, addCovertOpClassification, removeCovertOpClassification } from "../store.js?v=49";
 import { hasRole, actorLabel, ROLES } from "../auth.js?v=20";
 import { esc, fmtDateTime, toast, openModal, closeModal } from "../utils.js?v=22";
 

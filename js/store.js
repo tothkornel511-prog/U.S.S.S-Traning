@@ -1319,10 +1319,14 @@ export function removeInvestigationAttachment(id, index, actorLabel) {
    ki hajtja végre, mi a cél, milyen minősítésű. Külön a Belső Vizsgálati
    Rendszertől: az nem az USSS saját állományának fegyelmi ügye, hanem
    kifelé irányuló, proaktív nyomozati/felderítési tevékenység. */
+/* Valódi, dokumentált történelmi hadműveleti fedőnevek — nem kitalált
+   szavak — hogy a javaslat tényleg azt az érzetet adja, amit egy IRL
+   fedőnév-választás adna. */
 const CODENAME_SUGGESTIONS = [
-  "Griffin", "Ravenshadow", "Obsidian Veil", "Iron Sentinel", "Blackthorn", "Silent Vanguard",
-  "Falcon's Eye", "Ashfall", "Ironclad", "Nightfall", "Grey Wolf", "Cold Harbor", "Ember Watch",
-  "Stonebridge", "Vantage Point", "Quiet Storm", "Marble Hawk", "Deadbolt", "Hollow Crown", "Wraithline",
+  "Overlord", "Torch", "Market Garden", "Neptune", "Mincemeat", "Fortitude", "Chastise",
+  "Paperclip", "Mongoose", "Ivy Bells", "Eagle Claw", "Just Cause", "Urgent Fury",
+  "Praying Mantis", "Golden Pheasant", "Nimrod", "Desert Shield", "Desert Storm",
+  "Nifty Package", "El Dorado Canyon", "Uphold Democracy", "Cyclone", "Rolling Thunder",
 ];
 export function suggestCodename() {
   return CODENAME_SUGGESTIONS[Math.floor(Math.random() * CODENAME_SUGGESTIONS.length)];

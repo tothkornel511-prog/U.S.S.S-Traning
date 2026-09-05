@@ -2,7 +2,7 @@
    U.S.S.S. ELITE TRAINING SYSTEM — APP ENTRY
    ========================================================================== */
 
-import { seedIfNeeded, globalSearch, getCustomCss, getOperationRecords } from "./store.js?v=48";
+import { seedIfNeeded, globalSearch, getCustomCss, getOperationRecords } from "./store.js?v=49";
 import { isAuthenticated, currentSession, logout, hasRole, ROLES } from "./auth.js?v=20";
 import { registerRoute, resolve, startRouter, navigate, currentPath } from "./router.js?v=20";
 import { esc, sealMark, closeModal } from "./utils.js?v=22";

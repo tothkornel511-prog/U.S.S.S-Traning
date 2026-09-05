@@ -3,7 +3,7 @@ import {
   getCovertOpClassifications, addCovertOpClassification, getPersonnel, getInvestigationsLinkedToOp,
   addCovertOpAttachment, removeCovertOpAttachment, suggestCodename,
   CO_STATUSES, CO_CLOSED_STATUSES,
-} from "../store.js?v=48";
+} from "../store.js?v=49";
 import { hasRole, actorLabel } from "../auth.js?v=20";
 import { esc, fmtDate, fmtDateTime, toast, openModal, closeModal } from "../utils.js?v=22";
 import { navigate } from "../router.js?v=20";
