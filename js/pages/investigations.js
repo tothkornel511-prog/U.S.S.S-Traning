@@ -1,8 +1,9 @@
 import {
   getInvestigations, getInvestigation, createInvestigation, updateInvestigation, closeInvestigation, reopenInvestigation, deleteInvestigation,
   getPersonnel, getInvestigationCategories, addInvestigationCategory,
+  getCovertOps, getCovertOp, linkCovertOp, unlinkCovertOp,
   INVESTIGATION_SEVERITIES, INVESTIGATION_STATUSES, INVESTIGATION_CLOSED_STATUSES, INVESTIGATION_OUTCOMES, INVESTIGATION_ORIGINS,
-} from "../store.js?v=46";
+} from "../store.js?v=47";
 import { hasRole, actorLabel } from "../auth.js?v=20";
 import { esc, fmtDate, fmtDateTime, toast, openModal, closeModal } from "../utils.js?v=22";
 import { navigate } from "../router.js?v=20";
@@ -197,6 +198,23 @@ export function renderInvestigationDetail(container, id) {
         `<div class="text-mid" style="white-space:pre-wrap">${inv.findings ? esc(inv.findings) : '<span class="text-low">Nincs rögzített megállapítás.</span>'}</div>`}
     </div>
 
+    <div class="card mb-2">
+      <div class="card-title mb-1">KAPCSOLÓDÓ FEDETT MŰVELETEK</div>
+      ${(inv.linkedOps || []).length ? (inv.linkedOps || []).map((opId) => {
+        const op = getCovertOp(opId);
+        return `<div class="history-item">
+          <span>${op ? `<a href="#/covert-ops/${esc(opId)}" class="text-gold">${esc(opId)} — Operation ${esc(op.codename)}</a>` : `<span class="text-low">${esc(opId)} (törölve)</span>`}</span>
+          ${canEdit ? `<button class="btn btn-sm btn-danger" data-unlink-op="${esc(opId)}">×</button>` : ""}
+        </div>`;
+      }).join("") : `<div class="text-low small">Nincs hozzárendelt fedett művelet.</div>`}
+      ${canEdit ? `
+        <div class="flex gap-1 mt-2">
+          <select id="inv-link-op" style="flex:1"><option value="">Válasszon fedett műveletet…</option>${getCovertOps().filter((op) => !(inv.linkedOps || []).includes(op.id)).map((op) => `<option value="${esc(op.id)}">${esc(op.id)} — Operation ${esc(op.codename)}</option>`).join("")}</select>
+          <button type="button" class="btn btn-sm" id="link-op-btn">+ Hozzárendelés</button>
+        </div>
+      ` : ""}
+    </div>
+
     <div class="card">
       <div class="card-title mb-1">ELŐZMÉNYEK</div>
       ${(inv.history || []).slice().reverse().map((h) => `<div class="history-item"><span>${esc(h.action)}</span><span class="text-low small">${esc(h.by)} · ${fmtDateTime(h.at)}</span></div>`).join("") || `<div class="text-low small">Nincs rögzített esemény.</div>`}
@@ -241,6 +259,20 @@ export function renderInvestigationDetail(container, id) {
     toast("Vizsgálat törölve");
     navigate("/investigations");
   });
+  document.getElementById("link-op-btn")?.addEventListener("click", () => {
+    const opId = document.getElementById("inv-link-op").value;
+    if (!opId) return;
+    linkCovertOp(inv.id, opId, actorLabel());
+    toast("Fedett művelet hozzárendelve");
+    renderInvestigationDetail(container, inv.id);
+  });
+  container.querySelectorAll("[data-unlink-op]").forEach((b) =>
+    b.addEventListener("click", () => {
+      unlinkCovertOp(inv.id, b.getAttribute("data-unlink-op"), actorLabel());
+      toast("Kapcsolat megszüntetve");
+      renderInvestigationDetail(container, inv.id);
+    })
+  );
 
   const quickInvestigator = document.getElementById("inv-investigator-quick");
   if (quickInvestigator) {

@@ -1,8 +1,8 @@
 import {
   getCovertOps, getCovertOp, createCovertOp, updateCovertOp, addOperative, removeOperative, closeCovertOp, reopenCovertOp, deleteCovertOp,
-  getCovertOpClassifications, addCovertOpClassification, getPersonnel,
+  getCovertOpClassifications, addCovertOpClassification, getPersonnel, getInvestigationsLinkedToOp,
   CO_STATUSES, CO_CLOSED_STATUSES,
-} from "../store.js?v=46";
+} from "../store.js?v=47";
 import { hasRole, actorLabel } from "../auth.js?v=20";
 import { esc, fmtDate, fmtDateTime, toast, openModal, closeModal } from "../utils.js?v=22";
 import { navigate } from "../router.js?v=20";
@@ -140,6 +140,7 @@ export function renderCovertOpDetail(container, id) {
   const canAdmin = hasRole("ADMIN");
   const isClosed = CO_CLOSED_STATUSES.includes(op.status);
   const personnel = getPersonnel();
+  const linkedInvestigations = getInvestigationsLinkedToOp(op.id);
 
   container.innerHTML = `
     <a href="#/covert-ops" class="text-low small">← Vissza a fedett műveletekhez</a>
@@ -201,6 +202,16 @@ export function renderCovertOpDetail(container, id) {
       <p class="text-low small mb-1">A művelet lezárásakor vagy közben rögzített eredmények, tapasztalatok.</p>
       ${canEdit ? `<textarea id="op-report" rows="6" style="width:100%; background:var(--bg-base); border:1px solid var(--line-soft); border-radius:var(--radius-sm); color:var(--text-hi); padding:12px;">${esc(op.report || "")}</textarea><button class="btn btn-sm mt-1" id="save-report">Mentés</button>` :
         `<div class="text-mid" style="white-space:pre-wrap">${op.report ? esc(op.report) : '<span class="text-low">Nincs rögzített jelentés.</span>'}</div>`}
+    </div>
+
+    <div class="card mb-2">
+      <div class="card-title mb-1">KAPCSOLÓDÓ BELSŐ VIZSGÁLATOK</div>
+      ${linkedInvestigations.length ? linkedInvestigations.map((inv) => `
+        <div class="history-item">
+          <a href="#/investigations/${esc(inv.id)}" class="text-gold">${esc(inv.id)} — ${esc(inv.subjectName || inv.subjectUsssId || "Ismeretlen érintett")}</a>
+          <span class="badge badge-gold">${esc(inv.status)}</span>
+        </div>`).join("") : `<div class="text-low small">Nincs hozzárendelt belső vizsgálat.</div>`}
+      <p class="text-low small mt-1">Hozzárendelés a Belső Vizsgálatok modulból, az érintett vizsgálat oldaláról tehető meg.</p>
     </div>
 
     <div class="card">

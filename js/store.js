@@ -1219,6 +1219,7 @@ export function createInvestigation(fields, actorLabel) {
     description: (fields.description || "").trim(),
     findings: "",
     outcome: "",
+    linkedOps: [],
     openedAt: now,
     closedAt: null,
     createdBy: actorLabel || "Rendszer",
@@ -1422,6 +1423,37 @@ export function deleteCovertOp(id, actorLabel) {
   const op = getCovertOp(id);
   write(KEYS.covertOps, getCovertOps().filter((o) => o.id !== id));
   logAudit(actorLabel, "Fedett művelet törölve", op ? `${id} — Operation ${op.codename}` : id);
+}
+
+/* Kereszthivatkozás Belső Vizsgálat ↔ Fedett Művelet között. A kapcsolat
+   csak a vizsgálat oldalán tárolódik (inv.linkedOps), a fedett művelet
+   oldalán egy visszakeresés (getInvestigationsLinkedToOp) mutatja meg —
+   így egyetlen forrásból származik az igazság, nem tud szétcsúszni. */
+export function linkCovertOp(investigationId, opId, actorLabel) {
+  const list = getInvestigations();
+  const inv = list.find((i) => i.id === investigationId);
+  const op = getCovertOp(opId);
+  if (!inv || !op) return;
+  inv.linkedOps = inv.linkedOps || [];
+  if (inv.linkedOps.includes(opId)) return;
+  inv.linkedOps.push(opId);
+  inv.updatedAt = new Date().toISOString();
+  inv.history.push({ at: inv.updatedAt, by: actorLabel || "Rendszer", action: `Fedett művelet hozzárendelve: ${opId} — Operation ${op.codename}` });
+  write(KEYS.investigations, list);
+  logAudit(actorLabel, "Fedett művelet hozzárendelve vizsgálathoz", `${investigationId} ↔ ${opId}`);
+}
+export function unlinkCovertOp(investigationId, opId, actorLabel) {
+  const list = getInvestigations();
+  const inv = list.find((i) => i.id === investigationId);
+  if (!inv) return;
+  inv.linkedOps = (inv.linkedOps || []).filter((id) => id !== opId);
+  inv.updatedAt = new Date().toISOString();
+  inv.history.push({ at: inv.updatedAt, by: actorLabel || "Rendszer", action: `Fedett művelet kapcsolat megszüntetve: ${opId}` });
+  write(KEYS.investigations, list);
+  logAudit(actorLabel, "Fedett művelet kapcsolat megszüntetve", `${investigationId} ↔ ${opId}`);
+}
+export function getInvestigationsLinkedToOp(opId) {
+  return getInvestigations().filter((i) => (i.linkedOps || []).includes(opId));
 }
 
 /* ---------- Global search ------------------------------------------------*/
