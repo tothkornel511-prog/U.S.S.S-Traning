@@ -20,7 +20,7 @@ import { renderAdmin } from "./pages/admin.js?v=23";
 import { renderOperations } from "./pages/operations.js?v=37";
 import { renderReadiness } from "./pages/readiness.js?v=32";
 import { renderInvestigationList, renderInvestigationDetail } from "./pages/investigations.js?v=6";
-import { renderCovertOpList, renderCovertOpDetail } from "./pages/covert-ops.js?v=6";
+import { renderCovertOpList, renderCovertOpDetail } from "./pages/covert-ops.js?v=7";
 
 seedIfNeeded();
 applyCustomCss();

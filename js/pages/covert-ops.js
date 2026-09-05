@@ -176,8 +176,9 @@ export function renderCovertOpDetail(container, id) {
       <div class="grid grid-3 mb-2">
         <div><div class="card-title">Engedélyező</div><div class="text-hi">${esc(op.authorizedBy || "—")}${op.authorizedByRank ? ` · ${esc(op.authorizedByRank)}` : ""}</div></div>
         <div><div class="card-title">Művelet vezetője</div><div class="text-hi">${esc(op.leadOperative || "Nincs kijelölve")}</div></div>
-        <div><div class="card-title">Végrehajtók száma</div><div class="text-hi">${(op.operatives || []).length}</div></div>
         <div><div class="card-title">Kezdés</div><div class="text-hi">${fmtDate(op.startDate)}</div></div>
+        <div><div class="card-title">Végrehajtók száma</div><div class="card-value" style="font-size:22px">${(op.operatives || []).length}</div></div>
+        <div><div class="card-title">Gyanúsítottak száma</div><div class="card-value" style="font-size:22px">${(op.subjects || []).length}</div></div>
         <div><div class="card-title">Lezárás</div><div class="text-hi">${op.endDate ? fmtDate(op.endDate) : "Folyamatban"}</div></div>
       </div>
 
