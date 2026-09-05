@@ -2,8 +2,9 @@ import {
   getInvestigations, getInvestigation, createInvestigation, updateInvestigation, closeInvestigation, reopenInvestigation, deleteInvestigation,
   getPersonnel, getInvestigationCategories, addInvestigationCategory,
   getCovertOps, getCovertOp, linkCovertOp, unlinkCovertOp,
+  addInvestigationAttachment, removeInvestigationAttachment,
   INVESTIGATION_SEVERITIES, INVESTIGATION_STATUSES, INVESTIGATION_CLOSED_STATUSES, INVESTIGATION_OUTCOMES, INVESTIGATION_ORIGINS,
-} from "../store.js?v=47";
+} from "../store.js?v=48";
 import { hasRole, actorLabel } from "../auth.js?v=20";
 import { esc, fmtDate, fmtDateTime, toast, openModal, closeModal } from "../utils.js?v=22";
 import { navigate } from "../router.js?v=20";
@@ -199,6 +200,22 @@ export function renderInvestigationDetail(container, id) {
     </div>
 
     <div class="card mb-2">
+      <div class="card-title mb-1">CSATOLMÁNYOK</div>
+      <p class="text-low small mb-1">Bizonyítékok, dokumentumok (.docx, kép stb.) és beszélgetés-linkek — külső helyen tárolva (Discord, Drive, Dropbox), itt csak hivatkozásként.</p>
+      ${(inv.attachments || []).length ? inv.attachments.map((a, i) => `
+        <div class="history-item">
+          <a href="${esc(a.url)}" target="_blank" rel="noopener noreferrer" class="text-gold">${esc(a.label)}</a>
+          ${canEdit ? `<button class="btn btn-sm btn-danger" data-remove-attachment="${i}">×</button>` : ""}
+        </div>`).join("") : `<div class="text-low small">Nincs csatolmány.</div>`}
+      ${canEdit ? `
+        <div class="grid grid-2 mt-2">
+          <input id="inv-attachment-label" placeholder="Megnevezés, pl. Kihallgatási jegyzőkönyv.docx" />
+          <div class="flex gap-1"><input id="inv-attachment-url" placeholder="https://…" style="flex:1" /><button type="button" class="btn btn-sm" id="add-inv-attachment-btn">+ Hozzáadás</button></div>
+        </div>
+      ` : ""}
+    </div>
+
+    <div class="card mb-2">
       <div class="card-title mb-1">KAPCSOLÓDÓ FEDETT MŰVELETEK</div>
       ${(inv.linkedOps || []).length ? (inv.linkedOps || []).map((opId) => {
         const op = getCovertOp(opId);
@@ -270,6 +287,21 @@ export function renderInvestigationDetail(container, id) {
     b.addEventListener("click", () => {
       unlinkCovertOp(inv.id, b.getAttribute("data-unlink-op"), actorLabel());
       toast("Kapcsolat megszüntetve");
+      renderInvestigationDetail(container, inv.id);
+    })
+  );
+  document.getElementById("add-inv-attachment-btn")?.addEventListener("click", () => {
+    const label = document.getElementById("inv-attachment-label").value.trim();
+    const url = document.getElementById("inv-attachment-url").value.trim();
+    if (!label || !url) return;
+    addInvestigationAttachment(inv.id, { label, url }, actorLabel());
+    toast("Csatolmány hozzáadva");
+    renderInvestigationDetail(container, inv.id);
+  });
+  container.querySelectorAll("[data-remove-attachment]").forEach((b) =>
+    b.addEventListener("click", () => {
+      removeInvestigationAttachment(inv.id, Number(b.getAttribute("data-remove-attachment")), actorLabel());
+      toast("Csatolmány eltávolítva");
       renderInvestigationDetail(container, inv.id);
     })
   );

@@ -1,4 +1,4 @@
-import { getPersonnel, getProtocols, getLocations, getOperationRecords, getReadinessState, READINESS_LEVELS, readinessPercent, ref, getExams, examScoreSummary, getExamCategories } from "../store.js?v=47";
+import { getPersonnel, getProtocols, getLocations, getOperationRecords, getReadinessState, READINESS_LEVELS, readinessPercent, ref, getExams, examScoreSummary, getExamCategories } from "../store.js?v=48";
 import { hasRole } from "../auth.js?v=20";
 import { esc, initials } from "../utils.js?v=22";
 import { navigate } from "../router.js?v=20";

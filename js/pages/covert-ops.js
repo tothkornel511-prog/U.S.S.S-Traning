@@ -1,8 +1,9 @@
 import {
   getCovertOps, getCovertOp, createCovertOp, updateCovertOp, addOperative, removeOperative, closeCovertOp, reopenCovertOp, deleteCovertOp,
   getCovertOpClassifications, addCovertOpClassification, getPersonnel, getInvestigationsLinkedToOp,
+  addCovertOpAttachment, removeCovertOpAttachment, suggestCodename,
   CO_STATUSES, CO_CLOSED_STATUSES,
-} from "../store.js?v=47";
+} from "../store.js?v=48";
 import { hasRole, actorLabel } from "../auth.js?v=20";
 import { esc, fmtDate, fmtDateTime, toast, openModal, closeModal } from "../utils.js?v=22";
 import { navigate } from "../router.js?v=20";
@@ -78,12 +79,15 @@ function openCovertOpForm() {
     <div class="modal-head"><h3>Új fedett művelet indítása</h3><button class="modal-close" data-close-modal>×</button></div>
     <form id="op-form">
       <div class="grid grid-2">
-        <div class="field"><label>Fedőnév</label><input id="of-codename" required placeholder="pl. Griffin" autofocus /></div>
+        <div class="field">
+          <label>Fedőnév</label>
+          <div class="flex gap-1"><input id="of-codename" required placeholder="pl. Griffin" autofocus style="flex:1" /><button type="button" class="btn btn-sm" id="of-suggest-codename" title="Javasolj fedőnevet">Javasolj</button></div>
+        </div>
         <div class="field"><label>Célszemély / szervezet</label><input id="of-target" placeholder="opcionális" /></div>
       </div>
       <div class="field"><label>A művelet célja</label><textarea id="of-objective" rows="4" required placeholder="Mit kell elérni, milyen körülmények indokolják…"></textarea></div>
       <div class="grid grid-2">
-        <div class="field"><label>Engedélyező neve</label><input id="of-authorizer" /></div>
+        <div class="field"><label>Engedélyező</label><select id="of-authorizer"><option value="">Nincs kijelölve</option>${personnel.map((p) => `<option value="${esc(p.name)}" data-position="${esc(p.position || "")}">${esc(p.name)}</option>`).join("")}</select></div>
         <div class="field"><label>Engedélyező rangja</label><input id="of-authorizer-rank" placeholder="pl. U.S.S.S. Director" /></div>
       </div>
       <div class="grid grid-2">
@@ -102,6 +106,13 @@ function openCovertOpForm() {
   `);
   document.getElementById("of-classification").addEventListener("change", (e) => {
     document.getElementById("of-new-class-wrap").style.display = e.target.value === "__new__" ? "block" : "none";
+  });
+  document.getElementById("of-suggest-codename").addEventListener("click", () => {
+    document.getElementById("of-codename").value = suggestCodename();
+  });
+  document.getElementById("of-authorizer").addEventListener("change", (e) => {
+    const position = e.target.selectedOptions[0]?.getAttribute("data-position");
+    if (position) document.getElementById("of-authorizer-rank").value = position;
   });
   document.getElementById("op-form").addEventListener("submit", (e) => {
     e.preventDefault();
@@ -205,6 +216,22 @@ export function renderCovertOpDetail(container, id) {
     </div>
 
     <div class="card mb-2">
+      <div class="card-title mb-1">CSATOLMÁNYOK</div>
+      <p class="text-low small mb-1">Bizonyítékok, dokumentumok (.docx, kép stb.) és beszélgetés-linkek — külső helyen tárolva (Discord, Drive, Dropbox), itt csak hivatkozásként.</p>
+      ${(op.attachments || []).length ? op.attachments.map((a, i) => `
+        <div class="history-item">
+          <a href="${esc(a.url)}" target="_blank" rel="noopener noreferrer" class="text-gold">${esc(a.label)}</a>
+          ${canEdit ? `<button class="btn btn-sm btn-danger" data-remove-attachment="${i}">×</button>` : ""}
+        </div>`).join("") : `<div class="text-low small">Nincs csatolmány.</div>`}
+      ${canEdit ? `
+        <div class="grid grid-2 mt-2">
+          <input id="op-attachment-label" placeholder="Megnevezés, pl. Kihallgatási jegyzőkönyv.docx" />
+          <div class="flex gap-1"><input id="op-attachment-url" placeholder="https://…" style="flex:1" /><button type="button" class="btn btn-sm" id="add-attachment-btn">+ Hozzáadás</button></div>
+        </div>
+      ` : ""}
+    </div>
+
+    <div class="card mb-2">
       <div class="card-title mb-1">KAPCSOLÓDÓ BELSŐ VIZSGÁLATOK</div>
       ${linkedInvestigations.length ? linkedInvestigations.map((inv) => `
         <div class="history-item">
@@ -271,6 +298,21 @@ export function renderCovertOpDetail(container, id) {
     b.addEventListener("click", () => {
       removeOperative(op.id, Number(b.getAttribute("data-remove-op")), actorLabel());
       toast("Végrehajtó eltávolítva");
+      renderCovertOpDetail(container, op.id);
+    })
+  );
+  document.getElementById("add-attachment-btn")?.addEventListener("click", () => {
+    const label = document.getElementById("op-attachment-label").value.trim();
+    const url = document.getElementById("op-attachment-url").value.trim();
+    if (!label || !url) return;
+    addCovertOpAttachment(op.id, { label, url }, actorLabel());
+    toast("Csatolmány hozzáadva");
+    renderCovertOpDetail(container, op.id);
+  });
+  container.querySelectorAll("[data-remove-attachment]").forEach((b) =>
+    b.addEventListener("click", () => {
+      removeCovertOpAttachment(op.id, Number(b.getAttribute("data-remove-attachment")), actorLabel());
+      toast("Csatolmány eltávolítva");
       renderCovertOpDetail(container, op.id);
     })
   );

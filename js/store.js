@@ -1220,6 +1220,7 @@ export function createInvestigation(fields, actorLabel) {
     findings: "",
     outcome: "",
     linkedOps: [],
+    attachments: [],
     openedAt: now,
     closedAt: null,
     createdBy: actorLabel || "Rendszer",
@@ -1284,12 +1285,49 @@ export function deleteInvestigation(id, actorLabel) {
   write(KEYS.investigations, getInvestigations().filter((i) => i.id !== id));
   logAudit(actorLabel, "Belső vizsgálat törölve", inv ? `${id} — ${inv.subjectName || inv.subjectUsssId}` : id);
 }
+/* Csatolmányok — mivel a rendszernek nincs szervere, nem fájlokat tárol,
+   hanem külső helyen (Discord, Drive, Dropbox stb.) elérhető linkeket,
+   pont úgy, ahogy a személyi profilkép is URL-ként van tárolva. */
+export function addInvestigationAttachment(id, attachment, actorLabel) {
+  const list = getInvestigations();
+  const inv = list.find((i) => i.id === id);
+  if (!inv) return;
+  const label = (attachment.label || "").trim();
+  const url = (attachment.url || "").trim();
+  if (!label || !url) return;
+  inv.attachments = inv.attachments || [];
+  inv.attachments.push({ label, url });
+  inv.updatedAt = new Date().toISOString();
+  inv.history.push({ at: inv.updatedAt, by: actorLabel || "Rendszer", action: `Csatolmány hozzáadva: ${label}` });
+  write(KEYS.investigations, list);
+  logAudit(actorLabel, "Csatolmány hozzáadva belső vizsgálathoz", `${id} — ${label}`);
+}
+export function removeInvestigationAttachment(id, index, actorLabel) {
+  const list = getInvestigations();
+  const inv = list.find((i) => i.id === id);
+  if (!inv || !inv.attachments || !inv.attachments[index]) return;
+  const removed = inv.attachments[index];
+  inv.attachments.splice(index, 1);
+  inv.updatedAt = new Date().toISOString();
+  inv.history.push({ at: inv.updatedAt, by: actorLabel || "Rendszer", action: `Csatolmány eltávolítva: ${removed.label}` });
+  write(KEYS.investigations, list);
+  logAudit(actorLabel, "Csatolmány eltávolítva belső vizsgálatból", `${id} — ${removed.label}`);
+}
 
 /* ---------- Fedett Műveletek (Covert Operations) --------------------------
    Engedélyezett, kódnevesített fedett/nyomozási műveletek — ki rendelte el,
    ki hajtja végre, mi a cél, milyen minősítésű. Külön a Belső Vizsgálati
    Rendszertől: az nem az USSS saját állományának fegyelmi ügye, hanem
    kifelé irányuló, proaktív nyomozati/felderítési tevékenység. */
+const CODENAME_SUGGESTIONS = [
+  "Griffin", "Ravenshadow", "Obsidian Veil", "Iron Sentinel", "Blackthorn", "Silent Vanguard",
+  "Falcon's Eye", "Ashfall", "Ironclad", "Nightfall", "Grey Wolf", "Cold Harbor", "Ember Watch",
+  "Stonebridge", "Vantage Point", "Quiet Storm", "Marble Hawk", "Deadbolt", "Hollow Crown", "Wraithline",
+];
+export function suggestCodename() {
+  return CODENAME_SUGGESTIONS[Math.floor(Math.random() * CODENAME_SUGGESTIONS.length)];
+}
+
 const DEFAULT_CO_CLASSIFICATIONS = ["Bizalmas", "Titkos", "Szigorúan titkos"];
 export function getCovertOpClassifications() {
   return read(KEYS.covertOpClassifications, DEFAULT_CO_CLASSIFICATIONS);
@@ -1335,6 +1373,7 @@ export function createCovertOp(fields, actorLabel) {
     classification: fields.classification || getCovertOpClassifications()[0],
     status: "Tervezés alatt",
     operatives: [],
+    attachments: [],
     report: "",
     startDate: fields.startDate || now.slice(0, 10),
     endDate: null,
@@ -1423,6 +1462,31 @@ export function deleteCovertOp(id, actorLabel) {
   const op = getCovertOp(id);
   write(KEYS.covertOps, getCovertOps().filter((o) => o.id !== id));
   logAudit(actorLabel, "Fedett művelet törölve", op ? `${id} — Operation ${op.codename}` : id);
+}
+export function addCovertOpAttachment(id, attachment, actorLabel) {
+  const list = getCovertOps();
+  const op = list.find((o) => o.id === id);
+  if (!op) return;
+  const label = (attachment.label || "").trim();
+  const url = (attachment.url || "").trim();
+  if (!label || !url) return;
+  op.attachments = op.attachments || [];
+  op.attachments.push({ label, url });
+  op.updatedAt = new Date().toISOString();
+  op.history.push({ at: op.updatedAt, by: actorLabel || "Rendszer", action: `Csatolmány hozzáadva: ${label}` });
+  write(KEYS.covertOps, list);
+  logAudit(actorLabel, "Csatolmány hozzáadva fedett művelethez", `${id} — ${label}`);
+}
+export function removeCovertOpAttachment(id, index, actorLabel) {
+  const list = getCovertOps();
+  const op = list.find((o) => o.id === id);
+  if (!op || !op.attachments || !op.attachments[index]) return;
+  const removed = op.attachments[index];
+  op.attachments.splice(index, 1);
+  op.updatedAt = new Date().toISOString();
+  op.history.push({ at: op.updatedAt, by: actorLabel || "Rendszer", action: `Csatolmány eltávolítva: ${removed.label}` });
+  write(KEYS.covertOps, list);
+  logAudit(actorLabel, "Csatolmány eltávolítva fedett műveletből", `${id} — ${removed.label}`);
 }
 
 /* Kereszthivatkozás Belső Vizsgálat ↔ Fedett Művelet között. A kapcsolat
