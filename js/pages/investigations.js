@@ -2,9 +2,9 @@ import {
   getInvestigations, getInvestigation, createInvestigation, updateInvestigation, closeInvestigation, reopenInvestigation, deleteInvestigation,
   getPersonnel, getInvestigationCategories, addInvestigationCategory,
   getCovertOps, getCovertOp, linkCovertOp, unlinkCovertOp,
-  addInvestigationAttachment, removeInvestigationAttachment,
+  addInvestigationAttachment, removeInvestigationAttachment, formatCodename,
   INVESTIGATION_SEVERITIES, INVESTIGATION_STATUSES, INVESTIGATION_CLOSED_STATUSES, INVESTIGATION_OUTCOMES, INVESTIGATION_ORIGINS,
-} from "../store.js?v=50";
+} from "../store.js?v=52";
 import { hasRole, actorLabel } from "../auth.js?v=20";
 import { esc, fmtDate, fmtDateTime, toast, openModal, closeModal } from "../utils.js?v=22";
 import { navigate } from "../router.js?v=20";
@@ -220,13 +220,13 @@ export function renderInvestigationDetail(container, id) {
       ${(inv.linkedOps || []).length ? (inv.linkedOps || []).map((opId) => {
         const op = getCovertOp(opId);
         return `<div class="history-item">
-          <span>${op ? `<a href="#/covert-ops/${esc(opId)}" class="text-gold">${esc(opId)} — Operation ${esc(op.codename)}</a>` : `<span class="text-low">${esc(opId)} (törölve)</span>`}</span>
+          <span>${op ? `<a href="#/covert-ops/${esc(opId)}" class="text-gold">${esc(opId)} — ${esc(formatCodename(op.codename))}</a>` : `<span class="text-low">${esc(opId)} (törölve)</span>`}</span>
           ${canEdit ? `<button class="btn btn-sm btn-danger" data-unlink-op="${esc(opId)}">×</button>` : ""}
         </div>`;
       }).join("") : `<div class="text-low small">Nincs hozzárendelt fedett művelet.</div>`}
       ${canEdit ? `
         <div class="flex gap-1 mt-2">
-          <select id="inv-link-op" style="flex:1"><option value="">Válasszon fedett műveletet…</option>${getCovertOps().filter((op) => !(inv.linkedOps || []).includes(op.id)).map((op) => `<option value="${esc(op.id)}">${esc(op.id)} — Operation ${esc(op.codename)}</option>`).join("")}</select>
+          <select id="inv-link-op" style="flex:1"><option value="">Válasszon fedett műveletet…</option>${getCovertOps().filter((op) => !(inv.linkedOps || []).includes(op.id)).map((op) => `<option value="${esc(op.id)}">${esc(op.id)} — ${esc(formatCodename(op.codename))}</option>`).join("")}</select>
           <button type="button" class="btn btn-sm" id="link-op-btn">+ Hozzárendelés</button>
         </div>
       ` : ""}

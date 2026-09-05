@@ -1,9 +1,10 @@
 import {
   getCovertOps, getCovertOp, createCovertOp, updateCovertOp, addOperative, removeOperative, closeCovertOp, reopenCovertOp, deleteCovertOp,
   getCovertOpClassifications, addCovertOpClassification, getPersonnel, getInvestigationsLinkedToOp,
-  addCovertOpAttachment, removeCovertOpAttachment, suggestCodename,
+  addCovertOpAttachment, removeCovertOpAttachment, suggestCodename, formatCodename,
+  addSubject, removeSubject,
   CO_STATUSES, CO_CLOSED_STATUSES,
-} from "../store.js?v=50";
+} from "../store.js?v=52";
 import { hasRole, actorLabel } from "../auth.js?v=20";
 import { esc, fmtDate, fmtDateTime, toast, openModal, closeModal } from "../utils.js?v=22";
 import { navigate } from "../router.js?v=20";
@@ -45,7 +46,7 @@ export function renderCovertOpList(container) {
     const status = document.getElementById("op-status-filter").value;
     const cls = document.getElementById("op-class-filter").value;
     const filtered = ops.filter((op) => {
-      const searchable = [op.id, op.codename, op.targetSubject, op.authorizedBy, op.leadOperative].join(" ").toLowerCase();
+      const searchable = [op.id, op.codename, op.targetSubject, op.authorizedBy, op.leadOperative, ...(op.subjects || []).map((s) => `${s.label} ${s.name}`)].join(" ").toLowerCase();
       return (!query || searchable.includes(query)) &&
         (status === "all" || (status === "open" && !CO_CLOSED_STATUSES.includes(op.status)) || op.status === status) &&
         (cls === "all" || op.classification === cls);
@@ -62,8 +63,8 @@ export function renderCovertOpList(container) {
 function renderOpRow(op) {
   return `<tr class="row-link" data-nav="/covert-ops/${esc(op.id)}">
     <td class="text-gold" style="font-family:var(--font-mono)">${esc(op.id)}</td>
-    <td class="text-hi">Operation ${esc(op.codename || "—")}</td>
-    <td class="text-low small">${esc(op.targetSubject || "—")}</td>
+    <td class="text-hi">${esc(formatCodename(op.codename))}</td>
+    <td class="text-low small">${esc(op.targetSubject || "—")}${(op.subjects || []).length ? ` <span class="badge badge-gold" style="font-size:9px; padding:1px 6px; vertical-align:middle">${op.subjects.length} gyanúsított</span>` : ""}</td>
     <td><span class="badge badge-${CLASS_BADGE[op.classification] || "gray"}">${esc(op.classification)}</span></td>
     <td><span class="badge badge-${STATUS_BADGE(op.status)}">${esc(op.status)}</span></td>
     <td class="text-low small">${esc(op.leadOperative || "—")}</td>
@@ -81,7 +82,8 @@ function openCovertOpForm() {
       <div class="grid grid-2">
         <div class="field">
           <label>Fedőnév</label>
-          <div class="flex gap-1"><input id="of-codename" required placeholder="pl. Griffin" autofocus style="flex:1" /><button type="button" class="btn btn-sm" id="of-suggest-codename" title="Javasolj fedőnevet">Javasolj</button></div>
+          <div class="flex gap-1"><input id="of-codename" required placeholder="pl. Operation Overlord" autofocus style="flex:1" /><button type="button" class="btn btn-sm" id="of-suggest-codename" title="Javasolj fedőnevet a cél leírása alapján">Javasolj</button></div>
+          <p class="hint">A javaslat a lent megadott cél/célszemély szövege alapján készül — töltse ki előbb azokat a pontosabb találathoz.</p>
         </div>
         <div class="field"><label>Célszemély / szervezet</label><input id="of-target" placeholder="opcionális" /></div>
       </div>
@@ -108,7 +110,8 @@ function openCovertOpForm() {
     document.getElementById("of-new-class-wrap").style.display = e.target.value === "__new__" ? "block" : "none";
   });
   document.getElementById("of-suggest-codename").addEventListener("click", () => {
-    document.getElementById("of-codename").value = suggestCodename();
+    const context = `${document.getElementById("of-target").value} ${document.getElementById("of-objective").value}`;
+    document.getElementById("of-codename").value = suggestCodename(context);
   });
   document.getElementById("of-authorizer").addEventListener("change", (e) => {
     const position = e.target.selectedOptions[0]?.getAttribute("data-position");
@@ -161,7 +164,7 @@ export function renderCovertOpDetail(container, id) {
       <div class="flex justify-between items-center mb-2 flex-wrap">
         <div>
           <div class="card-title">Fedőnév</div>
-          <h2 style="font-size:22px; color: var(--gold-bright)">Operation ${esc(op.codename)}</h2>
+          <h2 style="font-size:22px; color: var(--gold-bright)">${esc(formatCodename(op.codename))}</h2>
           <div class="text-low small">${esc(op.targetSubject || "Nincs megadva célszemély/szervezet")}</div>
         </div>
         <div class="flex gap-1" style="align-items:flex-start">
@@ -207,6 +210,25 @@ export function renderCovertOpDetail(container, id) {
         </div>
         <div class="flex gap-1 mt-1">
           <button type="button" class="btn btn-sm" id="add-operative-btn">+ Hozzáadás</button>
+        </div>
+      ` : ""}
+    </div>
+
+    <div class="card mb-2">
+      <div class="card-title mb-1">GYANÚSÍTOTTAK / CÉLSZEMÉLYEK</div>
+      <p class="text-low small mb-1">NATO-betűzéses jelölés (Subject Alpha, Subject Bravo, …) — akkor is rögzíthető, ha a valódi kilét még nem megerősített.</p>
+      ${(op.subjects || []).length ? op.subjects.map((s, i) => `
+        <div class="history-item">
+          <span><span class="text-gold">${esc(s.label)}</span> — ${esc(s.name)}${s.notes ? ` <span class="text-low small">(${esc(s.notes)})</span>` : ""}</span>
+          ${canEdit && !isClosed ? `<button class="btn btn-sm btn-danger" data-remove-subject="${i}">×</button>` : ""}
+        </div>`).join("") : `<div class="text-low small">Nincs rögzített gyanúsított.</div>`}
+      ${canEdit && !isClosed ? `
+        <div class="grid grid-2 mt-2">
+          <input id="op-new-subject-name" placeholder="Név / leírás, pl. Ismeretlen férfi, kb. 40 éves" />
+          <input id="op-new-subject-notes" placeholder="Megjegyzés (opcionális)" />
+        </div>
+        <div class="flex gap-1 mt-1">
+          <button type="button" class="btn btn-sm" id="add-subject-btn">+ Hozzáadás</button>
         </div>
       ` : ""}
     </div>
@@ -302,6 +324,21 @@ export function renderCovertOpDetail(container, id) {
     b.addEventListener("click", () => {
       removeOperative(op.id, Number(b.getAttribute("data-remove-op")), actorLabel());
       toast("Végrehajtó eltávolítva");
+      renderCovertOpDetail(container, op.id);
+    })
+  );
+  document.getElementById("add-subject-btn")?.addEventListener("click", () => {
+    const name = document.getElementById("op-new-subject-name").value.trim();
+    if (!name) return;
+    const notes = document.getElementById("op-new-subject-notes").value.trim();
+    addSubject(op.id, { name, notes }, actorLabel());
+    toast("Gyanúsított hozzáadva");
+    renderCovertOpDetail(container, op.id);
+  });
+  container.querySelectorAll("[data-remove-subject]").forEach((b) =>
+    b.addEventListener("click", () => {
+      removeSubject(op.id, Number(b.getAttribute("data-remove-subject")), actorLabel());
+      toast("Gyanúsított eltávolítva");
       renderCovertOpDetail(container, op.id);
     })
   );

@@ -1,4 +1,4 @@
-import { getReadinessState, setReadinessState, READINESS_LEVELS, getAuditLog } from "../store.js?v=50";
+import { getReadinessState, setReadinessState, READINESS_LEVELS, getAuditLog } from "../store.js?v=52";
 import { hasRole, actorLabel } from "../auth.js?v=20";
 import { esc, fmtDateTime, toast } from "../utils.js?v=22";
 

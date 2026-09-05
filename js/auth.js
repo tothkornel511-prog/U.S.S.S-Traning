@@ -6,7 +6,7 @@
    (lásd a lenti "TODO backend" jelzéseket).
    ========================================================================== */
 
-import { findAccessCode, getPerson } from "./store.js?v=50";
+import { findAccessCode, getPerson } from "./store.js?v=52";
 
 const SESSION_KEY = "usss_ets_v1_session";
 

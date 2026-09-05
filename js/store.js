@@ -1319,17 +1319,45 @@ export function removeInvestigationAttachment(id, index, actorLabel) {
    ki hajtja végre, mi a cél, milyen minősítésű. Külön a Belső Vizsgálati
    Rendszertől: az nem az USSS saját állományának fegyelmi ügye, hanem
    kifelé irányuló, proaktív nyomozati/felderítési tevékenység. */
-/* Valódi, dokumentált történelmi hadműveleti fedőnevek — nem kitalált
-   szavak — hogy a javaslat tényleg azt az érzetet adja, amit egy IRL
-   fedőnév-választás adna. */
-const CODENAME_SUGGESTIONS = [
+/* Fedőnév-javaslat a cél/leírás szövege alapján — a rendszernek nincs
+   szervere, ezért nem hívunk külső AI API-t (nyilvános repóban egy
+   beégetett API-kulcs ellopható lenne), hanem helyben, kulcsszó-egyezés
+   alapján választunk tematikusan illő nevet, "Operation "-előtaggal. Ha
+   a leírásban nincs felismerhető téma, valódi, dokumentált történelmi
+   hadműveleti fedőnevekre esik vissza — nem kitalált szavakra. */
+const CODENAME_THEMES = [
+  { keywords: ["korrupció", "megveszteget", "csalás", "sikkasztás", "visszaélés"], pool: ["Ledger", "Backhand", "Greenlight", "Kickback", "Hollow Purse"] },
+  { keywords: ["árulás", "hazaárulás", "kém", "beépített", "informátor"], pool: ["Judas", "Double Cross", "False Flag", "Trojan Horse", "Sleeper"] },
+  { keywords: ["csempész", "fegyver", "drog", "kábítószer"], pool: ["Contraband", "Blacktide", "Iron River", "Smokescreen", "Dead Drop"] },
+  { keywords: ["emberrablás", "túsz", "elrabol"], pool: ["Ransom", "Silent Hostage", "Broken Chain", "Lockdown"] },
+  { keywords: ["terror", "robbant", "bomba"], pool: ["Firebreak", "Trip Wire", "Blast Radius", "Deadline"] },
+  { keywords: ["zsarol", "fenyeget"], pool: ["Coercion", "Pressure Point", "Iron Grip"] },
+  { keywords: ["merénylet", "gyilkos", "likvidál"], pool: ["Nightfall", "Cold Trigger", "Last Rites"] },
+  { keywords: ["hacker", "adatlopás", "kiber", "feltör"], pool: ["Backdoor", "Ghost Wire", "Firewall Breach"] },
+  { keywords: ["pénzmos"], pool: ["Clean Slate", "Laundry Line", "Hollow Vault"] },
+];
+const DEFAULT_CODENAME_POOL = [
   "Overlord", "Torch", "Market Garden", "Neptune", "Mincemeat", "Fortitude", "Chastise",
   "Paperclip", "Mongoose", "Ivy Bells", "Eagle Claw", "Just Cause", "Urgent Fury",
   "Praying Mantis", "Golden Pheasant", "Nimrod", "Desert Shield", "Desert Storm",
   "Nifty Package", "El Dorado Canyon", "Uphold Democracy", "Cyclone", "Rolling Thunder",
 ];
-export function suggestCodename() {
-  return CODENAME_SUGGESTIONS[Math.floor(Math.random() * CODENAME_SUGGESTIONS.length)];
+export function suggestCodename(descriptionText) {
+  const text = (descriptionText || "").toLowerCase();
+  const matched = CODENAME_THEMES.filter((t) => t.keywords.some((k) => text.includes(k)));
+  const pool = matched.length ? matched.flatMap((t) => t.pool) : DEFAULT_CODENAME_POOL;
+  const name = pool[Math.floor(Math.random() * pool.length)];
+  return `Operation ${name}`;
+}
+/* A tárolt fedőnév megjelenítésekor csak akkor teszünk elé "Operation "
+   szót, ha a mentett érték maga még nem tartalmazza — így a régebbi,
+   előtag nélkül mentett rekordok is helyesen jelennek meg, az újak
+   (amik már a javaslatból vagy kézzel "Operation ..."-ként érkeztek)
+   pedig nem duplázódnak. */
+export function formatCodename(codename) {
+  const name = (codename || "").trim();
+  if (!name) return "—";
+  return /^operation\b/i.test(name) ? name : `Operation ${name}`;
 }
 
 const DEFAULT_CO_CLASSIFICATIONS = ["Bizalmas", "Titkos", "Szigorúan titkos"];
@@ -1377,6 +1405,8 @@ export function createCovertOp(fields, actorLabel) {
     classification: fields.classification || getCovertOpClassifications()[0],
     status: "Tervezés alatt",
     operatives: [],
+    subjects: [],
+    subjectSeq: 0,
     attachments: [],
     report: "",
     startDate: fields.startDate || now.slice(0, 10),
@@ -1434,6 +1464,39 @@ export function removeOperative(opId, index, actorLabel) {
   op.history.push({ at: op.updatedAt, by: actorLabel || "Rendszer", action: `Végrehajtó eltávolítva: ${removed.name}` });
   write(KEYS.covertOps, list);
   logAudit(actorLabel, "Végrehajtó eltávolítva fedett műveletből", `${opId} — ${removed.name}`);
+}
+/* Gyanúsítottak/célszemélyek NATO-betűzéses jelöléssel (Subject Alpha,
+   Subject Bravo, …) — valós fedett nyomozati gyakorlat, amikor a valódi
+   kilétet (még) nem lehet vagy nem szabad rögzíteni. A jelölés a
+   hozzáadás sorrendjéhez van kötve (subjectSeq), nem a tömbindexhez, így
+   egy korábbi gyanúsított törlése nem nevezi át a többit. */
+const NATO_ALPHABET = ["Alpha", "Bravo", "Charlie", "Delta", "Echo", "Foxtrot", "Golf", "Hotel", "India", "Juliett", "Kilo", "Lima", "Mike", "November", "Oscar", "Papa", "Quebec", "Romeo", "Sierra", "Tango", "Uniform", "Victor", "Whiskey", "X-ray", "Yankee", "Zulu"];
+export function addSubject(opId, { name, notes }, actorLabel) {
+  const list = getCovertOps();
+  const op = list.find((o) => o.id === opId);
+  if (!op) return;
+  const trimmedName = (name || "").trim();
+  if (!trimmedName) return;
+  op.subjects = op.subjects || [];
+  op.subjectSeq = op.subjectSeq || 0;
+  const label = `Subject ${NATO_ALPHABET[op.subjectSeq % NATO_ALPHABET.length]}`;
+  op.subjectSeq += 1;
+  op.subjects.push({ label, name: trimmedName, notes: (notes || "").trim() });
+  op.updatedAt = new Date().toISOString();
+  op.history.push({ at: op.updatedAt, by: actorLabel || "Rendszer", action: `Gyanúsított hozzáadva: ${label} — ${trimmedName}` });
+  write(KEYS.covertOps, list);
+  logAudit(actorLabel, "Gyanúsított hozzáadva fedett művelethez", `${opId} — ${label}: ${trimmedName}`);
+}
+export function removeSubject(opId, index, actorLabel) {
+  const list = getCovertOps();
+  const op = list.find((o) => o.id === opId);
+  if (!op || !op.subjects || !op.subjects[index]) return;
+  const removed = op.subjects[index];
+  op.subjects.splice(index, 1);
+  op.updatedAt = new Date().toISOString();
+  op.history.push({ at: op.updatedAt, by: actorLabel || "Rendszer", action: `Gyanúsított eltávolítva: ${removed.label} — ${removed.name}` });
+  write(KEYS.covertOps, list);
+  logAudit(actorLabel, "Gyanúsított eltávolítva fedett műveletből", `${opId} — ${removed.label}`);
 }
 export function closeCovertOp(id, { status, report }, actorLabel) {
   if (!CO_CLOSED_STATUSES.includes(status)) return null;
