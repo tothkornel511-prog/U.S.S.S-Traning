@@ -3,7 +3,7 @@ import {
   getCovertOpClassifications, addCovertOpClassification, getPersonnel, getInvestigationsLinkedToOp,
   addCovertOpAttachment, removeCovertOpAttachment, suggestCodename,
   CO_STATUSES, CO_CLOSED_STATUSES,
-} from "../store.js?v=49";
+} from "../store.js?v=50";
 import { hasRole, actorLabel } from "../auth.js?v=20";
 import { esc, fmtDate, fmtDateTime, toast, openModal, closeModal } from "../utils.js?v=22";
 import { navigate } from "../router.js?v=20";
@@ -197,12 +197,15 @@ export function renderCovertOpDetail(container, id) {
       <div class="card-title mb-1">VÉGREHAJTÓK</div>
       ${(op.operatives || []).length ? op.operatives.map((o, i) => `
         <div class="history-item">
-          <span>${esc(o.name)}${o.usssId ? ` <span class="text-low small">(${esc(o.usssId)})</span>` : ""}</span>
+          <span>${esc(o.name)}${o.codename ? ` — <span class="text-gold">${esc(o.codename)}</span>` : ""}${o.usssId ? ` <span class="text-low small">(${esc(o.usssId)})</span>` : ""}</span>
           ${canEdit && !isClosed ? `<button class="btn btn-sm btn-danger" data-remove-op="${i}">×</button>` : ""}
         </div>`).join("") : `<div class="text-low small">Nincs kijelölt végrehajtó.</div>`}
       ${canEdit && !isClosed ? `
-        <div class="flex gap-1 mt-2">
-          <select id="op-new-operative" style="flex:1"><option value="">Válasszon személyt…</option>${personnel.map((p) => `<option value="${esc(p.usssId)}">${esc(p.name)} (${esc(p.usssId)})</option>`).join("")}</select>
+        <div class="grid grid-2 mt-2">
+          <select id="op-new-operative"><option value="">Válasszon személyt…</option>${personnel.map((p) => `<option value="${esc(p.usssId)}">${esc(p.name)} (${esc(p.usssId)})</option>`).join("")}</select>
+          <input id="op-new-operative-codename" placeholder="Kódnév (opcionális), pl. Ghost" />
+        </div>
+        <div class="flex gap-1 mt-1">
           <button type="button" class="btn btn-sm" id="add-operative-btn">+ Hozzáadás</button>
         </div>
       ` : ""}
@@ -290,7 +293,8 @@ export function renderCovertOpDetail(container, id) {
     const usssId = select.value;
     if (!usssId) return;
     const person = personnel.find((p) => p.usssId === usssId);
-    addOperative(op.id, { usssId, name: person ? person.name : usssId }, actorLabel());
+    const codename = document.getElementById("op-new-operative-codename").value.trim();
+    addOperative(op.id, { usssId, name: person ? person.name : usssId, codename }, actorLabel());
     toast("Végrehajtó hozzáadva");
     renderCovertOpDetail(container, op.id);
   });

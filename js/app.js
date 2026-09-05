@@ -2,7 +2,7 @@
    U.S.S.S. ELITE TRAINING SYSTEM — APP ENTRY
    ========================================================================== */
 
-import { seedIfNeeded, globalSearch, getCustomCss, getOperationRecords } from "./store.js?v=49";
+import { seedIfNeeded, globalSearch, getCustomCss, getOperationRecords } from "./store.js?v=50";
 import { isAuthenticated, currentSession, logout, hasRole, ROLES } from "./auth.js?v=20";
 import { registerRoute, resolve, startRouter, navigate, currentPath } from "./router.js?v=20";
 import { esc, sealMark, closeModal } from "./utils.js?v=22";
@@ -20,7 +20,7 @@ import { renderAdmin } from "./pages/admin.js?v=23";
 import { renderOperations } from "./pages/operations.js?v=37";
 import { renderReadiness } from "./pages/readiness.js?v=32";
 import { renderInvestigationList, renderInvestigationDetail } from "./pages/investigations.js?v=5";
-import { renderCovertOpList, renderCovertOpDetail } from "./pages/covert-ops.js?v=3";
+import { renderCovertOpList, renderCovertOpDetail } from "./pages/covert-ops.js?v=4";
 
 seedIfNeeded();
 applyCustomCss();

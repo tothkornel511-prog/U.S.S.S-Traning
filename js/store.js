@@ -1416,10 +1416,11 @@ export function addOperative(opId, operative, actorLabel) {
   if (!op) return;
   const name = (operative.name || "").trim();
   if (!name) return;
+  const codename = (operative.codename || "").trim();
   op.operatives = op.operatives || [];
-  op.operatives.push({ usssId: (operative.usssId || "").trim(), name });
+  op.operatives.push({ usssId: (operative.usssId || "").trim(), name, codename });
   op.updatedAt = new Date().toISOString();
-  op.history.push({ at: op.updatedAt, by: actorLabel || "Rendszer", action: `Végrehajtó hozzáadva: ${name}` });
+  op.history.push({ at: op.updatedAt, by: actorLabel || "Rendszer", action: `Végrehajtó hozzáadva: ${name}${codename ? ` — kódnév: ${codename}` : ""}` });
   write(KEYS.covertOps, list);
   logAudit(actorLabel, "Végrehajtó hozzáadva fedett művelethez", `${opId} — ${name}`);
 }
