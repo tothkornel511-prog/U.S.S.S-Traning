@@ -329,22 +329,30 @@ export function getPerson(usssId) {
   return getPersonnel().find((p) => p.usssId === usssId);
 }
 export function savePersonnel(list) {
-  write(KEYS.personnel, list);
+  return write(KEYS.personnel, list);
 }
+/* Fényképek is base64-ként kerülnek a localStorage-ba, ezért itt is
+   szigorú méretkorlát kell (lásd MAX_ATTACHMENT_BYTES fentebb a tervek
+   mellékleteinél ugyanígy) — sok kép esetén könnyen megtelhet a tárhely. */
+export const MAX_PHOTO_BYTES = 400 * 1024;
+
 export function upsertPerson(person, actorLabel) {
   const list = getPersonnel();
   const idx = list.findIndex((p) => p.usssId === person.usssId);
   if (idx >= 0) {
-    list[idx] = { ...list[idx], ...person };
-    logAudit(actorLabel, "Profil frissítve", `${person.name || list[idx].name} (${person.usssId})`);
+    const previous = list[idx];
+    list[idx] = { ...previous, ...person };
+    if (!write(KEYS.personnel, list)) return false;
+    logAudit(actorLabel, "Profil frissítve", `${person.name || previous.name} (${person.usssId})`);
   } else {
     list.push({
       modules: {}, notes: "", photo: "", probationLifted: false,
       levelUpEligible: false, createdAt: new Date().toISOString(), ...person,
     });
+    if (!write(KEYS.personnel, list)) return false;
     logAudit(actorLabel, "Új személy felvéve", `${person.name} (${person.usssId})`);
   }
-  savePersonnel(list);
+  return true;
 }
 export function deletePerson(usssId, actorLabel) {
   const list = getPersonnel().filter((p) => p.usssId !== usssId);

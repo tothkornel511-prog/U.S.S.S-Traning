@@ -29,13 +29,14 @@ export function renderProfile(container, usssId) {
   container.innerHTML = `
     <a href="#/personnel" class="text-low small">← Vissza az állományhoz</a>
     <div class="profile-head mt-2">
-      <div class="avatar avatar-lg">${person.photo ? `<img src="${esc(person.photo)}"/>` : initials(person.name)}</div>
+      <div class="avatar avatar-lg ${person.level === "V" ? "avatar-elite" : ""}">${person.photo ? `<img src="${esc(person.photo)}"/>` : initials(person.name)}</div>
       <div style="flex:1">
         <div class="profile-name">${esc(person.name)}</div>
         <div class="profile-id">${esc(person.usssId)} · ${esc(person.position)}</div>
         <div class="profile-meta">
           <span class="badge ${statusColor(person.status)}">${esc(person.status)}</span>
-          <span class="level-chip">${esc(levelLabel(person.level))}</span>
+          <span class="level-chip ${person.level === "V" ? "level-chip-elite" : ""}">${esc(levelLabel(person.level))}</span>
+          ${person.level === "V" ? `<span class="badge badge-orange">ELIT</span>` : ""}
           ${prob ? `<span class="badge ${prob.active ? "badge-yellow" : "badge-gray"}">PRÓBAIDŐ ${prob.active ? `AKTÍV · ${prob.daysLeft} nap hátra` : "LEJÁRT"}</span>` : ""}
           ${person.levelUpEligible ? `<span class="badge badge-gold">Szintlépésre jogosult</span>` : ""}
         </div>

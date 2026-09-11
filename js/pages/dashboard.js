@@ -18,6 +18,7 @@ export function renderDashboard(container) {
   const commandBrief = buildCommandBrief(readiness, openOperations, criticalOperations, activeProtectees);
 
   const active = personnel.filter((p) => p.status === "Aktív").length;
+  const elite = personnel.filter((p) => p.level === "V").length;
   const probationers = personnel.filter((p) => p.level === "0" && !p.probationLifted).length;
   const eligible = personnel.filter((p) => p.levelUpEligible).length;
   const avgReadiness = personnel.length
@@ -35,7 +36,7 @@ export function renderDashboard(container) {
       <div class="card row-link" data-nav="/personnel">
         <div class="card-title">☰ Állomány</div>
         <div class="card-value">${personnel.length}</div>
-        <div class="card-sub">${active} aktív szolgálatban · ${probationers} próbaidős</div>
+        <div class="card-sub">${active} aktív szolgálatban · ${probationers} próbaidős · <span class="text-orange">${elite} elit</span></div>
       </div>
       <div class="card row-link" data-nav="/protocols">
         <div class="card-title">▤ Jegyzőkönyvek</div>

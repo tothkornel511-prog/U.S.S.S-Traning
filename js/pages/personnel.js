@@ -1,7 +1,16 @@
-import { getPersonnel, upsertPerson, deletePerson, readinessPercent, ref, probationInfo, getPositions } from "../store.js?v=53";
+import { getPersonnel, upsertPerson, deletePerson, readinessPercent, ref, probationInfo, getPositions, MAX_PHOTO_BYTES } from "../store.js?v=55";
 import { hasRole, actorLabel } from "../auth.js?v=20";
 import { esc, initials, toast, openModal, closeModal } from "../utils.js?v=22";
 import { navigate } from "../router.js?v=20";
+
+function readFileAsDataUrl(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = () => reject(reader.error);
+    reader.readAsDataURL(file);
+  });
+}
 
 let state = { search: "", position: "", level: "", status: "" };
 
@@ -69,11 +78,11 @@ export function renderPersonnelList(container) {
       return `
       <tr>
         <td class="row-link" data-nav="/personnel/${esc(p.usssId)}"><div class="person-cell">
-          <div class="avatar">${p.photo ? `<img src="${esc(p.photo)}"/>` : initials(p.name)}</div>
+          <div class="avatar ${p.level === "V" ? "avatar-elite" : ""}">${p.photo ? `<img src="${esc(p.photo)}"/>` : initials(p.name)}</div>
           <div><div class="person-name">${esc(p.name)}</div><div class="person-sub">${esc(p.usssId)}</div></div>
         </div></td>
         <td class="row-link" data-nav="/personnel/${esc(p.usssId)}">${esc(p.position)}</td>
-        <td class="row-link" data-nav="/personnel/${esc(p.usssId)}"><span class="level-chip">${esc(p.level)}</span>${p.levelUpEligible ? ' <span class="badge badge-gold">Szintlépésre jogosult</span>' : ""}</td>
+        <td class="row-link" data-nav="/personnel/${esc(p.usssId)}"><span class="level-chip ${p.level === "V" ? "level-chip-elite" : ""}">${esc(p.level)}</span>${p.level === "V" ? ' <span class="badge badge-orange">ELIT</span>' : ""}${p.levelUpEligible ? ' <span class="badge badge-gold">Szintlépésre jogosult</span>' : ""}</td>
         <td class="row-link" data-nav="/personnel/${esc(p.usssId)}">${statusPill(p.status)}</td>
         <td class="row-link" data-nav="/personnel/${esc(p.usssId)}">${readinessPercent(p)}%</td>
         <td class="row-link" data-nav="/personnel/${esc(p.usssId)}">${prob ? `<span class="badge ${prob.active ? "badge-yellow" : "badge-gray"}">${prob.active ? `Aktív · ${prob.daysLeft} nap` : "Lejárt"}</span>` : "—"}</td>
@@ -117,32 +126,73 @@ function openPersonForm(person) {
         </div>
         <div class="field"><label>Próbaidő kezdete</label><input type="date" id="pf-prob" value="${esc(person?.probationStart || "")}" /></div>
       </div>
-      <div class="field"><label>Profilkép URL (opcionális)</label><input id="pf-photo" value="${esc(person?.photo || "")}" placeholder="https://…" /></div>
+      <div class="field">
+        <label>Profilkép</label>
+        <div class="avatar-upload-row">
+          <div class="avatar avatar-lg" id="pf-photo-preview">${person?.photo ? `<img src="${esc(person.photo)}"/>` : initials(person?.name || "?")}</div>
+          <div class="avatar-upload-actions">
+            <input type="file" id="pf-photo-file" accept="image/*" />
+            <span class="text-low small">Max. ${Math.round(MAX_PHOTO_BYTES / 1024)} KB, vagy adjon meg URL-t:</span>
+            <input id="pf-photo" value="${esc(person?.photo && person.photo.startsWith("http") ? person.photo : "")}" placeholder="https://…" />
+          </div>
+        </div>
+      </div>
       <div class="field"><label>Megjegyzések</label><textarea id="pf-notes" rows="3">${esc(person?.notes || "")}</textarea></div>
       <div class="flex justify-between mt-2">
         ${!isNew ? `<button type="button" class="btn btn-danger" id="pf-delete">Törlés</button>` : "<span></span>"}
         <div class="flex gap-1">
           <button type="button" class="btn" data-close-modal>Mégse</button>
-          <button type="submit" class="btn btn-gold">Mentés</button>
+          <button type="submit" class="btn btn-gold" id="pf-submit">Mentés</button>
         </div>
       </div>
     </form>
   `);
 
+  let currentPhoto = person?.photo || "";
+  const photoPreview = document.getElementById("pf-photo-preview");
+  const photoUrlInput = document.getElementById("pf-photo");
+  const submitBtn = document.getElementById("pf-submit");
+
+  function setPhoto(dataUrlOrUrl) {
+    currentPhoto = dataUrlOrUrl || "";
+    photoPreview.innerHTML = currentPhoto ? `<img src="${esc(currentPhoto)}"/>` : initials(document.getElementById("pf-name").value || "?");
+  }
+
+  photoUrlInput.addEventListener("input", () => setPhoto(photoUrlInput.value.trim()));
+
+  document.getElementById("pf-photo-file").addEventListener("change", async (e) => {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file) return;
+    if (!file.type.startsWith("image/")) return toast("Csak képfájl tölthető fel.", "warn");
+    if (file.size > MAX_PHOTO_BYTES) return toast(`A kép túl nagy (max. ${Math.round(MAX_PHOTO_BYTES / 1024)} KB).`, "warn");
+    submitBtn.disabled = true;
+    try {
+      const dataUrl = await readFileAsDataUrl(file);
+      photoUrlInput.value = "";
+      setPhoto(dataUrl);
+    } catch {
+      toast("Nem sikerült beolvasni a képet.", "warn");
+    } finally {
+      submitBtn.disabled = false;
+    }
+  });
+
   document.getElementById("person-form").addEventListener("submit", (e) => {
     e.preventDefault();
     const usssId = document.getElementById("pf-id").value.trim();
     if (!usssId) return toast("Az USSS azonosító megadása kötelező.", "warn");
-    upsertPerson({
+    const ok = upsertPerson({
       usssId,
       name: document.getElementById("pf-name").value.trim(),
       position: document.getElementById("pf-position").value,
       status: document.getElementById("pf-status").value,
       level: document.getElementById("pf-level").value,
       probationStart: document.getElementById("pf-prob").value,
-      photo: document.getElementById("pf-photo").value.trim(),
+      photo: currentPhoto,
       notes: document.getElementById("pf-notes").value.trim(),
     }, actorLabel());
+    if (!ok) return toast("Nem sikerült menteni — megtelt a böngésző helyi tárhelye. Próbáljon kisebb képet.", "warn");
     toast(isNew ? "Személy felvéve" : "Profil frissítve");
     closeModal();
     navigate("/personnel");
