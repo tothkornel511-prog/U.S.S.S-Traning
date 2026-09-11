@@ -1,6 +1,6 @@
 import { getPersonnel, getProtocols, getLocations, getOperationRecords, getReadinessState, READINESS_LEVELS, readinessPercent, ref, getExams, examScoreSummary, getExamCategories } from "../store.js?v=55";
 import { hasRole, currentSession, ROLES } from "../auth.js?v=20";
-import { esc, initials, sealMark } from "../utils.js?v=22";
+import { esc, avatarContent, sealMark } from "../utils.js?v=23";
 import { navigate } from "../router.js?v=20";
 
 export function renderDashboard(container) {
@@ -126,7 +126,7 @@ export function renderDashboard(container) {
             ${recent.map((p) => `
               <tr class="row-link" data-nav="/personnel/${esc(p.usssId)}">
                 <td><div class="person-cell">
-                  <div class="avatar">${p.photo ? `<img src="${esc(p.photo)}"/>` : initials(p.name)}</div>
+                  <div class="avatar">${avatarContent(p.photo, p.name)}</div>
                   <div><div class="person-name">${esc(p.name)}</div><div class="person-sub">${esc(p.usssId)}</div></div>
                 </div></td>
                 <td>${esc(p.position)}</td>

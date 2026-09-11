@@ -39,6 +39,14 @@ export function initials(name) {
     .toUpperCase();
 }
 
+/* Avatar tartalom (kép vagy monogram). Ha a fotó URL törött/lejárt
+   (pl. régi, lejárt Discord CDN-link), a böngésző alapértelmezett
+   "törött kép" ikonja helyett szépen visszaesik a monogramra. */
+export function avatarContent(photo, name) {
+  if (!photo) return esc(initials(name));
+  return `<img src="${esc(photo)}" onerror="this.outerHTML='${esc(initials(name))}'"/>`;
+}
+
 let toastTimer = null;
 export function toast(message, type = "ok") {
   let el = document.getElementById("toast");

@@ -1,6 +1,6 @@
 import { getPersonnel, ref, moduleState, moduleByCode, levelLabel } from "../store.js?v=53";
 import { hasRole } from "../auth.js?v=20";
-import { esc, initials } from "../utils.js?v=22";
+import { esc, avatarContent } from "../utils.js?v=23";
 import { navigate } from "../router.js?v=20";
 import { openModuleDetail } from "./profile.js?v=20";
 
@@ -85,7 +85,7 @@ export function renderMatrix(container) {
           <tr>
             <td class="sticky-col row-link" data-nav="/personnel/${esc(p.usssId)}">
               <div class="person-cell">
-                <div class="avatar">${p.photo ? `<img src="${esc(p.photo)}"/>` : initials(p.name)}</div>
+                <div class="avatar">${avatarContent(p.photo, p.name)}</div>
                 <div><div class="person-name">${esc(p.name)}</div><div class="person-sub">${esc(p.usssId)}</div></div>
               </div>
             </td>

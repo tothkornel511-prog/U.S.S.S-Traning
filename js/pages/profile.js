@@ -4,7 +4,7 @@ import {
   levelLabel, moduleByCode, examStats, THEORY_PASS_THRESHOLD, deleteHistoryEntry,
 } from "../store.js?v=53";
 import { hasRole, actorLabel } from "../auth.js?v=20";
-import { esc, initials, fmtDate, fmtDateTime, toast, openModal, closeModal } from "../utils.js?v=22";
+import { esc, avatarContent, fmtDate, fmtDateTime, toast, openModal, closeModal } from "../utils.js?v=23";
 import { navigate } from "../router.js?v=20";
 
 let activeTab = "modules";
@@ -29,7 +29,7 @@ export function renderProfile(container, usssId) {
   container.innerHTML = `
     <a href="#/personnel" class="text-low small">← Vissza az állományhoz</a>
     <div class="profile-head mt-2">
-      <div class="avatar avatar-lg ${person.level === "V" ? "avatar-elite" : ""}">${person.photo ? `<img src="${esc(person.photo)}"/>` : initials(person.name)}</div>
+      <div class="avatar avatar-lg ${person.level === "V" ? "avatar-elite" : ""}">${avatarContent(person.photo, person.name)}</div>
       <div style="flex:1">
         <div class="profile-name">${esc(person.name)}</div>
         <div class="profile-id">${esc(person.usssId)} · ${esc(person.position)}</div>

@@ -1,6 +1,6 @@
 import { getPersonnel, upsertPerson, deletePerson, readinessPercent, ref, probationInfo, getPositions, MAX_PHOTO_BYTES } from "../store.js?v=55";
 import { hasRole, actorLabel } from "../auth.js?v=20";
-import { esc, initials, toast, openModal, closeModal } from "../utils.js?v=22";
+import { esc, avatarContent, toast, openModal, closeModal } from "../utils.js?v=23";
 import { navigate } from "../router.js?v=20";
 
 function readFileAsDataUrl(file) {
@@ -78,7 +78,7 @@ export function renderPersonnelList(container) {
       return `
       <tr>
         <td class="row-link" data-nav="/personnel/${esc(p.usssId)}"><div class="person-cell">
-          <div class="avatar ${p.level === "V" ? "avatar-elite" : ""}">${p.photo ? `<img src="${esc(p.photo)}"/>` : initials(p.name)}</div>
+          <div class="avatar ${p.level === "V" ? "avatar-elite" : ""}">${avatarContent(p.photo, p.name)}</div>
           <div><div class="person-name">${esc(p.name)}</div><div class="person-sub">${esc(p.usssId)}</div></div>
         </div></td>
         <td class="row-link" data-nav="/personnel/${esc(p.usssId)}">${esc(p.position)}</td>
@@ -129,7 +129,7 @@ function openPersonForm(person) {
       <div class="field">
         <label>Profilkép</label>
         <div class="avatar-upload-row">
-          <div class="avatar avatar-lg" id="pf-photo-preview">${person?.photo ? `<img src="${esc(person.photo)}"/>` : initials(person?.name || "?")}</div>
+          <div class="avatar avatar-lg" id="pf-photo-preview">${avatarContent(person?.photo, person?.name || "?")}</div>
           <div class="avatar-upload-actions">
             <input type="file" id="pf-photo-file" accept="image/*" />
             <span class="text-low small">Max. ${Math.round(MAX_PHOTO_BYTES / 1024)} KB, vagy adjon meg URL-t:</span>
@@ -155,7 +155,7 @@ function openPersonForm(person) {
 
   function setPhoto(dataUrlOrUrl) {
     currentPhoto = dataUrlOrUrl || "";
-    photoPreview.innerHTML = currentPhoto ? `<img src="${esc(currentPhoto)}"/>` : initials(document.getElementById("pf-name").value || "?");
+    photoPreview.innerHTML = avatarContent(currentPhoto, document.getElementById("pf-name").value || "?");
   }
 
   photoUrlInput.addEventListener("input", () => setPhoto(photoUrlInput.value.trim()));

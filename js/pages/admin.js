@@ -1,6 +1,13 @@
-import { getAccessCodes, upsertAccessCode, revokeAccessCode, generateCode, getAuditLog, getPersonnel, resetAllData, ref, getPositionEntries, addPosition, removePosition, getCustomCss, setCustomCss, getInvestigationCategories, addInvestigationCategory, removeInvestigationCategory, getCovertOpClassifications, addCovertOpClassification, removeCovertOpClassification } from "../store.js?v=53";
+import { getAccessCodes, upsertAccessCode, revokeAccessCode, generateCode, getAuditLog, getPersonnel, resetAllData, ref, getPositionEntries, addPosition, removePosition, getCustomCss, setCustomCss, getInvestigationCategories, addInvestigationCategory, removeInvestigationCategory, getCovertOpClassifications, addCovertOpClassification, removeCovertOpClassification, exportAllData, importAllData, getStorageReport } from "../store.js?v=56";
 import { hasRole, actorLabel, ROLES } from "../auth.js?v=20";
 import { esc, fmtDateTime, toast, openModal, closeModal } from "../utils.js?v=22";
+
+function formatBytes(bytes) {
+  if (!bytes) return "0 B";
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
+}
 
 let activeTab = "access";
 
@@ -19,6 +26,7 @@ export function renderAdmin(container) {
       <button class="tab-btn ${activeTab === "op-classifications" ? "active" : ""}" data-tab="op-classifications">Műveleti minősítések</button>
       <button class="tab-btn ${activeTab === "audit" ? "active" : ""}" data-tab="audit">Eseménynapló</button>
       ${isAdmin ? `<button class="tab-btn ${activeTab === "system" ? "active" : ""}" data-tab="system">Rendszerbeállítások</button>` : ""}
+      ${isAdmin ? `<button class="tab-btn ${activeTab === "dev" ? "active" : ""}" data-tab="dev">Fejlesztés</button>` : ""}
     </div>
     <div id="admin-tab-content"></div>
   `;
@@ -34,6 +42,7 @@ export function renderAdmin(container) {
   else if (activeTab === "op-classifications") renderOpClassificationsTab(content, isAdmin);
   else if (activeTab === "audit") renderAuditTab(content);
   else if (activeTab === "system") renderSystemTab(content);
+  else if (activeTab === "dev") renderDevTab(content);
 }
 
 function renderPositionsTab(content, isAdmin) {
@@ -372,6 +381,94 @@ function renderSystemTab(content) {
       toast("Adatok visszaállítva");
       location.hash = "/dashboard";
       location.reload();
+    }
+  });
+}
+
+const BRANDING_ASSETS = [
+  { file: "hero-command.jpg", label: "Fő háttérkép", usage: "Bejelentkező képernyő, Vezérlőpult fejléc, teljes alkalmazás háttere" },
+  { file: "hero-training.jpg", label: "Kiképzés hero", usage: "Kiképzési tervek oldal fejléce" },
+  { file: "hero-covert.jpg", label: "Fedett műveletek hero", usage: "Fedett Műveletek oldal fejléce" },
+  { file: "strip-ops.jpg", label: "Műveleti fotósáv", usage: "Kiképzési Áttekintés oldal fejléce" },
+  { file: "strip-brand.jpg", label: "Márka-sáv", usage: "Vezérlőpult záró sávja" },
+];
+
+const BRANDING_WISHLIST = [
+  "Belső Vizsgálatok oldal fejléce — pl. akta/dosszié vagy iroda hangulatú fotó",
+  "Felvételi (toborzás) oldal fejléce — pl. eskütétel / kiképzés-avatás jelenet",
+  "Parancsnoki Központ (Command Center) fejléc — pl. híradó/irányítóterem hangulat",
+  "Valódi Los Santos térkép-kép az assets/maps/ mappába (lásd assets/maps/README.md) — enélkül a Térkép oldal helyőrző felületet mutat",
+  "Nagyfelbontású jelvény/pecsét PNG a favicon és a bejelentkező pecsét cseréjéhez (jelenleg egyszerű SVG-rajz)",
+  "Néhány semleges, arctalan/egyenruhás 'agent' portré alapértelmezett profilképnek, azok számára, akik nem töltenek fel sajátot",
+];
+
+function renderDevTab(content) {
+  const report = getStorageReport();
+  const quotaEstimateBytes = 5 * 1024 * 1024;
+  const pct = Math.min(100, Math.round((report.total / quotaEstimateBytes) * 100));
+
+  content.innerHTML = `
+    <div class="card mb-2">
+      <div class="card-title mb-1">Adatmentés / visszaállítás</div>
+      <p class="text-mid small mb-1">Minden adat kizárólag ebben a böngészőben, a localStorage-ban él — nincs szerver, nincs automatikus felhő-mentés. Egy törölt böngészőadat vagy géphiba mindent elvinne. Töltsd le rendszeresen ezt a biztonsági mentést, és őrizd meg egy külön helyen.</p>
+      <div class="flex gap-1 flex-wrap">
+        <button class="btn btn-gold btn-sm" id="dev-export">Teljes mentés letöltése (.json)</button>
+        <label class="btn btn-sm" style="cursor:pointer">Mentés visszatöltése…<input type="file" id="dev-import" accept="application/json" style="display:none" /></label>
+      </div>
+    </div>
+
+    <div class="card mb-2">
+      <div class="card-title mb-1">Tárhely-használat</div>
+      <p class="text-mid small mb-1">A böngészők jellemzően 5-10 MB localStorage-ot engednek eredetenként. Ez alatta marad a rendszer szinte mindig biztonságos — a nagy fájlmellékletek (kiképzési terv, fedett művelet, profilkép) miatt viszont érdemes szemmel tartani.</p>
+      <div class="progress mb-1"><div style="width:${pct}%; ${pct > 70 ? "background:linear-gradient(90deg,#8a3f3a,#d1554a); box-shadow:var(--glow-red)" : ""}"></div></div>
+      <div class="flex justify-between small text-low mb-2"><span>${formatBytes(report.total)} felhasználva</span><span>~5 MB becsült keret</span></div>
+      ${report.items.map((i) => `<div class="history-item"><span>${esc(i.label)}</span><span class="text-low small" style="font-family:var(--font-mono)">${formatBytes(i.bytes)}</span></div>`).join("") || `<div class="text-low small">Nincs adat.</div>`}
+    </div>
+
+    <div class="card">
+      <div class="card-title mb-1">Márka-képek (branding)</div>
+      <p class="text-mid small mb-2">A rendszerben jelenleg használt fotók, és amikre a felülethez még szükség lenne.</p>
+      <div class="grid grid-3 mb-2">
+        ${BRANDING_ASSETS.map((a) => `
+          <div class="loc-card" style="cursor:default">
+            <div class="loc-card-img"><img src="assets/branding/${esc(a.file)}" style="width:100%;height:100%;object-fit:cover" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'loc-card-ic',textContent:'◆'}))"/></div>
+            <div class="loc-card-body">
+              <div class="person-name">${esc(a.label)}</div>
+              <div class="text-low small mt-1">${esc(a.usage)}</div>
+            </div>
+          </div>`).join("")}
+      </div>
+      <div class="divider"></div>
+      <div class="card-title mb-1">Még hasznos lenne</div>
+      ${BRANDING_WISHLIST.map((w) => `<div class="history-item"><span>${esc(w)}</span></div>`).join("")}
+    </div>
+  `;
+
+  document.getElementById("dev-export").addEventListener("click", () => {
+    const payload = exportAllData();
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = `usss-mentes-${new Date().toISOString().slice(0, 10)}.json`;
+    link.click();
+    URL.revokeObjectURL(link.href);
+    toast("Mentés letöltve");
+  });
+
+  document.getElementById("dev-import").addEventListener("change", async (e) => {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file) return;
+    if (!confirm("Ez felülírja a jelenlegi adatokat a fájlban lévőkkel. Biztosan folytatja?")) return;
+    try {
+      const text = await file.text();
+      const payload = JSON.parse(text);
+      const ok = importAllData(payload, actorLabel());
+      if (!ok) return toast("Érvénytelen mentésfájl.", "warn");
+      toast("Adatok visszatöltve — újratöltés…");
+      setTimeout(() => location.reload(), 800);
+    } catch {
+      toast("Nem sikerült beolvasni a fájlt.", "warn");
     }
   });
 }

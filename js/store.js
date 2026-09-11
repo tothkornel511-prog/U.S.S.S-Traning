@@ -271,6 +271,59 @@ export function resetAllData() {
   seedIfNeeded();
 }
 
+/* ---------- Adatmentés / visszaállítás (fejlesztői eszköz) --------------
+   Mivel minden adat a böngésző localStorage-ában él, ez az egyetlen védelem
+   egy véletlen "böngésző-adatok törlése" vagy géphiba ellen. Csak a rendszer
+   saját (usss_ets előtagú) kulcsait exportálja/importálja. */
+const STORAGE_PREFIX = "usss_ets";
+
+function allOwnKeys() {
+  const keys = [];
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    if (key && key.startsWith(STORAGE_PREFIX)) keys.push(key);
+  }
+  return keys;
+}
+
+export function exportAllData() {
+  const data = {};
+  allOwnKeys().forEach((key) => { data[key] = localStorage.getItem(key); });
+  return { exportedAt: new Date().toISOString(), app: "usss-elite-training", data };
+}
+
+export function importAllData(payload, actorLabel) {
+  if (!payload || typeof payload !== "object" || typeof payload.data !== "object") return false;
+  const entries = Object.entries(payload.data).filter(([key]) => key.startsWith(STORAGE_PREFIX));
+  if (!entries.length) return false;
+  entries.forEach(([key, value]) => localStorage.setItem(key, value));
+  logAudit(actorLabel, "Adat-visszaállítás importból", `${entries.length} kulcs`);
+  return true;
+}
+
+const STORAGE_LABELS = {
+  personnel: "Állomány", access_codes: "Hozzáférési kódok", locations: "Védett helyszínek",
+  districts: "Térkép-körzetek", positions: "Pozíciók", protocols: "Jegyzőkönyvek",
+  audit_log: "Eseménynapló", training_plans: "Kiképzési tervek", recruitment_questions: "Felvételi kérdésbank",
+  applicants: "Jelentkezők", exams: "Felvételi vizsgák", operations: "Command Center rekordok",
+  readiness: "Készültségi állapot", investigations: "Belső vizsgálatok", covert_ops: "Fedett műveletek",
+};
+export function getStorageReport() {
+  const all = allOwnKeys().map((key) => {
+    const value = localStorage.getItem(key) || "";
+    const suffix = key.replace(/^usss_ets(_v\d+)?_/, "");
+    return { key, label: STORAGE_LABELS[suffix], bytes: new Blob([value]).size };
+  });
+  const known = all.filter((i) => i.label);
+  const unknown = all.filter((i) => !i.label);
+  const items = known.sort((a, b) => b.bytes - a.bytes);
+  if (unknown.length) {
+    items.push({ key: "misc", label: `Egyéb rendszerjelzők (${unknown.length} db)`, bytes: unknown.reduce((s, i) => s + i.bytes, 0) });
+  }
+  const total = all.reduce((sum, i) => sum + i.bytes, 0);
+  return { items, total };
+}
+
 /* ---------- Static reference data ------------------------------------ */
 export const ref = { LEVELS, SERVICE_STATUSES, MODULES, LEVEL_MODULE_ORDER, MAPS };
 
