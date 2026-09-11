@@ -1,6 +1,6 @@
 import { getPersonnel, ref, moduleState, moduleByCode, levelLabel } from "../store.js?v=53";
 import { hasRole } from "../auth.js?v=20";
-import { esc, avatarContent } from "../utils.js?v=23";
+import { esc, avatarContent, applyBranding } from "../utils.js?v=23";
 import { navigate } from "../router.js?v=20";
 import { openModuleDetail } from "./profile.js?v=20";
 
@@ -46,6 +46,7 @@ export function renderMatrix(container) {
     <div class="small text-low mt-2">✓ = teljesítve · ✗ = sikertelen / nincs teljesítve · ⏳ = elmélet kész, gyakorlatra vár · E: = elméleti eredmény · ×N = próbálkozások száma. Kattints egy cellára a részletekért.</div>
   `;
 
+  applyBranding(container.querySelector(".page-banner-ops"), "hero-training-single");
   document.getElementById("mx-level").value = filterLevel;
   document.getElementById("mx-module").value = filterModule;
   document.getElementById("mx-level").addEventListener("change", (e) => { filterLevel = e.target.value; draw(); });

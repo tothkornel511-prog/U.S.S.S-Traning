@@ -7,7 +7,7 @@ import {
   CO_STATUSES, CO_CLOSED_STATUSES,
 } from "../store.js?v=53";
 import { hasRole, actorLabel } from "../auth.js?v=20";
-import { esc, fmtDate, fmtDateTime, toast, openModal, closeModal } from "../utils.js?v=22";
+import { esc, fmtDate, fmtDateTime, toast, openModal, closeModal, applyBranding } from "../utils.js?v=23";
 import { navigate } from "../router.js?v=20";
 
 const CLASS_BADGE = { "Bizalmas": "gray", "Titkos": "yellow", "Szigorúan titkos": "red" };
@@ -32,8 +32,7 @@ export function renderCovertOpList(container) {
         <p>Fedőnév, engedélyező, végrehajtók és minősítés nyilvántartásával.</p>
       </div>
     </div>
-    <div class="classification-strip">U.S.S.S. FEDETT MŰVELETEK · SZIGORÚAN TITKOS</div>
-    <p class="text-low small mb-2">Engedélyezett fedett/nyomozási műveletek — fedőnév, engedélyező, végrehajtók és minősítés nyilvántartásával. Csak oktatásvezetői/admin jogosultsággal érhető el.</p>
+    <div class="classification-strip">U.S.S.S. FEDETT MŰVELETEK · SZIGORÚAN TITKOS · CSAK OKTATÁSVEZETŐI/ADMIN HOZZÁFÉRÉS</div>
     <div class="section-head">
       <h2 style="visibility:hidden">.</h2>
       <div class="actions">${canEdit ? `<button class="btn btn-gold" id="new-op">+ Új művelet</button>` : ""}</div>
@@ -65,6 +64,7 @@ export function renderCovertOpList(container) {
   };
   ["op-filter", "op-status-filter", "op-class-filter"].forEach((id) => document.getElementById(id).addEventListener("input", updateRows));
   document.getElementById("new-op")?.addEventListener("click", () => openCovertOpForm());
+  applyBranding(container.querySelector(".page-banner-covert"), "hero-covert");
   updateRows();
 }
 

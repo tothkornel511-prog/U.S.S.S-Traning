@@ -1,6 +1,15 @@
-import { getAccessCodes, upsertAccessCode, revokeAccessCode, generateCode, getAuditLog, getPersonnel, resetAllData, ref, getPositionEntries, addPosition, removePosition, getCustomCss, setCustomCss, getInvestigationCategories, addInvestigationCategory, removeInvestigationCategory, getCovertOpClassifications, addCovertOpClassification, removeCovertOpClassification, exportAllData, importAllData, getStorageReport, SECTIONS } from "../store.js?v=57";
+import { getAccessCodes, upsertAccessCode, revokeAccessCode, generateCode, getAuditLog, getPersonnel, resetAllData, ref, getPositionEntries, addPosition, removePosition, getCustomCss, setCustomCss, getInvestigationCategories, addInvestigationCategory, removeInvestigationCategory, getCovertOpClassifications, addCovertOpClassification, removeCovertOpClassification, exportAllData, importAllData, getStorageReport, SECTIONS, BRANDING_SLOTS, MAX_BRANDING_BYTES, getBrandingUrl, getBrandingOverride, setBrandingOverride, clearBrandingOverride } from "../store.js?v=58";
 import { hasRole, isSuperAdmin, SUPER_ADMIN_ID, actorLabel, ROLES } from "../auth.js?v=21";
-import { esc, fmtDateTime, toast, openModal, closeModal } from "../utils.js?v=22";
+import { esc, fmtDateTime, toast, openModal, closeModal, applyBranding } from "../utils.js?v=23";
+
+function readFileAsDataUrl(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = () => reject(reader.error);
+    reader.readAsDataURL(file);
+  });
+}
 
 function formatBytes(bytes) {
   if (!bytes) return "0 B";
@@ -419,18 +428,7 @@ function renderSystemTab(content) {
   });
 }
 
-const BRANDING_ASSETS = [
-  { file: "hero-command.jpg", label: "Fő háttérkép", usage: "Bejelentkező képernyő, Vezérlőpult fejléc, teljes alkalmazás háttere" },
-  { file: "hero-command-ops.jpg", label: "Parancsnoki Központ hero", usage: "Command Center (Jelentések, Fenyegetésértékelés stb.) oldalak fejléce" },
-  { file: "hero-training.jpg", label: "Kiképzés hero", usage: "Kiképzési tervek oldal fejléce" },
-  { file: "hero-covert.jpg", label: "Fedett műveletek hero", usage: "Fedett Műveletek oldal fejléce" },
-  { file: "strip-ops.jpg", label: "Műveleti fotósáv", usage: "Kiképzési Áttekintés oldal fejléce" },
-  { file: "strip-brand.jpg", label: "Márka-sáv", usage: "Vezérlőpult záró sávja" },
-];
-
 const BRANDING_WISHLIST = [
-  "Belső Vizsgálatok oldal fejléce — pl. akta/dosszié vagy iroda hangulatú fotó",
-  "Felvételi (toborzás) oldal fejléce — pl. eskütétel / kiképzés-avatás jelenet",
   "Valódi Los Santos térkép-kép az assets/maps/ mappába (lásd assets/maps/README.md) — enélkül a Térkép oldal helyőrző felületet mutat",
   "Nagyfelbontású jelvény/pecsét PNG a favicon és a bejelentkező pecsét cseréjéhez (jelenleg egyszerű SVG-rajz)",
   "Néhány semleges, arctalan/egyenruhás 'agent' portré alapértelmezett profilképnek, azok számára, akik nem töltenek fel sajátot",
@@ -461,14 +459,18 @@ function renderDevTab(content) {
 
     <div class="card">
       <div class="card-title mb-1">Márka-képek (branding)</div>
-      <p class="text-mid small mb-2">A rendszerben jelenleg használt fotók, és amikre a felülethez még szükség lenne.</p>
+      <p class="text-mid small mb-2">Bármelyik kép lecserélhető innen — a csere azonnal, kód-push nélkül érvényes lesz mindenkinek. Max. ${formatBytes(MAX_BRANDING_BYTES)}/kép.</p>
       <div class="grid grid-3 mb-2">
-        ${BRANDING_ASSETS.map((a) => `
+        ${BRANDING_SLOTS.map((s) => `
           <div class="loc-card" style="cursor:default">
-            <div class="loc-card-img"><img src="assets/branding/${esc(a.file)}" style="width:100%;height:100%;object-fit:cover" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'loc-card-ic',textContent:'◆'}))"/></div>
+            <div class="loc-card-img"><img src="${esc(getBrandingUrl(s.id))}" style="width:100%;height:100%;object-fit:cover" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'loc-card-ic',textContent:'◆'}))"/></div>
             <div class="loc-card-body">
-              <div class="person-name">${esc(a.label)}</div>
-              <div class="text-low small mt-1">${esc(a.usage)}</div>
+              <div class="person-name">${esc(s.label)}${getBrandingOverride(s.id) ? ` <span class="badge badge-orange" style="font-size:9px; padding:1px 6px; vertical-align:middle">EGYÉNI</span>` : ""}</div>
+              <div class="text-low small mt-1">${esc(s.usage)}</div>
+              <div class="flex gap-1 mt-1">
+                <label class="btn btn-sm" style="cursor:pointer">Csere…<input type="file" class="brand-upload" data-slot="${esc(s.id)}" accept="image/*" style="display:none" /></label>
+                ${getBrandingOverride(s.id) ? `<button class="btn btn-sm" data-brand-reset="${esc(s.id)}">Alapértelmezett</button>` : ""}
+              </div>
             </div>
           </div>`).join("")}
       </div>
@@ -477,6 +479,35 @@ function renderDevTab(content) {
       ${BRANDING_WISHLIST.map((w) => `<div class="history-item"><span>${esc(w)}</span></div>`).join("")}
     </div>
   `;
+
+  content.querySelectorAll(".brand-upload").forEach((input) =>
+    input.addEventListener("change", async (e) => {
+      const slotId = input.getAttribute("data-slot");
+      const file = e.target.files?.[0];
+      e.target.value = "";
+      if (!file) return;
+      if (!file.type.startsWith("image/")) return toast("Csak képfájl tölthető fel.", "warn");
+      if (file.size > MAX_BRANDING_BYTES) return toast(`A kép túl nagy (max. ${formatBytes(MAX_BRANDING_BYTES)}).`, "warn");
+      try {
+        const dataUrl = await readFileAsDataUrl(file);
+        const ok = setBrandingOverride(slotId, dataUrl, actorLabel());
+        if (!ok) return toast("Nem sikerült menteni — megtelt a böngésző helyi tárhelye.", "warn");
+        toast("Márka-kép lecserélve");
+        renderAdmin(document.getElementById("content"));
+        applyBranding(document.body, "hero-main");
+      } catch {
+        toast("Nem sikerült beolvasni a képet.", "warn");
+      }
+    })
+  );
+  content.querySelectorAll("[data-brand-reset]").forEach((b) =>
+    b.addEventListener("click", () => {
+      clearBrandingOverride(b.getAttribute("data-brand-reset"), actorLabel());
+      toast("Visszaállítva az alapértelmezett képre");
+      renderAdmin(document.getElementById("content"));
+      applyBranding(document.body, "hero-main");
+    })
+  );
 
   document.getElementById("dev-export").addEventListener("click", () => {
     const payload = exportAllData();

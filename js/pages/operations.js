@@ -6,7 +6,7 @@ import {
   archiveOperationRecord,
 } from "../store.js?v=53";
 import { actorLabel, hasRole } from "../auth.js?v=20";
-import { esc, fmtDate, toast, openModal, closeModal } from "../utils.js?v=22";
+import { esc, fmtDate, toast, openModal, closeModal, applyBranding } from "../utils.js?v=23";
 import { navigate } from "../router.js?v=20";
 
 const STATUS = ["OPEN", "IN REVIEW", "APPROVED", "REJECTED", "COMPLETED"];
@@ -31,7 +31,7 @@ export function renderOperations(container, type = "reports") {
     </div>
     <div class="classification-strip">U.S.S.S. PARANCSNOKI KÖZPONT · ${esc(meta.label)}</div>
     <div class="command-page-head">
-      <div><div class="eyebrow">MŰVELETI OSZTÁLY / ELLENŐRZÖTT NYILVÁNTARTÁS</div><h2>${esc(meta.label)}</h2><p class="text-low small">Strukturált védelmi nyilvántartás · minden módosítás auditálva.</p></div>
+      <div class="eyebrow">MŰVELETI OSZTÁLY / ELLENŐRZÖTT NYILVÁNTARTÁS</div>
       <div class="operation-head-actions"><button class="btn btn-sm" id="export-operations">JSON export</button><button class="btn btn-sm" id="export-csv">CSV export</button>${canEdit ? `<button class="btn btn-gold" id="new-operation">+ ${esc(meta.singular)}</button>` : ""}</div>
     </div>
     <div class="filters operation-filters">
@@ -64,6 +64,7 @@ export function renderOperations(container, type = "reports") {
   document.getElementById("new-operation")?.addEventListener("click", () => openOperationForm(type, meta));
   document.getElementById("export-operations")?.addEventListener("click", () => exportOperations(records, meta.label));
   document.getElementById("export-csv")?.addEventListener("click", () => exportCsv(records, meta.label));
+  applyBranding(container.querySelector(".page-banner-command"), "hero-command-ops");
   render();
 }
 

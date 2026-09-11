@@ -1,5 +1,5 @@
 import { login } from "../auth.js?v=20";
-import { esc, sealMark } from "../utils.js?v=22";
+import { esc, sealMark, applyBranding } from "../utils.js?v=23";
 
 export function renderLogin(root, onSuccess) {
   root.innerHTML = `
@@ -28,6 +28,8 @@ export function renderLogin(root, onSuccess) {
       </div>
     </div>
   `;
+
+  applyBranding(root.querySelector(".login-screen"), "hero-main");
 
   document.getElementById("login-form").addEventListener("submit", (e) => {
     e.preventDefault();

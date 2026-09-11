@@ -4,7 +4,7 @@ import {
   removeRecruitmentQuestion, getPositions, getExamQuestions,
 } from "../store.js?v=53";
 import { hasRole, actorLabel } from "../auth.js?v=20";
-import { esc, fmtDateTime, toast, openModal, closeModal } from "../utils.js?v=22";
+import { esc, fmtDateTime, toast, openModal, closeModal, applyBranding } from "../utils.js?v=23";
 import { navigate } from "../router.js?v=20";
 import { renderExamList } from "./exam.js?v=22";
 
@@ -21,6 +21,13 @@ export function renderRecruitmentList(container) {
   const applicantQuestions = getRecruitmentQuestions();
 
   container.innerHTML = `
+    <div class="page-banner page-banner-recruitment">
+      <div class="page-banner-body">
+        <div class="eyebrow">ÁLLOMÁNY & KÉPZÉS</div>
+        <h2>Felvételi</h2>
+        <p>Jelentkezők elbírálása, felvételi vizsga és kérdésbank egy helyen.</p>
+      </div>
+    </div>
     <div class="classification-strip">FELVÉTELI ELJÁRÁS · U.S.S.S. TOBORZÁS</div>
     <div class="section-head">
       <h2 style="visibility:hidden">.</h2>
@@ -55,6 +62,7 @@ export function renderRecruitmentList(container) {
   `;
 
   container.querySelectorAll("[data-nav]").forEach((n) => n.addEventListener("click", () => navigate(n.getAttribute("data-nav"))));
+  applyBranding(container.querySelector(".page-banner-recruitment"), "hero-recruitment");
   document.getElementById("new-applicant")?.addEventListener("click", () => openApplicantForm(applicantQuestions));
   document.getElementById("new-question")?.addEventListener("click", () => openQuestionForm());
   container.querySelectorAll("[data-remove-q]").forEach((b) =>

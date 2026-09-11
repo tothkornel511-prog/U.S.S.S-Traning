@@ -4,7 +4,7 @@ import {
   MAX_ATTACHMENT_BYTES, MAX_ATTACHMENTS_PER_PLAN, ALLOWED_ATTACHMENT_EXT,
 } from "../store.js?v=54";
 import { hasRole, actorLabel } from "../auth.js?v=20";
-import { esc, fmtDate, fmtDateTime, toast, openModal, closeModal } from "../utils.js?v=22";
+import { esc, fmtDate, fmtDateTime, toast, openModal, closeModal, applyBranding } from "../utils.js?v=23";
 import { navigate } from "../router.js?v=20";
 import { openProtocolForm } from "./protocols.js?v=22";
 
@@ -71,6 +71,7 @@ export function renderTrainingPlansList(container) {
     </table></div>
   `;
 
+  applyBranding(container.querySelector(".page-banner-training"), "hero-training");
   container.querySelectorAll("[data-nav]").forEach((n) => n.addEventListener("click", () => navigate(n.getAttribute("data-nav"))));
   document.getElementById("new-plan")?.addEventListener("click", () => openPlanForm(allModules));
 }

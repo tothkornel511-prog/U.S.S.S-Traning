@@ -7,7 +7,7 @@ import {
   INVESTIGATION_SEVERITIES, INVESTIGATION_STATUSES, INVESTIGATION_CLOSED_STATUSES, INVESTIGATION_OUTCOMES, INVESTIGATION_ORIGINS,
 } from "../store.js?v=53";
 import { hasRole, actorLabel } from "../auth.js?v=20";
-import { esc, fmtDate, fmtDateTime, toast, openModal, closeModal } from "../utils.js?v=22";
+import { esc, fmtDate, fmtDateTime, toast, openModal, closeModal, applyBranding } from "../utils.js?v=23";
 import { navigate } from "../router.js?v=20";
 
 const SEVERITY_BADGE = { "Alacsony": "gray", "Közepes": "yellow", "Súlyos": "red", "Kritikus": "red" };
@@ -25,8 +25,14 @@ export function renderInvestigationList(container) {
   const investigations = getInvestigations();
 
   container.innerHTML = `
-    <div class="classification-strip">U.S.S.S. BELSŐ VIZSGÁLATI RENDSZER · BIZALMAS</div>
-    <p class="text-low small mb-2">Formális belső vizsgálatok bejelentéstől lezárásig — kivizsgáló kijelölése, megállapítások és szankció rögzítésével. Csak oktatásvezetői/admin jogosultsággal érhető el.</p>
+    <div class="page-banner page-banner-investigations">
+      <div class="page-banner-body">
+        <div class="eyebrow">PARANCSNOKI KÖZPONT</div>
+        <h2>Belső Vizsgálatok</h2>
+        <p>Formális belső vizsgálatok bejelentéstől lezárásig — kivizsgáló, megállapítások, szankció.</p>
+      </div>
+    </div>
+    <div class="classification-strip">U.S.S.S. BELSŐ VIZSGÁLATI RENDSZER · BIZALMAS · CSAK OKTATÁSVEZETŐI/ADMIN HOZZÁFÉRÉS</div>
     <div class="section-head">
       <h2 style="visibility:hidden">.</h2>
       <div class="actions">${canEdit ? `<button class="btn btn-gold" id="new-investigation">+ Új vizsgálat</button>` : ""}</div>
@@ -58,6 +64,7 @@ export function renderInvestigationList(container) {
   };
   ["inv-filter", "inv-status-filter", "inv-severity-filter"].forEach((id) => document.getElementById(id).addEventListener("input", updateRows));
   document.getElementById("new-investigation")?.addEventListener("click", () => openInvestigationForm());
+  applyBranding(container.querySelector(".page-banner-investigations"), "hero-investigations");
   updateRows();
 }
 

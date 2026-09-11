@@ -2,29 +2,30 @@
    U.S.S.S. ELITE TRAINING SYSTEM — APP ENTRY
    ========================================================================== */
 
-import { seedIfNeeded, globalSearch, getCustomCss, getOperationRecords, SECTIONS } from "./store.js?v=57";
+import { seedIfNeeded, globalSearch, getCustomCss, getOperationRecords, SECTIONS } from "./store.js?v=58";
 import { isAuthenticated, currentSession, logout, hasSection, ROLES } from "./auth.js?v=21";
 import { registerRoute, resolve, startRouter, navigate, currentPath } from "./router.js?v=20";
-import { esc, sealMark, closeModal } from "./utils.js?v=22";
-import { renderLogin } from "./pages/login.js?v=22";
-import { renderDashboard } from "./pages/dashboard.js?v=44";
+import { esc, sealMark, closeModal, applyBranding } from "./utils.js?v=23";
+import { renderLogin } from "./pages/login.js?v=23";
+import { renderDashboard } from "./pages/dashboard.js?v=45";
 import { renderPersonnelList } from "./pages/personnel.js?v=22";
 import { renderProfile } from "./pages/profile.js?v=22";
-import { renderMatrix } from "./pages/matrix.js?v=22";
+import { renderMatrix } from "./pages/matrix.js?v=23";
 import { renderProtocolsList, renderProtocolDetail } from "./pages/protocols.js?v=22";
-import { renderTrainingPlansList, renderTrainingPlanDetail } from "./pages/plans.js?v=2";
+import { renderTrainingPlansList, renderTrainingPlanDetail } from "./pages/plans.js?v=3";
 import { renderLocationsList, renderLocationDetail } from "./pages/locations.js?v=22";
 import { renderMapPage } from "./pages/map.js?v=21";
-import { renderRecruitmentHub, renderApplicantDetail } from "./pages/recruitment.js?v=25";
+import { renderRecruitmentHub, renderApplicantDetail } from "./pages/recruitment.js?v=26";
 import { renderExamList, renderExamDetail } from "./pages/exam.js?v=40";
-import { renderAdmin } from "./pages/admin.js?v=26";
-import { renderOperations } from "./pages/operations.js?v=38";
+import { renderAdmin } from "./pages/admin.js?v=27";
+import { renderOperations } from "./pages/operations.js?v=39";
 import { renderReadiness } from "./pages/readiness.js?v=32";
-import { renderInvestigationList, renderInvestigationDetail } from "./pages/investigations.js?v=7";
-import { renderCovertOpList, renderCovertOpDetail } from "./pages/covert-ops.js?v=9";
+import { renderInvestigationList, renderInvestigationDetail } from "./pages/investigations.js?v=8";
+import { renderCovertOpList, renderCovertOpDetail } from "./pages/covert-ops.js?v=10";
 
 seedIfNeeded();
 applyCustomCss();
+applyBranding(document.body, "hero-main");
 
 export function applyCustomCss() {
   let styleEl = document.getElementById("custom-css");

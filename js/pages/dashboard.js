@@ -1,6 +1,6 @@
 import { getPersonnel, getProtocols, getLocations, getOperationRecords, getReadinessState, READINESS_LEVELS, readinessPercent, ref, getExams, examScoreSummary, getExamCategories } from "../store.js?v=55";
 import { hasRole, currentSession, ROLES } from "../auth.js?v=20";
-import { esc, avatarContent, sealMark } from "../utils.js?v=23";
+import { esc, avatarContent, sealMark, applyBranding } from "../utils.js?v=23";
 import { navigate } from "../router.js?v=20";
 
 export function renderDashboard(container) {
@@ -143,6 +143,9 @@ export function renderDashboard(container) {
 
     <div class="brand-strip"><span>U.S.S.S. · Elit Kiképzési és Személyzeti Rendszer</span></div>
   `;
+
+  applyBranding(container.querySelector(".command-hero"), "hero-main");
+  applyBranding(container.querySelector(".brand-strip"), "brand-strip");
 
   container.querySelectorAll("[data-nav]").forEach((n) =>
     n.addEventListener("click", () => navigate(n.getAttribute("data-nav")))

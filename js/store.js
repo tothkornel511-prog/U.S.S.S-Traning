@@ -360,6 +360,45 @@ export const SECTIONS = [
   { id: "admin", label: "Adminisztráció", icon: "⚙", group: "Rendszer" },
 ];
 
+/* ---------- Márka-képek (branding) — admin felületről cserélhető ---------
+   Minden "slot"-hoz van egy alapértelmezett, a repóba mentett kép; az admin
+   ezt felülírhatja localStorage-ba mentett base64 képpel a Fejlesztés fülön.
+   A CSS a --brand-img egyéni tulajdonságot olvassa (var(--brand-img,
+   url(alapértelmezett))), a JS csak akkor állítja be inline stílusként, ha
+   van felülírás — így override nélkül minden a statikus fájlt mutatja. */
+export const MAX_BRANDING_BYTES = 700 * 1024;
+export const BRANDING_SLOTS = [
+  { id: "hero-main", label: "Fő háttérkép", usage: "Bejelentkező képernyő, Vezérlőpult fejléc, teljes alkalmazás háttere", file: "hero-command.jpg" },
+  { id: "hero-command-ops", label: "Parancsnoki Központ hero", usage: "Command Center oldalak fejléce", file: "hero-command-ops.jpg" },
+  { id: "hero-training", label: "Kiképzés hero (tervek)", usage: "Kiképzési tervek oldal fejléce", file: "hero-training.jpg" },
+  { id: "hero-training-single", label: "Kiképzési Áttekintés hero", usage: "Kiképzési Áttekintés oldal fejléce", file: "hero-training-single.jpg" },
+  { id: "hero-covert", label: "Fedett műveletek hero", usage: "Fedett Műveletek oldal fejléce", file: "hero-covert.jpg" },
+  { id: "hero-investigations", label: "Belső Vizsgálatok hero", usage: "Belső Vizsgálatok oldal fejléce", file: "hero-investigations.jpg" },
+  { id: "hero-recruitment", label: "Felvételi hero", usage: "Felvételi oldal fejléce", file: "hero-recruitment.jpg" },
+  { id: "brand-strip", label: "Márka-sáv", usage: "Vezérlőpult záró sávja", file: "strip-brand-2.jpg" },
+];
+function brandingKey(id) {
+  return NS + "branding_" + id;
+}
+export function getBrandingOverride(id) {
+  return read(brandingKey(id), null);
+}
+export function getBrandingUrl(id) {
+  const override = getBrandingOverride(id);
+  if (override) return override;
+  const slot = BRANDING_SLOTS.find((s) => s.id === id);
+  return slot ? `assets/branding/${slot.file}` : "";
+}
+export function setBrandingOverride(id, dataUrl, actorLabel) {
+  if (!write(brandingKey(id), dataUrl)) return false;
+  logAudit(actorLabel, "Márka-kép cserélve", id);
+  return true;
+}
+export function clearBrandingOverride(id, actorLabel) {
+  localStorage.removeItem(brandingKey(id));
+  logAudit(actorLabel, "Márka-kép visszaállítva alapértelmezettre", id);
+}
+
 export function mapById(id) {
   return MAPS.find((m) => m.id === id) || MAPS[0];
 }
