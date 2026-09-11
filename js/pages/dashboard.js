@@ -144,7 +144,7 @@ export function renderDashboard(container) {
     <div class="brand-strip"><span>U.S.S.S. · Elit Kiképzési és Személyzeti Rendszer</span></div>
   `;
 
-  applyBranding(container.querySelector(".command-hero"), "hero-main");
+  applyBranding(container.querySelector(".command-hero"), "hero-dashboard");
   applyBranding(container.querySelector(".brand-strip"), "brand-strip");
 
   container.querySelectorAll("[data-nav]").forEach((n) =>

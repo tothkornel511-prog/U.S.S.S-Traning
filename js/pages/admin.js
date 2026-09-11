@@ -1,4 +1,4 @@
-import { getAccessCodes, upsertAccessCode, revokeAccessCode, generateCode, getAuditLog, getPersonnel, resetAllData, ref, getPositionEntries, addPosition, removePosition, getCustomCss, setCustomCss, getInvestigationCategories, addInvestigationCategory, removeInvestigationCategory, getCovertOpClassifications, addCovertOpClassification, removeCovertOpClassification, exportAllData, importAllData, getStorageReport, SECTIONS, BRANDING_SLOTS, MAX_BRANDING_BYTES, getBrandingUrl, getBrandingOverride, setBrandingOverride, clearBrandingOverride } from "../store.js?v=58";
+import { getAccessCodes, upsertAccessCode, revokeAccessCode, generateCode, getAuditLog, getPersonnel, resetAllData, ref, getPositionEntries, addPosition, removePosition, getCustomCss, setCustomCss, getInvestigationCategories, addInvestigationCategory, removeInvestigationCategory, getCovertOpClassifications, addCovertOpClassification, removeCovertOpClassification, exportAllData, importAllData, getStorageReport, SECTIONS, BRANDING_SLOTS, MAX_BRANDING_BYTES, getBrandingUrl, getBrandingOverride, setBrandingOverride, clearBrandingOverride } from "../store.js?v=59";
 import { hasRole, isSuperAdmin, SUPER_ADMIN_ID, actorLabel, ROLES } from "../auth.js?v=21";
 import { esc, fmtDateTime, toast, openModal, closeModal, applyBranding } from "../utils.js?v=23";
 
@@ -308,15 +308,15 @@ function openAccessForm(personnel, entry) {
       ${owner ? `
       <div class="field"><label>Szobánkénti jogosultságok</label><p class="text-low small">Ez a fiók (${esc(SUPER_ADMIN_ID)}) mindig teljes hozzáféréssel rendelkezik — itt nincs mit beállítani.</p></div>
       ` : `
-      <div class="field">
-        <label>Szobánkénti jogosultságok</label>
+      <div style="margin-bottom:18px;">
+        <div class="section-check-label">Szobánkénti jogosultságok</div>
         <div class="flex gap-1 mb-1"><button type="button" class="btn btn-sm" id="af-select-all">Mind kijelöl</button><button type="button" class="btn btn-sm" id="af-select-none">Mind töröl</button></div>
         <div style="max-height:260px; overflow-y:auto; border:1px solid var(--line-soft); border-radius:var(--radius-sm); padding:10px;">
           ${groups.map((g) => `
             <div class="card-title mb-1 mt-1">${esc(g)}</div>
             ${SECTIONS.filter((s) => s.group === g).map((s) => `
-              <label class="flex items-center gap-1 small text-mid" style="cursor:pointer; padding:3px 0;">
-                <input type="checkbox" class="af-section" value="${esc(s.id)}" ${selectedSections.has(s.id) ? "checked" : ""} /> ${esc(s.label)}
+              <label class="section-check-row">
+                <input type="checkbox" class="af-section" value="${esc(s.id)}" ${selectedSections.has(s.id) ? "checked" : ""} /> <span>${esc(s.label)}</span>
               </label>`).join("")}
           `).join("")}
         </div>

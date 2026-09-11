@@ -368,7 +368,8 @@ export const SECTIONS = [
    van felülírás — így override nélkül minden a statikus fájlt mutatja. */
 export const MAX_BRANDING_BYTES = 700 * 1024;
 export const BRANDING_SLOTS = [
-  { id: "hero-main", label: "Fő háttérkép", usage: "Bejelentkező képernyő, Vezérlőpult fejléc, teljes alkalmazás háttere", file: "hero-command.jpg" },
+  { id: "hero-main", label: "Fő háttérkép", usage: "Bejelentkező képernyő, teljes alkalmazás háttere", file: "hero-command.jpg" },
+  { id: "hero-dashboard", label: "Vezérlőpult hero", usage: "Vezérlőpult fejléc", file: "hero-dashboard.jpg" },
   { id: "hero-command-ops", label: "Parancsnoki Központ hero", usage: "Command Center oldalak fejléce", file: "hero-command-ops.jpg" },
   { id: "hero-training", label: "Kiképzés hero (tervek)", usage: "Kiképzési tervek oldal fejléce", file: "hero-training.jpg" },
   { id: "hero-training-single", label: "Kiképzési Áttekintés hero", usage: "Kiképzési Áttekintés oldal fejléce", file: "hero-training-single.jpg" },

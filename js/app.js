@@ -2,12 +2,12 @@
    U.S.S.S. ELITE TRAINING SYSTEM — APP ENTRY
    ========================================================================== */
 
-import { seedIfNeeded, globalSearch, getCustomCss, getOperationRecords, SECTIONS } from "./store.js?v=58";
+import { seedIfNeeded, globalSearch, getCustomCss, getOperationRecords, SECTIONS } from "./store.js?v=59";
 import { isAuthenticated, currentSession, logout, hasSection, ROLES } from "./auth.js?v=21";
 import { registerRoute, resolve, startRouter, navigate, currentPath } from "./router.js?v=20";
 import { esc, sealMark, closeModal, applyBranding } from "./utils.js?v=23";
 import { renderLogin } from "./pages/login.js?v=23";
-import { renderDashboard } from "./pages/dashboard.js?v=45";
+import { renderDashboard } from "./pages/dashboard.js?v=46";
 import { renderPersonnelList } from "./pages/personnel.js?v=22";
 import { renderProfile } from "./pages/profile.js?v=22";
 import { renderMatrix } from "./pages/matrix.js?v=23";
@@ -17,7 +17,7 @@ import { renderLocationsList, renderLocationDetail } from "./pages/locations.js?
 import { renderMapPage } from "./pages/map.js?v=21";
 import { renderRecruitmentHub, renderApplicantDetail } from "./pages/recruitment.js?v=26";
 import { renderExamList, renderExamDetail } from "./pages/exam.js?v=40";
-import { renderAdmin } from "./pages/admin.js?v=27";
+import { renderAdmin } from "./pages/admin.js?v=28";
 import { renderOperations } from "./pages/operations.js?v=39";
 import { renderReadiness } from "./pages/readiness.js?v=32";
 import { renderInvestigationList, renderInvestigationDetail } from "./pages/investigations.js?v=8";
