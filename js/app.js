@@ -2,25 +2,26 @@
    U.S.S.S. ELITE TRAINING SYSTEM — APP ENTRY
    ========================================================================== */
 
-import { seedIfNeeded, globalSearch, getCustomCss, getOperationRecords } from "./store.js?v=42";
+import { seedIfNeeded, globalSearch, getCustomCss, getOperationRecords } from "./store.js?v=54";
 import { isAuthenticated, currentSession, logout, hasRole, ROLES } from "./auth.js?v=20";
 import { registerRoute, resolve, startRouter, navigate, currentPath } from "./router.js?v=20";
-import { esc, sealMark } from "./utils.js?v=20";
-import { renderLogin } from "./pages/login.js?v=20";
-import { renderDashboard } from "./pages/dashboard.js?v=37";
+import { esc, sealMark, closeModal } from "./utils.js?v=22";
+import { renderLogin } from "./pages/login.js?v=21";
+import { renderDashboard } from "./pages/dashboard.js?v=40";
 import { renderPersonnelList } from "./pages/personnel.js?v=20";
 import { renderProfile } from "./pages/profile.js?v=20";
 import { renderMatrix } from "./pages/matrix.js?v=20";
-import { renderProtocolsList, renderProtocolDetail } from "./pages/protocols.js?v=21";
+import { renderProtocolsList, renderProtocolDetail } from "./pages/protocols.js?v=22";
 import { renderTrainingPlansList, renderTrainingPlanDetail } from "./pages/plans.js?v=1";
-import { renderLocationsList, renderLocationDetail } from "./pages/locations.js?v=20";
-import { renderMapPage } from "./pages/map.js?v=20";
+import { renderLocationsList, renderLocationDetail } from "./pages/locations.js?v=21";
+import { renderMapPage } from "./pages/map.js?v=21";
 import { renderRecruitmentHub, renderApplicantDetail } from "./pages/recruitment.js?v=25";
-import { renderExamList, renderExamDetail } from "./pages/exam.js?v=38";
-import { renderAdmin } from "./pages/admin.js?v=20";
-import { renderOperations } from "./pages/operations.js?v=36";
+import { renderExamList, renderExamDetail } from "./pages/exam.js?v=40";
+import { renderAdmin } from "./pages/admin.js?v=23";
+import { renderOperations } from "./pages/operations.js?v=37";
 import { renderReadiness } from "./pages/readiness.js?v=32";
-import { renderSatcom } from "./pages/satcom.js?v=42";
+import { renderInvestigationList, renderInvestigationDetail } from "./pages/investigations.js?v=7";
+import { renderCovertOpList, renderCovertOpDetail } from "./pages/covert-ops.js?v=8";
 
 seedIfNeeded();
 applyCustomCss();
@@ -50,36 +51,28 @@ const NAV = [
   ]},
   { group: "Objektumok", items: [
     { path: "/locations", label: "Védett helyszínek", icon: "◆" },
-    { path: "/map", label: "Térkép", icon: "🗺" },
+    { path: "/map", label: "Térkép", icon: "⛶" },
   ]},
   { group: "Vezetői irányítás", items: [
     { path: "/readiness", label: "Készültségi rendszer", icon: "◉", minRole: "TRAINING" },
-    { path: "/satcom", label: "Blue Dragon 2 SATCOM", icon: "⌁", minRole: "TRAINING" },
   ]},
   { group: "Parancsnoki Központ", items: [
     { path: "/operations/reports", label: "Jelentések", icon: "▤", minRole: "TRAINING" },
-    { path: "/operations/incidents", label: "Incidensek", icon: "!", minRole: "TRAINING" },
     { path: "/operations/threats", label: "Fenyegetésértékelés", icon: "△", minRole: "TRAINING" },
     { path: "/operations/events", label: "Események", icon: "◈", minRole: "TRAINING" },
     { path: "/operations/assignments", label: "Feladatok", icon: "▣", minRole: "TRAINING" },
     { path: "/operations/protectees", label: "Védett személyek", icon: "◆", minRole: "TRAINING" },
-    { path: "/operations/fleet", label: "Járműflotta", icon: "▰", minRole: "TRAINING" },
     { path: "/operations/escorts", label: "Kísérések", icon: "↗", minRole: "TRAINING" },
     { path: "/operations/advance", label: "Előzetes helyszínfelmérés", icon: "⌖", minRole: "TRAINING" },
     { path: "/operations/protection-levels", label: "Védelmi fokozatok", icon: "◉", minRole: "TRAINING" },
     { path: "/operations/protective-plans", label: "Védelmi tervek", icon: "⬡", minRole: "TRAINING" },
-    { path: "/operations/recommendations", label: "Biztonsági javaslatok", icon: "◇", minRole: "TRAINING" },
     { path: "/operations/intelligence", label: "Védelmi információk", icon: "⌁", minRole: "TRAINING" },
-    { path: "/operations/after-action", label: "Utólagos értékelések", icon: "↻", minRole: "TRAINING" },
-    { path: "/operations/certifications", label: "Minősítések", icon: "✦", minRole: "TRAINING" },
-    { path: "/operations/documents", label: "Dokumentumok", icon: "▧", minRole: "TRAINING" },
-    { path: "/operations/discipline", label: "Fegyelmi ügyek", icon: "⚖", minRole: "TRAINING" },
-    { path: "/operations/recognition", label: "Elismerések", icon: "★", minRole: "TRAINING" },
+    { path: "/investigations", label: "Belső Vizsgálatok", icon: "⚖", minRole: "TRAINING" },
+    { path: "/covert-ops", label: "Fedett Műveletek", icon: "◐", minRole: "TRAINING" },
     { path: "/operations/government", label: "Kormányzati névjegyzék", icon: "⌂", minRole: "TRAINING" },
     { path: "/operations/succession", label: "Elnöki öröklési sorrend", icon: "Ⅰ", minRole: "TRAINING" },
     { path: "/operations/calendar", label: "Naptár", icon: "▦", minRole: "TRAINING" },
     { path: "/operations/notifications", label: "Értesítések", icon: "◌", minRole: "TRAINING" },
-    { path: "/operations/analytics", label: "Elemzések", icon: "▥", minRole: "TRAINING" },
   ]},
   { group: "Rendszer", items: [
     { path: "/admin", label: "Adminisztráció", icon: "⚙", minRole: "TRAINING" },
@@ -94,6 +87,8 @@ function pageTitleFor(path) {
   if (path.startsWith("/exam/")) return { crumb: "Felvételi Vizsga", title: "Vizsga részletei" };
   if (path.startsWith("/locations/")) return { crumb: "Objektumok", title: "Helyszín részletei" };
   if (path.startsWith("/operations/")) return { crumb: "Command Center", title: "Operációs központ" };
+  if (path.startsWith("/investigations/")) return { crumb: "Belső Vizsgálatok", title: "Vizsgálat részletei" };
+  if (path.startsWith("/covert-ops/")) return { crumb: "Fedett Műveletek", title: "Művelet részletei" };
   if (path.startsWith("/map")) return { crumb: "Objektumok", title: "Térkép" };
   const flat = NAV.flatMap((g) => g.items);
   const found = flat.find((i) => i.path === path);
@@ -106,7 +101,7 @@ function renderShell() {
     <div class="app-shell">
       <aside class="sidebar" id="sidebar">
         <div class="brand">
-          <div class="brand-seal">${sealMark(34)}</div>
+          <div class="brand-seal">${sealMark(44)}</div>
           <div>
             <div class="brand-name">U.S.S.S. COMMAND</div>
             <div class="brand-sub">Védelmi Műveletek</div>
@@ -230,8 +225,11 @@ registerRoute("/map", () => renderMapPage(document.getElementById("content")));
 registerRoute("/map/:mapId", (p) => renderMapPage(document.getElementById("content"), p.mapId));
 registerRoute("/admin", () => renderAdmin(document.getElementById("content")));
 registerRoute("/readiness", () => renderReadiness(document.getElementById("content")));
-registerRoute("/satcom", () => renderSatcom(document.getElementById("content")));
 registerRoute("/operations/:type", (p) => renderOperations(document.getElementById("content"), p.type));
+registerRoute("/investigations", () => renderInvestigationList(document.getElementById("content")));
+registerRoute("/investigations/:id", (p) => renderInvestigationDetail(document.getElementById("content"), p.id));
+registerRoute("/covert-ops", () => renderCovertOpList(document.getElementById("content")));
+registerRoute("/covert-ops/:id", (p) => renderCovertOpDetail(document.getElementById("content"), p.id));
 
 function onRouteChange() {
   if (!isAuthenticated()) { boot(); return; }
@@ -260,4 +258,22 @@ function boot() {
 boot();
 window.addEventListener("storage", () => {
   if (isAuthenticated()) onRouteChange();
+});
+
+/* Globális gyorsbillentyűk: "/" a kereséshez, Esc a modál/keresés záráshoz. */
+window.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") {
+    if (document.getElementById("modal-overlay")) { closeModal(); return; }
+    const results = document.getElementById("search-results");
+    if (results && results.style.display !== "none") { results.style.display = "none"; document.getElementById("global-search")?.blur(); }
+    return;
+  }
+  if (e.key !== "/") return;
+  const active = document.activeElement;
+  const typing = active && (active.tagName === "INPUT" || active.tagName === "TEXTAREA" || active.tagName === "SELECT" || active.isContentEditable);
+  if (typing) return;
+  const search = document.getElementById("global-search");
+  if (!search) return;
+  e.preventDefault();
+  search.focus();
 });

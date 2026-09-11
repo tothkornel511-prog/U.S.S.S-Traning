@@ -6,7 +6,7 @@
    Hiányzó térképkép esetén sötét placeholderre esik vissza, hogy a
    pöttyök/címkék attól még szerkeszthetők/megtekinthetők maradjanak.
    ========================================================================== */
-import { esc } from "./utils.js?v=20";
+import { esc } from "./utils.js?v=22";
 
 const DEFAULT_STAGE_W = 1400;
 const DEFAULT_STAGE_H = 1900; // placeholder arány, amíg nincs kép betöltve
@@ -64,14 +64,14 @@ export function createPanZoomMap(container, opts = {}) {
   img.addEventListener("error", () => {
     imgBox.innerHTML = `
       <div class="pz-missing">
-        <div class="pz-missing-ic">🗺️</div>
+        <div class="pz-missing-ic">⛶</div>
         <div>Térképkép hiányzik</div>
         <div class="pz-missing-path">${esc(image || "")}</div>
       </div>`;
     fitToViewport();
   });
   if (image) img.src = image;
-  else imgBox.innerHTML = `<div class="pz-missing"><div class="pz-missing-ic">🗺️</div><div>Nincs kiválasztva térkép</div></div>`;
+  else imgBox.innerHTML = `<div class="pz-missing"><div class="pz-missing-ic">⛶</div><div>Nincs kiválasztva térkép</div></div>`;
 
   function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
 

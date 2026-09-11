@@ -1,6 +1,6 @@
-import { getProtocols, getProtocol, getPersonnel, createProtocol, moduleByCode, allModulesFlat } from "../store.js?v=42";
+import { getProtocols, getProtocol, getPersonnel, createProtocol, moduleByCode, allModulesFlat } from "../store.js?v=54";
 import { hasRole, actorLabel } from "../auth.js?v=20";
-import { esc, fmtDate, fmtDateTime, toast, openModal, closeModal } from "../utils.js?v=20";
+import { esc, fmtDate, fmtDateTime, toast, openModal, closeModal } from "../utils.js?v=22";
 import { navigate } from "../router.js?v=20";
 
 export function renderProtocolsList(container) {

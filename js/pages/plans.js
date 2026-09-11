@@ -2,11 +2,11 @@ import {
   getTrainingPlans, getTrainingPlan, createTrainingPlan, updateTrainingPlan, deleteTrainingPlan,
   linkTrainingPlanProtocol, PLAN_STATUSES, getPersonnel, allModulesFlat, moduleByCode,
   MAX_ATTACHMENT_BYTES, MAX_ATTACHMENTS_PER_PLAN, ALLOWED_ATTACHMENT_EXT,
-} from "../store.js?v=43";
+} from "../store.js?v=54";
 import { hasRole, actorLabel } from "../auth.js?v=20";
-import { esc, fmtDate, fmtDateTime, toast, openModal, closeModal } from "../utils.js?v=20";
+import { esc, fmtDate, fmtDateTime, toast, openModal, closeModal } from "../utils.js?v=22";
 import { navigate } from "../router.js?v=20";
-import { openProtocolForm } from "./protocols.js?v=21";
+import { openProtocolForm } from "./protocols.js?v=22";
 
 const STATUS_BADGE = {
   TERVEZETT: "badge-gray",

@@ -32,6 +32,12 @@ const KEYS = {
   nextExamSeq: NS + "next_exam_seq",
   operations: NS + "operations",
   readiness: NS + "readiness",
+  investigations: NS + "investigations",
+  nextInvestigationSeq: NS + "next_investigation_seq",
+  investigationCategories: NS + "investigation_categories",
+  covertOps: NS + "covert_ops",
+  nextCovertOpSeq: NS + "next_covert_op_seq",
+  covertOpClassifications: NS + "covert_op_classifications",
 };
 
 /* Elméleti vizsgánál ez alatt a százalék alatt a modul nem számít teljesítettnek. */
@@ -118,6 +124,7 @@ export function seedIfNeeded() {
   applyCommandCenterCatalogSeedPatch();
   applyProtecteeScopePatch();
   applyTrainingPlansSeedPatch();
+  applyInvestigationSeedPatch();
 }
 
 /* Célzott seedelés: a Kiképzési tervek (training plans) modul új
@@ -246,6 +253,16 @@ function applyRecruitmentSeedPatch() {
   if (read(KEYS.exams, null) === null) {
     write(KEYS.exams, []);
     write(KEYS.nextExamSeq, 0);
+  }
+}
+
+/* Célzott seedelés: a Belső Vizsgálati Rendszer új localStorage-kulcsokat
+   vezet be, amiket egy már korábban seedelt böngésző még nem ismer — ez a
+   patch pótolja őket, minden mást érintetlenül hagyva. */
+function applyInvestigationSeedPatch() {
+  if (read(KEYS.investigations, null) === null) {
+    write(KEYS.investigations, []);
+    write(KEYS.nextInvestigationSeq, 1);
   }
 }
 
@@ -891,24 +908,15 @@ export const OPERATION_TYPES = {
   escorts: { label: "Kísérések", singular: "Kísérés", icon: "↗" },
   assignments: { label: "Feladatok", singular: "Feladat", icon: "▣" },
   reports: { label: "Jelentések", singular: "Jelentés", icon: "▤" },
-  incidents: { label: "Incidensek", singular: "Incidens", icon: "!" },
   threats: { label: "Fenyegetésértékelés", singular: "Fenyegetés", icon: "△" },
-  recommendations: { label: "Biztonsági javaslatok", singular: "Javaslat", icon: "◇" },
-  fleet: { label: "Járműflotta", singular: "Jármű", icon: "▰" },
   advance: { label: "Advance Work", singular: "Advance", icon: "⌖" },
   "protection-levels": { label: "Védelmi fokozatok", singular: "Védelmi fokozat", icon: "◉" },
   "protective-plans": { label: "Védelmi tervek", singular: "Védelmi terv", icon: "⬡" },
   intelligence: { label: "Védelmi információk", singular: "Védelmi információ", icon: "⌁" },
-  "after-action": { label: "Utólagos értékelések", singular: "Utólagos értékelés", icon: "↻" },
-  certifications: { label: "Minősítések", singular: "Minősítés", icon: "✦" },
-  documents: { label: "Dokumentumok", singular: "Dokumentum", icon: "▧" },
-  discipline: { label: "Fegyelmi ügyek", singular: "Fegyelmi ügy", icon: "⚖" },
-  recognition: { label: "Elismerések", singular: "Elismerés", icon: "★" },
   government: { label: "Kormányzati névjegyzék", singular: "Kormányzati bejegyzés", icon: "⌂" },
   succession: { label: "Elnöki öröklési sorrend", singular: "Öröklési bejegyzés", icon: "Ⅰ" },
   calendar: { label: "Naptár", singular: "Naptári esemény", icon: "▦" },
   notifications: { label: "Értesítések", singular: "Értesítés", icon: "◌" },
-  analytics: { label: "Elemzések", singular: "Elemzés", icon: "▥" },
   settings: { label: "Beállítások", singular: "Beállítás", icon: "⚙" },
 };
 export const PROTECTION_LEVELS = [
@@ -1210,6 +1218,21 @@ export function deleteExam(id, actorLabel) {
   write(KEYS.exams, getExams().filter((e) => e.id !== id));
   logAudit(actorLabel, "Felvételi vizsga törölve", exam ? `${id} — ${exam.candidateName}` : id);
 }
+/* Sikeres vizsga → új személyi profil egy lépésben. A profil a szokásos
+   upsertPerson-on megy át (saját auditbejegyzést kap), az exam rekordon
+   csak a visszahivatkozás (promotedTo) marad, hogy a gomb ne jelenjen
+   meg újra és a vizsgalapról egy kattintással el lehessen jutni a
+   profilhoz. */
+export function promoteExamCandidate(examId, personFields, actorLabel) {
+  const list = getExams();
+  const exam = list.find((e) => e.id === examId);
+  if (!exam) return null;
+  upsertPerson({ modules: {}, notes: `Felvéve a(z) ${examId} felvételi vizsga alapján.`, ...personFields }, actorLabel);
+  exam.promotedTo = personFields.usssId;
+  write(KEYS.exams, list);
+  logAudit(actorLabel, "Jelölt felvéve az állományba", `${exam.id} — ${exam.candidateName} → ${personFields.usssId}`);
+  return getPerson(personFields.usssId);
+}
 
 /* Pontszám, százalék, min. 80% eredmény és minőségi sáv kiszámítása. */
 export function examScoreSummary(exam) {
@@ -1239,6 +1262,447 @@ export function examScoreSummary(exam) {
   });
   const criticalErrors = (exam.answers || []).filter((a) => a.critical).length;
   return { total, max, pct, passed, tier, answered, totalQuestions: EXAM_QUESTIONS.length, categories, criticalErrors };
+}
+
+/* ---------- Belső Vizsgálati Rendszer -------------------------------------
+   Formális belső vizsgálat (nem azonos az általános "Fegyelmi ügy"
+   gyorsjegyzettel) — bejelentéstől a lezárásig végigvezetett ügymenet,
+   saját státuszgéppel, kivizsgálóval, megállapításokkal és szankcióval. */
+const DEFAULT_INVESTIGATION_CATEGORIES = ["Szolgálati mulasztás", "Fegyelemsértés", "Hatalommal való visszaélés", "Etikai vétség", "Biztonsági szabályszegés", "Árulás", "Titoksértés", "Korrupció", "Egyéb"];
+/* A kategórialista adminfelületről bővíthető (nem fix kódba égetett
+   lista) — lásd addInvestigationCategory / removeInvestigationCategory. */
+export function getInvestigationCategories() {
+  return read(KEYS.investigationCategories, DEFAULT_INVESTIGATION_CATEGORIES);
+}
+export function addInvestigationCategory(name, actorLabel) {
+  const trimmed = (name || "").trim();
+  if (!trimmed) return;
+  const list = getInvestigationCategories();
+  if (list.some((c) => c.toLowerCase() === trimmed.toLowerCase())) return;
+  list.push(trimmed);
+  write(KEYS.investigationCategories, list);
+  logAudit(actorLabel, "Vizsgálati kategória hozzáadva", trimmed);
+}
+export function removeInvestigationCategory(name, actorLabel) {
+  write(KEYS.investigationCategories, getInvestigationCategories().filter((c) => c !== name));
+  logAudit(actorLabel, "Vizsgálati kategória törölve", name);
+}
+export const INVESTIGATION_SEVERITIES = ["Alacsony", "Közepes", "Súlyos", "Kritikus"];
+export const INVESTIGATION_STATUSES = ["Bejelentve", "Vizsgálat alatt", "Felfüggesztve", "Lezárva – megalapozott", "Lezárva – nem megalapozott", "Elutasítva"];
+export const INVESTIGATION_CLOSED_STATUSES = ["Lezárva – megalapozott", "Lezárva – nem megalapozott", "Elutasítva"];
+export const INVESTIGATION_OUTCOMES = ["Nincs szankció", "Szóbeli figyelmeztetés", "Írásbeli figyelmeztetés", "Próbaidő / visszaminősítés", "Felfüggesztés", "Elbocsátás"];
+export const INVESTIGATION_ORIGINS = ["Belső kezdeményezés", "Külső panasz"];
+
+function nextInvestigationId() {
+  const seq = Math.max(1, read(KEYS.nextInvestigationSeq, 1));
+  return { id: `BV-${String(seq).padStart(3, "0")}`, seq };
+}
+export function getInvestigations() {
+  return read(KEYS.investigations, []);
+}
+export function getInvestigation(id) {
+  return getInvestigations().find((i) => i.id === id);
+}
+export function createInvestigation(fields, actorLabel) {
+  const { id, seq } = nextInvestigationId();
+  const now = new Date().toISOString();
+  const investigation = {
+    id,
+    subjectUsssId: (fields.subjectUsssId || "").trim(),
+    subjectName: (fields.subjectName || "").trim(),
+    reportedBy: (fields.reportedBy || "").trim(),
+    investigator: (fields.investigator || "").trim(),
+    category: fields.category || getInvestigationCategories()[0],
+    severity: fields.severity || INVESTIGATION_SEVERITIES[0],
+    origin: INVESTIGATION_ORIGINS.includes(fields.origin) ? fields.origin : INVESTIGATION_ORIGINS[0],
+    status: "Bejelentve",
+    confidential: Boolean(fields.confidential),
+    description: (fields.description || "").trim(),
+    findings: "",
+    outcome: "",
+    linkedOps: [],
+    attachments: [],
+    openedAt: now,
+    closedAt: null,
+    createdBy: actorLabel || "Rendszer",
+    createdAt: now,
+    updatedAt: now,
+    history: [{ at: now, by: actorLabel || "Rendszer", action: "Bejelentés rögzítve" }],
+  };
+  const list = getInvestigations();
+  list.unshift(investigation);
+  write(KEYS.investigations, list);
+  write(KEYS.nextInvestigationSeq, seq + 1);
+  logAudit(actorLabel, "Belső vizsgálat indítva", `${id} — ${investigation.subjectName || investigation.subjectUsssId || "ismeretlen érintett"}`);
+  return investigation;
+}
+export function updateInvestigation(id, patch, actorLabel) {
+  const list = getInvestigations();
+  const inv = list.find((i) => i.id === id);
+  if (!inv) return null;
+  const changes = Object.entries(patch).filter(([key, value]) => value !== undefined && inv[key] !== value);
+  changes.forEach(([key, value]) => { inv[key] = value; });
+  if (changes.length) {
+    const fieldLabels = { status: "Státusz", investigator: "Kivizsgáló", description: "Bejelentés leírása", findings: "Megállapítások", severity: "Súlyosság", category: "Kategória", origin: "Eredet", confidential: "Bizalmasság", reportedBy: "Bejelentő", subjectName: "Érintett neve", subjectUsssId: "Érintett azonosítója" };
+    const label = changes.map(([key]) => fieldLabels[key] || key).join(", ");
+    inv.updatedAt = new Date().toISOString();
+    inv.history = inv.history || [];
+    inv.history.push({ at: inv.updatedAt, by: actorLabel || "Rendszer", action: `${label} frissítve` });
+    write(KEYS.investigations, list);
+    logAudit(actorLabel, "Belső vizsgálat frissítve", `${id} — ${label}`);
+  }
+  return inv;
+}
+export function closeInvestigation(id, { status, outcome }, actorLabel) {
+  if (!INVESTIGATION_CLOSED_STATUSES.includes(status)) return null;
+  const list = getInvestigations();
+  const inv = list.find((i) => i.id === id);
+  if (!inv) return null;
+  inv.status = status;
+  inv.outcome = outcome || "";
+  inv.closedAt = new Date().toISOString();
+  inv.updatedAt = inv.closedAt;
+  inv.history = inv.history || [];
+  inv.history.push({ at: inv.closedAt, by: actorLabel || "Rendszer", action: `Vizsgálat lezárva — ${status}${outcome ? ` (${outcome})` : ""}` });
+  write(KEYS.investigations, list);
+  logAudit(actorLabel, "Belső vizsgálat lezárva", `${id} — ${status}${outcome ? ` · ${outcome}` : ""}`);
+  return inv;
+}
+export function reopenInvestigation(id, actorLabel) {
+  const list = getInvestigations();
+  const inv = list.find((i) => i.id === id);
+  if (!inv) return null;
+  inv.status = "Vizsgálat alatt";
+  inv.closedAt = null;
+  inv.updatedAt = new Date().toISOString();
+  inv.history = inv.history || [];
+  inv.history.push({ at: inv.updatedAt, by: actorLabel || "Rendszer", action: "Vizsgálat újranyitva" });
+  write(KEYS.investigations, list);
+  logAudit(actorLabel, "Belső vizsgálat újranyitva", id);
+  return inv;
+}
+export function deleteInvestigation(id, actorLabel) {
+  const inv = getInvestigation(id);
+  write(KEYS.investigations, getInvestigations().filter((i) => i.id !== id));
+  logAudit(actorLabel, "Belső vizsgálat törölve", inv ? `${id} — ${inv.subjectName || inv.subjectUsssId}` : id);
+}
+/* Csatolmányok — a rendszernek nincs szervere, ezért kétféle csatolmány létezik:
+   1) "upload": a fájl ténylegesen feltöltve, Base64-ként a böngésző localStorage-ában tárolva
+      (FileReader.readAsDataURL) — méretkorlátozott, mert a localStorage kvóta böngészőnként ~5-10MB.
+   2) "link": külső helyen (Discord, Drive, Dropbox stb.) elérhető hivatkozás,
+      pont úgy, ahogy a személyi profilkép is URL-ként van tárolva.
+   Kép típusú csatolmányok (mindkét fajta) előnézeti miniatűrként jelennek meg. */
+export const ATTACHMENT_MAX_UPLOAD_BYTES = 3 * 1024 * 1024;
+const IMAGE_EXT_RE = /\.(png|jpe?g|gif|webp|avif|svg|bmp)(\?.*)?$/i;
+export function isImageAttachment(a) {
+  if (!a || !a.url) return false;
+  if (a.url.startsWith("data:image/")) return true;
+  return IMAGE_EXT_RE.test(a.url);
+}
+export function formatFileSize(bytes) {
+  if (!bytes && bytes !== 0) return "";
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+}
+export function addInvestigationAttachment(id, attachment, actorLabel) {
+  const list = getInvestigations();
+  const inv = list.find((i) => i.id === id);
+  if (!inv) return;
+  const label = (attachment.label || "").trim();
+  const url = (attachment.url || "").trim();
+  if (!label || !url) return;
+  inv.attachments = inv.attachments || [];
+  inv.attachments.push({ label, url, kind: attachment.kind === "upload" ? "upload" : "link", size: attachment.size || null });
+  inv.updatedAt = new Date().toISOString();
+  inv.history.push({ at: inv.updatedAt, by: actorLabel || "Rendszer", action: `Csatolmány hozzáadva: ${label}${attachment.kind === "upload" ? " (feltöltve)" : ""}` });
+  write(KEYS.investigations, list);
+  logAudit(actorLabel, "Csatolmány hozzáadva belső vizsgálathoz", `${id} — ${label}`);
+}
+export function removeInvestigationAttachment(id, index, actorLabel) {
+  const list = getInvestigations();
+  const inv = list.find((i) => i.id === id);
+  if (!inv || !inv.attachments || !inv.attachments[index]) return;
+  const removed = inv.attachments[index];
+  inv.attachments.splice(index, 1);
+  inv.updatedAt = new Date().toISOString();
+  inv.history.push({ at: inv.updatedAt, by: actorLabel || "Rendszer", action: `Csatolmány eltávolítva: ${removed.label}` });
+  write(KEYS.investigations, list);
+  logAudit(actorLabel, "Csatolmány eltávolítva belső vizsgálatból", `${id} — ${removed.label}`);
+}
+
+/* ---------- Fedett Műveletek (Covert Operations) --------------------------
+   Engedélyezett, kódnevesített fedett/nyomozási műveletek — ki rendelte el,
+   ki hajtja végre, mi a cél, milyen minősítésű. Külön a Belső Vizsgálati
+   Rendszertől: az nem az USSS saját állományának fegyelmi ügye, hanem
+   kifelé irányuló, proaktív nyomozati/felderítési tevékenység. */
+/* Fedőnév-javaslat a cél/leírás szövege alapján — a rendszernek nincs
+   szervere, ezért nem hívunk külső AI API-t (nyilvános repóban egy
+   beégetett API-kulcs ellopható lenne), hanem helyben, kulcsszó-egyezés
+   alapján választunk tematikusan illő nevet, "Operation "-előtaggal. Ha
+   a leírásban nincs felismerhető téma, valódi, dokumentált történelmi
+   hadműveleti fedőnevekre esik vissza — nem kitalált szavakra. */
+const CODENAME_THEMES = [
+  { keywords: ["korrupció", "megveszteget", "csalás", "sikkasztás", "visszaélés"], pool: ["Ledger", "Backhand", "Greenlight", "Kickback", "Hollow Purse"] },
+  { keywords: ["árulás", "hazaárulás", "kém", "beépített", "informátor"], pool: ["Judas", "Double Cross", "False Flag", "Trojan Horse", "Sleeper"] },
+  { keywords: ["csempész", "fegyver", "drog", "kábítószer"], pool: ["Contraband", "Blacktide", "Iron River", "Smokescreen", "Dead Drop"] },
+  { keywords: ["emberrablás", "túsz", "elrabol"], pool: ["Ransom", "Silent Hostage", "Broken Chain", "Lockdown"] },
+  { keywords: ["terror", "robbant", "bomba"], pool: ["Firebreak", "Trip Wire", "Blast Radius", "Deadline"] },
+  { keywords: ["zsarol", "fenyeget"], pool: ["Coercion", "Pressure Point", "Iron Grip"] },
+  { keywords: ["merénylet", "gyilkos", "likvidál"], pool: ["Nightfall", "Cold Trigger", "Last Rites"] },
+  { keywords: ["hacker", "adatlopás", "kiber", "feltör"], pool: ["Backdoor", "Ghost Wire", "Firewall Breach"] },
+  { keywords: ["pénzmos"], pool: ["Clean Slate", "Laundry Line", "Hollow Vault"] },
+];
+const DEFAULT_CODENAME_POOL = [
+  "Overlord", "Torch", "Market Garden", "Neptune", "Mincemeat", "Fortitude", "Chastise",
+  "Paperclip", "Mongoose", "Ivy Bells", "Eagle Claw", "Just Cause", "Urgent Fury",
+  "Praying Mantis", "Golden Pheasant", "Nimrod", "Desert Shield", "Desert Storm",
+  "Nifty Package", "El Dorado Canyon", "Uphold Democracy", "Cyclone", "Rolling Thunder",
+];
+export function suggestCodename(descriptionText) {
+  const text = (descriptionText || "").toLowerCase();
+  const matched = CODENAME_THEMES.filter((t) => t.keywords.some((k) => text.includes(k)));
+  const pool = matched.length ? matched.flatMap((t) => t.pool) : DEFAULT_CODENAME_POOL;
+  const name = pool[Math.floor(Math.random() * pool.length)];
+  return `Operation ${name}`;
+}
+/* A tárolt fedőnév megjelenítésekor csak akkor teszünk elé "Operation "
+   szót, ha a mentett érték maga még nem tartalmazza — így a régebbi,
+   előtag nélkül mentett rekordok is helyesen jelennek meg, az újak
+   (amik már a javaslatból vagy kézzel "Operation ..."-ként érkeztek)
+   pedig nem duplázódnak. */
+export function formatCodename(codename) {
+  const name = (codename || "").trim();
+  if (!name) return "—";
+  return /^operation\b/i.test(name) ? name : `Operation ${name}`;
+}
+
+const DEFAULT_CO_CLASSIFICATIONS = ["Bizalmas", "Titkos", "Szigorúan titkos"];
+export function getCovertOpClassifications() {
+  return read(KEYS.covertOpClassifications, DEFAULT_CO_CLASSIFICATIONS);
+}
+export function addCovertOpClassification(name, actorLabel) {
+  const trimmed = (name || "").trim();
+  if (!trimmed) return;
+  const list = getCovertOpClassifications();
+  if (list.some((c) => c.toLowerCase() === trimmed.toLowerCase())) return;
+  list.push(trimmed);
+  write(KEYS.covertOpClassifications, list);
+  logAudit(actorLabel, "Fedett műveleti minősítés hozzáadva", trimmed);
+}
+export function removeCovertOpClassification(name, actorLabel) {
+  write(KEYS.covertOpClassifications, getCovertOpClassifications().filter((c) => c !== name));
+  logAudit(actorLabel, "Fedett műveleti minősítés törölve", name);
+}
+
+export const CO_STATUSES = ["Tervezés alatt", "Aktív", "Felfüggesztve", "Lezárva – sikeres", "Lezárva – sikertelen", "Megszakítva"];
+export const CO_CLOSED_STATUSES = ["Lezárva – sikeres", "Lezárva – sikertelen", "Megszakítva"];
+
+function nextCovertOpId() {
+  const seq = Math.max(1, read(KEYS.nextCovertOpSeq, 1));
+  return { id: `OP-${String(seq).padStart(3, "0")}`, seq };
+}
+export function getCovertOps() {
+  return read(KEYS.covertOps, []);
+}
+export function getCovertOp(id) {
+  return getCovertOps().find((o) => o.id === id);
+}
+export function createCovertOp(fields, actorLabel) {
+  const { id, seq } = nextCovertOpId();
+  const now = new Date().toISOString();
+  const op = {
+    id,
+    codename: (fields.codename || "").trim(),
+    objective: (fields.objective || "").trim(),
+    targetSubject: (fields.targetSubject || "").trim(),
+    authorizedBy: (fields.authorizedBy || "").trim(),
+    authorizedByRank: (fields.authorizedByRank || "").trim(),
+    leadOperative: (fields.leadOperative || "").trim(),
+    classification: fields.classification || getCovertOpClassifications()[0],
+    status: "Tervezés alatt",
+    operatives: [],
+    subjects: [],
+    subjectSeq: 0,
+    attachments: [],
+    report: "",
+    startDate: fields.startDate || now.slice(0, 10),
+    endDate: null,
+    createdBy: actorLabel || "Rendszer",
+    createdAt: now,
+    updatedAt: now,
+    history: [{ at: now, by: actorLabel || "Rendszer", action: "Művelet létrehozva" }],
+  };
+  const list = getCovertOps();
+  list.unshift(op);
+  write(KEYS.covertOps, list);
+  write(KEYS.nextCovertOpSeq, seq + 1);
+  logAudit(actorLabel, "Fedett művelet létrehozva", `${id} — Operation ${op.codename}`);
+  return op;
+}
+export function updateCovertOp(id, patch, actorLabel) {
+  const list = getCovertOps();
+  const op = list.find((o) => o.id === id);
+  if (!op) return null;
+  const changes = Object.entries(patch).filter(([key, value]) => value !== undefined && op[key] !== value);
+  changes.forEach(([key, value]) => { op[key] = value; });
+  if (changes.length) {
+    const fieldLabels = { status: "Státusz", objective: "Cél", targetSubject: "Célszemély/szervezet", authorizedBy: "Engedélyező", authorizedByRank: "Engedélyező rangja", leadOperative: "Művelet vezetője", classification: "Minősítés", report: "Jelentés", codename: "Fedőnév" };
+    const label = changes.map(([key]) => fieldLabels[key] || key).join(", ");
+    op.updatedAt = new Date().toISOString();
+    op.history = op.history || [];
+    op.history.push({ at: op.updatedAt, by: actorLabel || "Rendszer", action: `${label} frissítve` });
+    write(KEYS.covertOps, list);
+    logAudit(actorLabel, "Fedett művelet frissítve", `${id} — ${label}`);
+  }
+  return op;
+}
+export function addOperative(opId, operative, actorLabel) {
+  const list = getCovertOps();
+  const op = list.find((o) => o.id === opId);
+  if (!op) return;
+  const name = (operative.name || "").trim();
+  if (!name) return;
+  const codename = (operative.codename || "").trim();
+  op.operatives = op.operatives || [];
+  op.operatives.push({ usssId: (operative.usssId || "").trim(), name, codename });
+  op.updatedAt = new Date().toISOString();
+  op.history.push({ at: op.updatedAt, by: actorLabel || "Rendszer", action: `Végrehajtó hozzáadva: ${name}${codename ? ` — kódnév: ${codename}` : ""}` });
+  write(KEYS.covertOps, list);
+  logAudit(actorLabel, "Végrehajtó hozzáadva fedett művelethez", `${opId} — ${name}`);
+}
+export function removeOperative(opId, index, actorLabel) {
+  const list = getCovertOps();
+  const op = list.find((o) => o.id === opId);
+  if (!op || !op.operatives || !op.operatives[index]) return;
+  const removed = op.operatives[index];
+  op.operatives.splice(index, 1);
+  op.updatedAt = new Date().toISOString();
+  op.history.push({ at: op.updatedAt, by: actorLabel || "Rendszer", action: `Végrehajtó eltávolítva: ${removed.name}` });
+  write(KEYS.covertOps, list);
+  logAudit(actorLabel, "Végrehajtó eltávolítva fedett műveletből", `${opId} — ${removed.name}`);
+}
+/* Gyanúsítottak/célszemélyek NATO-betűzéses jelöléssel (Subject Alpha,
+   Subject Bravo, …) — valós fedett nyomozati gyakorlat, amikor a valódi
+   kilétet (még) nem lehet vagy nem szabad rögzíteni. A jelölés a
+   hozzáadás sorrendjéhez van kötve (subjectSeq), nem a tömbindexhez, így
+   egy korábbi gyanúsított törlése nem nevezi át a többit. */
+const NATO_ALPHABET = ["Alpha", "Bravo", "Charlie", "Delta", "Echo", "Foxtrot", "Golf", "Hotel", "India", "Juliett", "Kilo", "Lima", "Mike", "November", "Oscar", "Papa", "Quebec", "Romeo", "Sierra", "Tango", "Uniform", "Victor", "Whiskey", "X-ray", "Yankee", "Zulu"];
+export function addSubject(opId, { name, notes }, actorLabel) {
+  const list = getCovertOps();
+  const op = list.find((o) => o.id === opId);
+  if (!op) return;
+  const trimmedName = (name || "").trim();
+  if (!trimmedName) return;
+  op.subjects = op.subjects || [];
+  op.subjectSeq = op.subjectSeq || 0;
+  const label = `Subject ${NATO_ALPHABET[op.subjectSeq % NATO_ALPHABET.length]}`;
+  op.subjectSeq += 1;
+  op.subjects.push({ label, name: trimmedName, notes: (notes || "").trim() });
+  op.updatedAt = new Date().toISOString();
+  op.history.push({ at: op.updatedAt, by: actorLabel || "Rendszer", action: `Gyanúsított hozzáadva: ${label} — ${trimmedName}` });
+  write(KEYS.covertOps, list);
+  logAudit(actorLabel, "Gyanúsított hozzáadva fedett művelethez", `${opId} — ${label}: ${trimmedName}`);
+}
+export function removeSubject(opId, index, actorLabel) {
+  const list = getCovertOps();
+  const op = list.find((o) => o.id === opId);
+  if (!op || !op.subjects || !op.subjects[index]) return;
+  const removed = op.subjects[index];
+  op.subjects.splice(index, 1);
+  op.updatedAt = new Date().toISOString();
+  op.history.push({ at: op.updatedAt, by: actorLabel || "Rendszer", action: `Gyanúsított eltávolítva: ${removed.label} — ${removed.name}` });
+  write(KEYS.covertOps, list);
+  logAudit(actorLabel, "Gyanúsított eltávolítva fedett műveletből", `${opId} — ${removed.label}`);
+}
+export function closeCovertOp(id, { status, report }, actorLabel) {
+  if (!CO_CLOSED_STATUSES.includes(status)) return null;
+  const list = getCovertOps();
+  const op = list.find((o) => o.id === id);
+  if (!op) return null;
+  op.status = status;
+  if (report !== undefined) op.report = report;
+  op.endDate = new Date().toISOString().slice(0, 10);
+  op.updatedAt = new Date().toISOString();
+  op.history = op.history || [];
+  op.history.push({ at: op.updatedAt, by: actorLabel || "Rendszer", action: `Művelet lezárva — ${status}` });
+  write(KEYS.covertOps, list);
+  logAudit(actorLabel, "Fedett művelet lezárva", `${id} — ${status}`);
+  return op;
+}
+export function reopenCovertOp(id, actorLabel) {
+  const list = getCovertOps();
+  const op = list.find((o) => o.id === id);
+  if (!op) return null;
+  op.status = "Aktív";
+  op.endDate = null;
+  op.updatedAt = new Date().toISOString();
+  op.history = op.history || [];
+  op.history.push({ at: op.updatedAt, by: actorLabel || "Rendszer", action: "Művelet újranyitva" });
+  write(KEYS.covertOps, list);
+  logAudit(actorLabel, "Fedett művelet újranyitva", id);
+  return op;
+}
+export function deleteCovertOp(id, actorLabel) {
+  const op = getCovertOp(id);
+  write(KEYS.covertOps, getCovertOps().filter((o) => o.id !== id));
+  logAudit(actorLabel, "Fedett művelet törölve", op ? `${id} — Operation ${op.codename}` : id);
+}
+export function addCovertOpAttachment(id, attachment, actorLabel) {
+  const list = getCovertOps();
+  const op = list.find((o) => o.id === id);
+  if (!op) return;
+  const label = (attachment.label || "").trim();
+  const url = (attachment.url || "").trim();
+  if (!label || !url) return;
+  op.attachments = op.attachments || [];
+  op.attachments.push({ label, url, kind: attachment.kind === "upload" ? "upload" : "link", size: attachment.size || null });
+  op.updatedAt = new Date().toISOString();
+  op.history.push({ at: op.updatedAt, by: actorLabel || "Rendszer", action: `Csatolmány hozzáadva: ${label}${attachment.kind === "upload" ? " (feltöltve)" : ""}` });
+  write(KEYS.covertOps, list);
+  logAudit(actorLabel, "Csatolmány hozzáadva fedett művelethez", `${id} — ${label}`);
+}
+export function removeCovertOpAttachment(id, index, actorLabel) {
+  const list = getCovertOps();
+  const op = list.find((o) => o.id === id);
+  if (!op || !op.attachments || !op.attachments[index]) return;
+  const removed = op.attachments[index];
+  op.attachments.splice(index, 1);
+  op.updatedAt = new Date().toISOString();
+  op.history.push({ at: op.updatedAt, by: actorLabel || "Rendszer", action: `Csatolmány eltávolítva: ${removed.label}` });
+  write(KEYS.covertOps, list);
+  logAudit(actorLabel, "Csatolmány eltávolítva fedett műveletből", `${id} — ${removed.label}`);
+}
+
+/* Kereszthivatkozás Belső Vizsgálat ↔ Fedett Művelet között. A kapcsolat
+   csak a vizsgálat oldalán tárolódik (inv.linkedOps), a fedett művelet
+   oldalán egy visszakeresés (getInvestigationsLinkedToOp) mutatja meg —
+   így egyetlen forrásból származik az igazság, nem tud szétcsúszni. */
+export function linkCovertOp(investigationId, opId, actorLabel) {
+  const list = getInvestigations();
+  const inv = list.find((i) => i.id === investigationId);
+  const op = getCovertOp(opId);
+  if (!inv || !op) return;
+  inv.linkedOps = inv.linkedOps || [];
+  if (inv.linkedOps.includes(opId)) return;
+  inv.linkedOps.push(opId);
+  inv.updatedAt = new Date().toISOString();
+  inv.history.push({ at: inv.updatedAt, by: actorLabel || "Rendszer", action: `Fedett művelet hozzárendelve: ${opId} — Operation ${op.codename}` });
+  write(KEYS.investigations, list);
+  logAudit(actorLabel, "Fedett művelet hozzárendelve vizsgálathoz", `${investigationId} ↔ ${opId}`);
+}
+export function unlinkCovertOp(investigationId, opId, actorLabel) {
+  const list = getInvestigations();
+  const inv = list.find((i) => i.id === investigationId);
+  if (!inv) return;
+  inv.linkedOps = (inv.linkedOps || []).filter((id) => id !== opId);
+  inv.updatedAt = new Date().toISOString();
+  inv.history.push({ at: inv.updatedAt, by: actorLabel || "Rendszer", action: `Fedett művelet kapcsolat megszüntetve: ${opId}` });
+  write(KEYS.investigations, list);
+  logAudit(actorLabel, "Fedett művelet kapcsolat megszüntetve", `${investigationId} ↔ ${opId}`);
+}
+export function getInvestigationsLinkedToOp(opId) {
+  return getInvestigations().filter((i) => (i.linkedOps || []).includes(opId));
 }
 
 /* ---------- Global search ------------------------------------------------*/

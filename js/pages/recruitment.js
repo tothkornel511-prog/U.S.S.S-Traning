@@ -2,9 +2,9 @@ import {
   getApplicants, getApplicant, createApplicant, setApplicantStatus, setApplicantNotes,
   deleteApplicant, promoteApplicant, getRecruitmentQuestions, addRecruitmentQuestion,
   removeRecruitmentQuestion, getPositions, getExamQuestions,
-} from "../store.js?v=24";
+} from "../store.js?v=53";
 import { hasRole, actorLabel } from "../auth.js?v=20";
-import { esc, fmtDateTime, toast, openModal, closeModal } from "../utils.js?v=20";
+import { esc, fmtDateTime, toast, openModal, closeModal } from "../utils.js?v=22";
 import { navigate } from "../router.js?v=20";
 import { renderExamList } from "./exam.js?v=22";
 

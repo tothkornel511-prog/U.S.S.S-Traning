@@ -1,6 +1,6 @@
-import { getPersonnel, getProtocols, getLocations, getOperationRecords, getReadinessState, READINESS_LEVELS, readinessPercent, ref } from "../store.js?v=37";
+import { getPersonnel, getProtocols, getLocations, getOperationRecords, getReadinessState, READINESS_LEVELS, readinessPercent, ref, getExams, examScoreSummary, getExamCategories } from "../store.js?v=53";
 import { hasRole } from "../auth.js?v=20";
-import { esc, initials } from "../utils.js?v=20";
+import { esc, initials } from "../utils.js?v=22";
 import { navigate } from "../router.js?v=20";
 
 export function renderDashboard(container) {
@@ -28,27 +28,29 @@ export function renderDashboard(container) {
     .sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0))
     .slice(0, 6);
 
+  const examStats = buildExamStats();
+
   container.innerHTML = `
     <div class="grid grid-3 section">
       <div class="card row-link" data-nav="/personnel">
-        <div class="card-title">👤 Állomány</div>
+        <div class="card-title">☰ Állomány</div>
         <div class="card-value">${personnel.length}</div>
         <div class="card-sub">${active} aktív szolgálatban · ${probationers} próbaidős</div>
       </div>
       <div class="card row-link" data-nav="/protocols">
-        <div class="card-title">📋 Jegyzőkönyvek</div>
+        <div class="card-title">▤ Jegyzőkönyvek</div>
         <div class="card-value">${protocols.length}</div>
         <div class="card-sub">Rögzített oktatás / vizsga dokumentáció</div>
       </div>
       <div class="card row-link" data-nav="/locations">
-        <div class="card-title">🛡️ Védett helyszínek</div>
+        <div class="card-title">◆ Védett helyszínek</div>
         <div class="card-value">${locations.length}</div>
         <div class="card-sub">Nyilvántartott objektum</div>
       </div>
     </div>
 
     <div class="card command-overview section">
-      <div class="flex justify-between items-center mb-1 flex-wrap"><div><div class="eyebrow">EXECUTIVE CONTROL / LIVE STATUS</div><h2>COMMAND OVERVIEW</h2></div><a href="#/operations/incidents" class="btn btn-sm">Operációs központ →</a></div>
+      <div class="flex justify-between items-center mb-1 flex-wrap"><div><div class="eyebrow">EXECUTIVE CONTROL / LIVE STATUS</div><h2>COMMAND OVERVIEW</h2></div><a href="#/operations/reports" class="btn btn-sm">Operációs központ →</a></div>
       <div class="grid grid-3 command-overview-stats">
         <div><span class="card-title">Nyitott rekordok</span><strong>${openOperations.length}</strong><span class="text-low small">Jelentések, feladatok és műveletek</span></div>
         <div><span class="card-title">Kritikus figyelmeztetések</span><strong class="command-alert">${criticalOperations.length}</strong><span class="text-low small">Azonnali vezetői áttekintést igényel</span></div>
@@ -60,7 +62,7 @@ export function renderDashboard(container) {
       </div>
     </div>
 
-    ${criticalOperations.length ? `<div class="card command-alert-panel section"><div class="flex justify-between items-center mb-1"><div><div class="eyebrow">AZONNALI VEZETŐI FIGYELEM</div><h2>Kiemelt kockázatok</h2></div><a href="#/operations/incidents" class="btn btn-sm">Incidensek megnyitása</a></div>${criticalOperations.slice(0, 5).map((record) => `<div class="history-item"><span><strong class="text-hi">${esc(record.title)}</strong><span class="text-low small"> · ${esc(record.id)} · ${esc(record.location || "Helyszín nincs megadva")}</span></span><span class="badge badge-red">${esc(record.priority === "CRITICAL" ? "KRITIKUS" : "MAGAS KOCKÁZAT")}</span></div>`).join("")}</div>` : ""}
+    ${criticalOperations.length ? `<div class="card command-alert-panel section"><div class="flex justify-between items-center mb-1"><div><div class="eyebrow">AZONNALI VEZETŐI FIGYELEM</div><h2>Kiemelt kockázatok</h2></div><a href="#/operations/notifications" class="btn btn-sm">Értesítések megnyitása</a></div>${criticalOperations.slice(0, 5).map((record) => `<div class="history-item"><span><strong class="text-hi">${esc(record.title)}</strong><span class="text-low small"> · ${esc(record.id)} · ${esc(record.location || "Helyszín nincs megadva")}</span></span><span class="badge badge-red">${esc(record.priority === "CRITICAL" ? "KRITIKUS" : "MAGAS KOCKÁZAT")}</span></div>`).join("")}</div>` : ""}
 
     <div class="card command-brief section"><div class="flex justify-between items-center mb-1"><div><div class="eyebrow">AUTOMATIKUS DÖNTÉSTÁMOGATÁS</div><h2>Vezetői helyzetértékelés</h2></div><span class="badge badge-gold">HELYI ELEMZÉS</span></div><p>${esc(commandBrief.summary)}</p><div class="brief-actions">${commandBrief.actions.map((action) => `<div class="brief-action"><span class="brief-index">${action.level}</span><span>${esc(action.text)}</span></div>`).join("")}</div><div class="text-low small mt-1">Az összefoglaló a rendszerben mentett rekordokból készül, külső adatot nem használ.</div></div>
 
@@ -78,6 +80,25 @@ export function renderDashboard(container) {
         ${eligible ? `<a href="#/personnel" class="btn btn-sm mt-2">Megtekintés</a>` : ""}
       </div>
     </div>
+
+    ${examStats.count ? `<div class="card section">
+      <div class="flex justify-between items-center mb-1 flex-wrap">
+        <div><div class="eyebrow">FELVÉTELI VIZSGA TELJESÍTMÉNY</div><h2 style="font-size:18px">Vizsgastatisztika</h2></div>
+        <a href="#/exam" class="btn btn-sm">Felvételi vizsgák →</a>
+      </div>
+      <div class="grid grid-3 mb-2">
+        <div><span class="card-title">Lezárt vizsgák</span><strong class="card-value" style="font-size:22px">${examStats.count}</strong></div>
+        <div><span class="card-title">Sikeres arány</span><strong class="card-value" style="font-size:22px">${examStats.passRate}%</strong></div>
+        <div><span class="card-title">Leggyengébb kategória</span><strong class="card-value" style="font-size:16px; color:${examStats.weakest && examStats.weakest.pct < 70 ? "#f0a29b" : "var(--text-hi)"}">${examStats.weakest ? esc(examStats.weakest.category) : "—"}</strong></div>
+      </div>
+      <div class="text-low small mb-1">Átlagos teljesítmény kategóriánként, az összes lezárt vizsga alapján</div>
+      ${examStats.categories.map((c) => `
+        <div class="mb-1">
+          <div class="flex justify-between small text-mid"><span>${esc(c.category)}</span><span style="font-family:var(--font-mono)">${c.pct.toFixed(0)}%</span></div>
+          <div class="progress mt-1"><div style="width:${c.pct}%; ${c.pct < 60 ? "background:linear-gradient(90deg,#8a3f3a,#d1554a); box-shadow:var(--glow-red)" : c.pct < 80 ? "background:linear-gradient(90deg,#8a713f,#d9a53a); box-shadow:var(--glow-yellow)" : ""}"></div></div>
+        </div>
+      `).join("")}
+    </div>` : ""}
 
     <div class="section">
       <div class="section-head">
@@ -110,6 +131,35 @@ export function renderDashboard(container) {
   container.querySelectorAll("[data-nav]").forEach((n) =>
     n.addEventListener("click", () => navigate(n.getAttribute("data-nav")))
   );
+}
+
+function buildExamStats() {
+  const finished = getExams().filter((e) => e.endedAt);
+  if (!finished.length) return { count: 0, passRate: 0, categories: [], weakest: null };
+  const totals = {};
+  let passed = 0;
+  finished.forEach((exam) => {
+    const summary = examScoreSummary(exam);
+    if (summary.passed) passed++;
+    summary.categories.forEach((c) => {
+      if (!totals[c.category]) totals[c.category] = { total: 0, max: 0 };
+      totals[c.category].total += c.total;
+      totals[c.category].max += c.max;
+    });
+  });
+  const categories = getExamCategories()
+    .map((category) => {
+      const t = totals[category];
+      return t && t.max ? { category, pct: (t.total / t.max) * 100 } : null;
+    })
+    .filter(Boolean);
+  const weakest = categories.length ? categories.reduce((a, b) => (a.pct <= b.pct ? a : b)) : null;
+  return {
+    count: finished.length,
+    passRate: Math.round((passed / finished.length) * 100),
+    categories,
+    weakest,
+  };
 }
 
 function buildCommandBrief(readiness, openOperations, criticalOperations, activeProtectees) {

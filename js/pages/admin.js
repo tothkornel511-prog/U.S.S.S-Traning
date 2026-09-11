@@ -1,12 +1,12 @@
-import { getAccessCodes, upsertAccessCode, revokeAccessCode, generateCode, getAuditLog, getPersonnel, resetAllData, ref, getPositionEntries, addPosition, removePosition, getCustomCss, setCustomCss } from "../store.js?v=20";
+import { getAccessCodes, upsertAccessCode, revokeAccessCode, generateCode, getAuditLog, getPersonnel, resetAllData, ref, getPositionEntries, addPosition, removePosition, getCustomCss, setCustomCss, getInvestigationCategories, addInvestigationCategory, removeInvestigationCategory, getCovertOpClassifications, addCovertOpClassification, removeCovertOpClassification } from "../store.js?v=53";
 import { hasRole, actorLabel, ROLES } from "../auth.js?v=20";
-import { esc, fmtDateTime, toast, openModal, closeModal } from "../utils.js?v=20";
+import { esc, fmtDateTime, toast, openModal, closeModal } from "../utils.js?v=22";
 
 let activeTab = "access";
 
 export function renderAdmin(container) {
   if (!hasRole("TRAINING")) {
-    container.innerHTML = `<div class="denied"><div class="ic">⛔</div><h3>Hozzáférés megtagadva</h3><p class="text-low">Ehhez az oldalhoz Oktatásvezetői vagy Admin jogosultság szükséges.</p></div>`;
+    container.innerHTML = `<div class="denied"><div class="ic">⚠</div><h3>Hozzáférés megtagadva</h3><p class="text-low">Ehhez az oldalhoz Oktatásvezetői vagy Admin jogosultság szükséges.</p></div>`;
     return;
   }
   const isAdmin = hasRole("ADMIN");
@@ -15,6 +15,8 @@ export function renderAdmin(container) {
     <div class="tabs">
       <button class="tab-btn ${activeTab === "access" ? "active" : ""}" data-tab="access">Hozzáférések</button>
       <button class="tab-btn ${activeTab === "positions" ? "active" : ""}" data-tab="positions">Pozíciók</button>
+      <button class="tab-btn ${activeTab === "inv-categories" ? "active" : ""}" data-tab="inv-categories">Vizsgálati kategóriák</button>
+      <button class="tab-btn ${activeTab === "op-classifications" ? "active" : ""}" data-tab="op-classifications">Műveleti minősítések</button>
       <button class="tab-btn ${activeTab === "audit" ? "active" : ""}" data-tab="audit">Eseménynapló</button>
       ${isAdmin ? `<button class="tab-btn ${activeTab === "system" ? "active" : ""}" data-tab="system">Rendszerbeállítások</button>` : ""}
     </div>
@@ -28,6 +30,8 @@ export function renderAdmin(container) {
   const content = document.getElementById("admin-tab-content");
   if (activeTab === "access") renderAccessTab(content, isAdmin);
   else if (activeTab === "positions") renderPositionsTab(content, isAdmin);
+  else if (activeTab === "inv-categories") renderInvestigationCategoriesTab(content, isAdmin);
+  else if (activeTab === "op-classifications") renderOpClassificationsTab(content, isAdmin);
   else if (activeTab === "audit") renderAuditTab(content);
   else if (activeTab === "system") renderSystemTab(content);
 }
@@ -98,6 +102,112 @@ function openPositionForm(existingGroups) {
     if (!name || !group) return;
     addPosition(name, group, actorLabel());
     toast("Pozíció hozzáadva");
+    closeModal();
+    renderAdmin(document.getElementById("content"));
+  });
+}
+
+function renderInvestigationCategoriesTab(content, isAdmin) {
+  const categories = getInvestigationCategories();
+
+  content.innerHTML = `
+    <div class="section-head">
+      <h2 style="font-size:15px">Belső vizsgálati kategóriák</h2>
+      ${isAdmin ? `<button class="btn btn-gold btn-sm" id="new-inv-category">+ Új kategória</button>` : ""}
+    </div>
+    <p class="text-low small mb-2">Ezek jelennek meg a Belső Vizsgálatok modul "Kategória" mezőjében. Új kategória felvételéhez nincs szükség kódmódosításra.</p>
+    ${categories.map((c) => `
+      <div class="history-item">
+        <span>${esc(c)}</span>
+        ${isAdmin ? `<button class="btn btn-sm btn-danger" data-remove-cat="${esc(c)}">×</button>` : ""}
+      </div>`).join("") || `<div class="text-low small">Nincs rögzített kategória.</div>`}
+  `;
+
+  if (isAdmin) {
+    document.getElementById("new-inv-category").addEventListener("click", () => openInvestigationCategoryForm());
+    content.querySelectorAll("[data-remove-cat]").forEach((b) =>
+      b.addEventListener("click", () => {
+        const name = b.getAttribute("data-remove-cat");
+        if (confirm(`Törli a(z) "${name}" kategóriát a listából?`)) {
+          removeInvestigationCategory(name, actorLabel());
+          toast("Kategória törölve");
+          renderAdmin(document.getElementById("content"));
+        }
+      })
+    );
+  }
+}
+
+function openInvestigationCategoryForm() {
+  openModal(`
+    <div class="modal-head"><h3>Új vizsgálati kategória</h3><button class="modal-close" data-close-modal>×</button></div>
+    <form id="inv-category-form">
+      <div class="field"><label>Kategória neve</label><input required id="cf-name" autofocus placeholder="pl. Árulás" /></div>
+      <div class="flex justify-between mt-2">
+        <button type="button" class="btn" data-close-modal>Mégse</button>
+        <button type="submit" class="btn btn-gold">Mentés</button>
+      </div>
+    </form>
+  `);
+  document.getElementById("inv-category-form").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const name = document.getElementById("cf-name").value.trim();
+    if (!name) return;
+    addInvestigationCategory(name, actorLabel());
+    toast("Kategória hozzáadva");
+    closeModal();
+    renderAdmin(document.getElementById("content"));
+  });
+}
+
+function renderOpClassificationsTab(content, isAdmin) {
+  const classifications = getCovertOpClassifications();
+
+  content.innerHTML = `
+    <div class="section-head">
+      <h2 style="font-size:15px">Fedett műveleti minősítések</h2>
+      ${isAdmin ? `<button class="btn btn-gold btn-sm" id="new-op-class">+ Új minősítés</button>` : ""}
+    </div>
+    <p class="text-low small mb-2">Ezek jelennek meg a Fedett Műveletek modul "Minősítés" mezőjében. Új szint felvételéhez nincs szükség kódmódosításra.</p>
+    ${classifications.map((c) => `
+      <div class="history-item">
+        <span>${esc(c)}</span>
+        ${isAdmin ? `<button class="btn btn-sm btn-danger" data-remove-op-class="${esc(c)}">×</button>` : ""}
+      </div>`).join("") || `<div class="text-low small">Nincs rögzített minősítés.</div>`}
+  `;
+
+  if (isAdmin) {
+    document.getElementById("new-op-class").addEventListener("click", () => openOpClassificationForm());
+    content.querySelectorAll("[data-remove-op-class]").forEach((b) =>
+      b.addEventListener("click", () => {
+        const name = b.getAttribute("data-remove-op-class");
+        if (confirm(`Törli a(z) "${name}" minősítést a listából?`)) {
+          removeCovertOpClassification(name, actorLabel());
+          toast("Minősítés törölve");
+          renderAdmin(document.getElementById("content"));
+        }
+      })
+    );
+  }
+}
+
+function openOpClassificationForm() {
+  openModal(`
+    <div class="modal-head"><h3>Új fedett műveleti minősítés</h3><button class="modal-close" data-close-modal>×</button></div>
+    <form id="op-class-form">
+      <div class="field"><label>Minősítés neve</label><input required id="ocf-name" autofocus placeholder="pl. Kizárólag vezetői betekintés" /></div>
+      <div class="flex justify-between mt-2">
+        <button type="button" class="btn" data-close-modal>Mégse</button>
+        <button type="submit" class="btn btn-gold">Mentés</button>
+      </div>
+    </form>
+  `);
+  document.getElementById("op-class-form").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const name = document.getElementById("ocf-name").value.trim();
+    if (!name) return;
+    addCovertOpClassification(name, actorLabel());
+    toast("Minősítés hozzáadva");
     closeModal();
     renderAdmin(document.getElementById("content"));
   });
