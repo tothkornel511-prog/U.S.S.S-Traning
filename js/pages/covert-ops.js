@@ -25,6 +25,13 @@ export function renderCovertOpList(container) {
   const ops = getCovertOps();
 
   container.innerHTML = `
+    <div class="page-banner page-banner-covert">
+      <div class="page-banner-body">
+        <div class="eyebrow">PARANCSNOKI KÖZPONT</div>
+        <h2>Fedett Műveletek</h2>
+        <p>Fedőnév, engedélyező, végrehajtók és minősítés nyilvántartásával.</p>
+      </div>
+    </div>
     <div class="classification-strip">U.S.S.S. FEDETT MŰVELETEK · SZIGORÚAN TITKOS</div>
     <p class="text-low small mb-2">Engedélyezett fedett/nyomozási műveletek — fedőnév, engedélyező, végrehajtók és minősítés nyilvántartásával. Csak oktatásvezetői/admin jogosultsággal érhető el.</p>
     <div class="section-head">

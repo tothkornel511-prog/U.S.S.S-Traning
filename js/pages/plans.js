@@ -42,6 +42,13 @@ export function renderTrainingPlansList(container) {
   const plans = getTrainingPlans();
 
   container.innerHTML = `
+    <div class="page-banner page-banner-training">
+      <div class="page-banner-body">
+        <div class="eyebrow">ÁLLOMÁNY & KÉPZÉS</div>
+        <h2>Kiképzési tervek</h2>
+        <p>Jövőbeli oktatások és vizsgák előzetes megtervezése — cél, résztvevők, oktató, dátum.</p>
+      </div>
+    </div>
     <div class="section-head">
       <h2 style="visibility:hidden">.</h2>
       <div class="actions">${canEdit ? `<button class="btn btn-gold" id="new-plan">+ Új kiképzési terv</button>` : ""}</div>

@@ -12,7 +12,7 @@ import { renderPersonnelList } from "./pages/personnel.js?v=21";
 import { renderProfile } from "./pages/profile.js?v=21";
 import { renderMatrix } from "./pages/matrix.js?v=20";
 import { renderProtocolsList, renderProtocolDetail } from "./pages/protocols.js?v=22";
-import { renderTrainingPlansList, renderTrainingPlanDetail } from "./pages/plans.js?v=1";
+import { renderTrainingPlansList, renderTrainingPlanDetail } from "./pages/plans.js?v=2";
 import { renderLocationsList, renderLocationDetail } from "./pages/locations.js?v=21";
 import { renderMapPage } from "./pages/map.js?v=21";
 import { renderRecruitmentHub, renderApplicantDetail } from "./pages/recruitment.js?v=25";
@@ -21,7 +21,7 @@ import { renderAdmin } from "./pages/admin.js?v=23";
 import { renderOperations } from "./pages/operations.js?v=37";
 import { renderReadiness } from "./pages/readiness.js?v=32";
 import { renderInvestigationList, renderInvestigationDetail } from "./pages/investigations.js?v=7";
-import { renderCovertOpList, renderCovertOpDetail } from "./pages/covert-ops.js?v=8";
+import { renderCovertOpList, renderCovertOpDetail } from "./pages/covert-ops.js?v=9";
 
 seedIfNeeded();
 applyCustomCss();
