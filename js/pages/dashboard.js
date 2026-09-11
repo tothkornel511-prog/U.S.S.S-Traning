@@ -140,6 +140,8 @@ export function renderDashboard(container) {
     </div>
 
     ${!hasRole("TRAINING") ? `<div class="text-low small">Megtekintési jogosultsággal rendelkezik. Módosításokhoz Oktatásvezetői vagy Admin jogosultság szükséges.</div>` : ""}
+
+    <div class="brand-strip"><span>U.S.S.S. · Elit Kiképzési és Személyzeti Rendszer</span></div>
   `;
 
   container.querySelectorAll("[data-nav]").forEach((n) =>

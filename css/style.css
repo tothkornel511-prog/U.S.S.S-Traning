@@ -819,6 +819,23 @@ details.card[open] > summary::after { content: "−"; }
 .page-banner-body p { color: var(--text-mid); font-size: 12.5px; margin-top: 6px; max-width: 520px; }
 .page-banner-training { background-image: linear-gradient(100deg, rgba(6,7,10,0.92) 30%, rgba(6,7,10,0.45) 90%), url("../assets/branding/hero-training.jpg"); background-position: center 18%; }
 .page-banner-covert { background-image: linear-gradient(100deg, rgba(6,7,10,0.92) 30%, rgba(6,7,10,0.45) 90%), url("../assets/branding/hero-covert.jpg"); background-position: center 38%; }
+.page-banner-ops { background-image: linear-gradient(100deg, rgba(6,7,10,0.85) 24%, rgba(6,7,10,0.4) 90%), url("../assets/branding/strip-ops.jpg"); background-position: center; }
+
+/* Slim photographic brand strip — decorative closer for the dashboard */
+.brand-strip {
+  position: relative; overflow: hidden; border-radius: var(--radius-lg);
+  border: 1px solid rgba(198,166,100,0.25);
+  height: 90px; margin-top: 8px;
+  background-image: linear-gradient(rgba(6,7,10,0.3), rgba(6,7,10,0.5)), url("../assets/branding/strip-brand.jpg");
+  background-size: cover; background-position: center;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: var(--bevel), 0 14px 34px rgba(0,0,0,.3);
+}
+.brand-strip span {
+  font: 10px var(--font-mono); letter-spacing: .22em; text-transform: uppercase; color: var(--gold-bright);
+  text-shadow: 0 2px 10px rgba(0,0,0,.8); background: rgba(6,7,10,.55);
+  padding: 7px 18px; border: 1px solid rgba(198,166,100,.4); border-radius: 999px;
+}
 
 /* Command Center operational records */
 .command-page-head { display:flex; align-items:flex-end; justify-content:space-between; gap:20px; margin: 8px 0 22px; padding: 20px 22px; border:1px solid rgba(198,166,100,.24); border-left:3px solid var(--gold); background:linear-gradient(110deg, rgba(198,166,100,.1), rgba(18,20,27,.48) 42%, rgba(8,9,12,.3)); box-shadow:0 18px 40px rgba(0,0,0,.2); }

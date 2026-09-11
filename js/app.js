@@ -7,10 +7,10 @@ import { isAuthenticated, currentSession, logout, hasRole, ROLES } from "./auth.
 import { registerRoute, resolve, startRouter, navigate, currentPath } from "./router.js?v=20";
 import { esc, sealMark, closeModal } from "./utils.js?v=22";
 import { renderLogin } from "./pages/login.js?v=22";
-import { renderDashboard } from "./pages/dashboard.js?v=42";
+import { renderDashboard } from "./pages/dashboard.js?v=43";
 import { renderPersonnelList } from "./pages/personnel.js?v=21";
 import { renderProfile } from "./pages/profile.js?v=21";
-import { renderMatrix } from "./pages/matrix.js?v=20";
+import { renderMatrix } from "./pages/matrix.js?v=21";
 import { renderProtocolsList, renderProtocolDetail } from "./pages/protocols.js?v=22";
 import { renderTrainingPlansList, renderTrainingPlanDetail } from "./pages/plans.js?v=2";
 import { renderLocationsList, renderLocationDetail } from "./pages/locations.js?v=21";

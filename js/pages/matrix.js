@@ -29,6 +29,13 @@ export function renderMatrix(container) {
   const allModules = [...new Map(allGroups.flatMap((g) => g.codes).map((c) => [c, moduleByCode(c)])).keys()];
 
   container.innerHTML = `
+    <div class="page-banner page-banner-ops">
+      <div class="page-banner-body">
+        <div class="eyebrow">ÁLLOMÁNY & KÉPZÉS</div>
+        <h2>Kiképzési áttekintés</h2>
+        <p>Minden személy × minden modul — színkódolt állapot egy pillantásra.</p>
+      </div>
+    </div>
     <div class="filters">
       <select id="mx-level"><option value="">Minden szint</option>${ref.LEVELS.map((l) => `<option value="${l.id}">${esc(l.label)}</option>`).join("")}${ref.LEVEL_MODULE_ORDER.SPEC.map((c) => `<option value="${c}">${esc(moduleByCode(c).name)}</option>`).join("")}</select>
       <select id="mx-module"><option value="">Minden modul</option>${allModules.map((c) => `<option value="${c}">${c} — ${esc(moduleByCode(c).name)}</option>`).join("")}</select>
