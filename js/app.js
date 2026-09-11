@@ -2,8 +2,8 @@
    U.S.S.S. ELITE TRAINING SYSTEM — APP ENTRY
    ========================================================================== */
 
-import { seedIfNeeded, globalSearch, getCustomCss, getOperationRecords } from "./store.js?v=55";
-import { isAuthenticated, currentSession, logout, hasRole, ROLES } from "./auth.js?v=20";
+import { seedIfNeeded, globalSearch, getCustomCss, getOperationRecords, SECTIONS } from "./store.js?v=57";
+import { isAuthenticated, currentSession, logout, hasSection, ROLES } from "./auth.js?v=21";
 import { registerRoute, resolve, startRouter, navigate, currentPath } from "./router.js?v=20";
 import { esc, sealMark, closeModal } from "./utils.js?v=22";
 import { renderLogin } from "./pages/login.js?v=22";
@@ -17,8 +17,8 @@ import { renderLocationsList, renderLocationDetail } from "./pages/locations.js?
 import { renderMapPage } from "./pages/map.js?v=21";
 import { renderRecruitmentHub, renderApplicantDetail } from "./pages/recruitment.js?v=25";
 import { renderExamList, renderExamDetail } from "./pages/exam.js?v=40";
-import { renderAdmin } from "./pages/admin.js?v=24";
-import { renderOperations } from "./pages/operations.js?v=37";
+import { renderAdmin } from "./pages/admin.js?v=26";
+import { renderOperations } from "./pages/operations.js?v=38";
 import { renderReadiness } from "./pages/readiness.js?v=32";
 import { renderInvestigationList, renderInvestigationDetail } from "./pages/investigations.js?v=7";
 import { renderCovertOpList, renderCovertOpDetail } from "./pages/covert-ops.js?v=9";
@@ -38,46 +38,16 @@ export function applyCustomCss() {
 
 const root = document.getElementById("root");
 
-const NAV = [
-  { group: "Áttekintés", items: [
-    { path: "/dashboard", label: "Vezérlőpult", icon: "◈" },
-  ]},
-  { group: "Állomány & Képzés", items: [
-    { path: "/personnel", label: "Állomány", icon: "☰" },
-    { path: "/matrix", label: "Kiképzési Áttekintés", icon: "▦" },
-    { path: "/plans", label: "Kiképzési tervek", icon: "✎" },
-    { path: "/protocols", label: "Jegyzőkönyvek", icon: "▤" },
-    { path: "/recruitment", label: "Felvételi", icon: "✎" },
-  ]},
-  { group: "Objektumok", items: [
-    { path: "/locations", label: "Védett helyszínek", icon: "◆" },
-    { path: "/map", label: "Térkép", icon: "⛶" },
-  ]},
-  { group: "Vezetői irányítás", items: [
-    { path: "/readiness", label: "Készültségi rendszer", icon: "◉", minRole: "TRAINING" },
-  ]},
-  { group: "Parancsnoki Központ", items: [
-    { path: "/operations/reports", label: "Jelentések", icon: "▤", minRole: "TRAINING" },
-    { path: "/operations/threats", label: "Fenyegetésértékelés", icon: "△", minRole: "TRAINING" },
-    { path: "/operations/events", label: "Események", icon: "◈", minRole: "TRAINING" },
-    { path: "/operations/assignments", label: "Feladatok", icon: "▣", minRole: "TRAINING" },
-    { path: "/operations/protectees", label: "Védett személyek", icon: "◆", minRole: "TRAINING" },
-    { path: "/operations/escorts", label: "Kísérések", icon: "↗", minRole: "TRAINING" },
-    { path: "/operations/advance", label: "Előzetes helyszínfelmérés", icon: "⌖", minRole: "TRAINING" },
-    { path: "/operations/protection-levels", label: "Védelmi fokozatok", icon: "◉", minRole: "TRAINING" },
-    { path: "/operations/protective-plans", label: "Védelmi tervek", icon: "⬡", minRole: "TRAINING" },
-    { path: "/operations/intelligence", label: "Védelmi információk", icon: "⌁", minRole: "TRAINING" },
-    { path: "/investigations", label: "Belső Vizsgálatok", icon: "⚖", minRole: "TRAINING" },
-    { path: "/covert-ops", label: "Fedett Műveletek", icon: "◐", minRole: "TRAINING" },
-    { path: "/operations/government", label: "Kormányzati névjegyzék", icon: "⌂", minRole: "TRAINING" },
-    { path: "/operations/succession", label: "Elnöki öröklési sorrend", icon: "Ⅰ", minRole: "TRAINING" },
-    { path: "/operations/calendar", label: "Naptár", icon: "▦", minRole: "TRAINING" },
-    { path: "/operations/notifications", label: "Értesítések", icon: "◌", minRole: "TRAINING" },
-  ]},
-  { group: "Rendszer", items: [
-    { path: "/admin", label: "Adminisztráció", icon: "⚙", minRole: "TRAINING" },
-  ]},
-];
+/* A NAV a SECTIONS katalógusból épül fel (lásd store.js) — így a menü, a
+   route-védelem és az admin jogosultság-kezelő űrlap sosem futhat szét. */
+const NAV = Object.values(
+  SECTIONS.reduce((groups, s) => {
+    (groups[s.group] ||= { group: s.group, items: [] }).items.push({
+      path: "/" + s.id, label: s.label, icon: s.icon, section: s.id,
+    });
+    return groups;
+  }, {})
+);
 
 function pageTitleFor(path) {
   if (path.startsWith("/personnel/")) return { crumb: "Állomány", title: "Személyi profil" };
@@ -198,7 +168,7 @@ function renderNav() {
   const path = currentPath();
   const alertCount = getOperationRecords().filter((record) => !record.archived && record.status !== "COMPLETED" && (record.priority === "CRITICAL" || record.priority === "HIGH" || record.risk === "CRITICAL")).length;
   navRoot.innerHTML = NAV.map((group) => {
-    const items = group.items.filter((i) => !i.minRole || hasRole(i.minRole));
+    const items = group.items.filter((i) => hasSection(i.section));
     if (!items.length) return "";
     return `
       <div class="nav-group">
@@ -236,6 +206,16 @@ registerRoute("/investigations/:id", (p) => renderInvestigationDetail(document.g
 registerRoute("/covert-ops", () => renderCovertOpList(document.getElementById("content")));
 registerRoute("/covert-ops/:id", (p) => renderCovertOpDetail(document.getElementById("content"), p.id));
 
+/* Az útvonal első (operations esetén első két) szegmenséből számolja ki,
+   melyik "szoba" felel meg neki — ugyanaz az id, mint a SECTIONS-ban. */
+function sectionForPath(path) {
+  const clean = path.replace(/^\//, "");
+  const first = clean.split("/")[0];
+  if (first === "operations") return clean.split("/").slice(0, 2).join("/");
+  if (first === "exam") return "recruitment";
+  return first;
+}
+
 function onRouteChange() {
   if (!isAuthenticated()) { boot(); return; }
   document.getElementById("sidebar")?.classList.remove("open");
@@ -247,6 +227,10 @@ function onRouteChange() {
   document.getElementById("page-title").textContent = title;
   renderNav();
   if (!match) { navigate("/dashboard"); return; }
+  if (!hasSection(sectionForPath(currentPath()))) {
+    content.innerHTML = `<div class="denied"><div class="ic">⚠</div><h3>Hozzáférés megtagadva</h3><p class="text-low">Ehhez a részhez nincs jogosultságod. Kérj hozzáférést egy adminisztrátortól.</p></div>`;
+    return;
+  }
   content.innerHTML = "";
   match.handler(match.params);
 }

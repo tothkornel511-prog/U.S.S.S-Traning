@@ -327,6 +327,39 @@ export function getStorageReport() {
 /* ---------- Static reference data ------------------------------------ */
 export const ref = { LEVELS, SERVICE_STATUSES, MODULES, LEVEL_MODULE_ORDER, MAPS };
 
+/* ---------- Szobánkénti hozzáférés (menüpontok / "rooms") ---------------
+   Egyetlen forrás mind a navigációhoz (app.js), mind az admin felület
+   jogosultság-kezelő űrlapjához (admin.js) — így a kettő sosem futhat szét.
+   Az id egyben az útvonal is ("/" + id), a "dashboard" mindenkinek jár. */
+export const SECTIONS = [
+  { id: "dashboard", label: "Vezérlőpult", icon: "◈", group: "Áttekintés" },
+  { id: "personnel", label: "Állomány", icon: "☰", group: "Állomány & Képzés" },
+  { id: "matrix", label: "Kiképzési Áttekintés", icon: "▦", group: "Állomány & Képzés" },
+  { id: "plans", label: "Kiképzési tervek", icon: "✎", group: "Állomány & Képzés" },
+  { id: "protocols", label: "Jegyzőkönyvek", icon: "▤", group: "Állomány & Képzés" },
+  { id: "recruitment", label: "Felvételi", icon: "✎", group: "Állomány & Képzés" },
+  { id: "locations", label: "Védett helyszínek", icon: "◆", group: "Objektumok" },
+  { id: "map", label: "Térkép", icon: "⛶", group: "Objektumok" },
+  { id: "readiness", label: "Készültségi rendszer", icon: "◉", group: "Vezetői irányítás" },
+  { id: "operations/reports", label: "Jelentések", icon: "▤", group: "Parancsnoki Központ" },
+  { id: "operations/threats", label: "Fenyegetésértékelés", icon: "△", group: "Parancsnoki Központ" },
+  { id: "operations/events", label: "Események", icon: "◈", group: "Parancsnoki Központ" },
+  { id: "operations/assignments", label: "Feladatok", icon: "▣", group: "Parancsnoki Központ" },
+  { id: "operations/protectees", label: "Védett személyek", icon: "◆", group: "Parancsnoki Központ" },
+  { id: "operations/escorts", label: "Kísérések", icon: "↗", group: "Parancsnoki Központ" },
+  { id: "operations/advance", label: "Előzetes helyszínfelmérés", icon: "⌖", group: "Parancsnoki Központ" },
+  { id: "operations/protection-levels", label: "Védelmi fokozatok", icon: "◉", group: "Parancsnoki Központ" },
+  { id: "operations/protective-plans", label: "Védelmi tervek", icon: "⬡", group: "Parancsnoki Központ" },
+  { id: "operations/intelligence", label: "Védelmi információk", icon: "⌁", group: "Parancsnoki Központ" },
+  { id: "investigations", label: "Belső Vizsgálatok", icon: "⚖", group: "Parancsnoki Központ" },
+  { id: "covert-ops", label: "Fedett Műveletek", icon: "◐", group: "Parancsnoki Központ" },
+  { id: "operations/government", label: "Kormányzati névjegyzék", icon: "⌂", group: "Parancsnoki Központ" },
+  { id: "operations/succession", label: "Elnöki öröklési sorrend", icon: "Ⅰ", group: "Parancsnoki Központ" },
+  { id: "operations/calendar", label: "Naptár", icon: "▦", group: "Parancsnoki Központ" },
+  { id: "operations/notifications", label: "Értesítések", icon: "◌", group: "Parancsnoki Központ" },
+  { id: "admin", label: "Adminisztráció", icon: "⚙", group: "Rendszer" },
+];
+
 export function mapById(id) {
   return MAPS.find((m) => m.id === id) || MAPS[0];
 }

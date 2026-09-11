@@ -1,5 +1,5 @@
-import { getAccessCodes, upsertAccessCode, revokeAccessCode, generateCode, getAuditLog, getPersonnel, resetAllData, ref, getPositionEntries, addPosition, removePosition, getCustomCss, setCustomCss, getInvestigationCategories, addInvestigationCategory, removeInvestigationCategory, getCovertOpClassifications, addCovertOpClassification, removeCovertOpClassification, exportAllData, importAllData, getStorageReport } from "../store.js?v=56";
-import { hasRole, actorLabel, ROLES } from "../auth.js?v=20";
+import { getAccessCodes, upsertAccessCode, revokeAccessCode, generateCode, getAuditLog, getPersonnel, resetAllData, ref, getPositionEntries, addPosition, removePosition, getCustomCss, setCustomCss, getInvestigationCategories, addInvestigationCategory, removeInvestigationCategory, getCovertOpClassifications, addCovertOpClassification, removeCovertOpClassification, exportAllData, importAllData, getStorageReport, SECTIONS } from "../store.js?v=57";
+import { hasRole, isSuperAdmin, SUPER_ADMIN_ID, actorLabel, ROLES } from "../auth.js?v=21";
 import { esc, fmtDateTime, toast, openModal, closeModal } from "../utils.js?v=22";
 
 function formatBytes(bytes) {
@@ -17,6 +17,7 @@ export function renderAdmin(container) {
     return;
   }
   const isAdmin = hasRole("ADMIN");
+  const superAdmin = isSuperAdmin();
 
   container.innerHTML = `
     <div class="tabs">
@@ -25,8 +26,8 @@ export function renderAdmin(container) {
       <button class="tab-btn ${activeTab === "inv-categories" ? "active" : ""}" data-tab="inv-categories">Vizsgálati kategóriák</button>
       <button class="tab-btn ${activeTab === "op-classifications" ? "active" : ""}" data-tab="op-classifications">Műveleti minősítések</button>
       <button class="tab-btn ${activeTab === "audit" ? "active" : ""}" data-tab="audit">Eseménynapló</button>
-      ${isAdmin ? `<button class="tab-btn ${activeTab === "system" ? "active" : ""}" data-tab="system">Rendszerbeállítások</button>` : ""}
-      ${isAdmin ? `<button class="tab-btn ${activeTab === "dev" ? "active" : ""}" data-tab="dev">Fejlesztés</button>` : ""}
+      ${superAdmin ? `<button class="tab-btn ${activeTab === "system" ? "active" : ""}" data-tab="system">Rendszerbeállítások</button>` : ""}
+      ${superAdmin ? `<button class="tab-btn ${activeTab === "dev" ? "active" : ""}" data-tab="dev">Fejlesztés</button>` : ""}
     </div>
     <div id="admin-tab-content"></div>
   `;
@@ -36,7 +37,7 @@ export function renderAdmin(container) {
   );
 
   const content = document.getElementById("admin-tab-content");
-  if (activeTab === "access") renderAccessTab(content, isAdmin);
+  if (activeTab === "access") renderAccessTab(content, superAdmin);
   else if (activeTab === "positions") renderPositionsTab(content, isAdmin);
   else if (activeTab === "inv-categories") renderInvestigationCategoriesTab(content, isAdmin);
   else if (activeTab === "op-classifications") renderOpClassificationsTab(content, isAdmin);
@@ -222,33 +223,37 @@ function openOpClassificationForm() {
   });
 }
 
-function renderAccessTab(content, isAdmin) {
+function renderAccessTab(content, canManage) {
   const codes = getAccessCodes();
   const personnel = getPersonnel();
 
   content.innerHTML = `
     <div class="section-head">
-      <h2 style="font-size:15px">Hozzáférési kódok és szerepkörök</h2>
-      ${isAdmin ? `<button class="btn btn-gold btn-sm" id="new-access">+ Új hozzáférés</button>` : ""}
+      <h2 style="font-size:15px">Hozzáférési kódok és szobánkénti jogosultságok</h2>
+      ${canManage ? `<button class="btn btn-gold btn-sm" id="new-access">+ Új hozzáférés</button>` : ""}
     </div>
+    <p class="text-mid small mb-2">A ${esc(SUPER_ADMIN_ID)} fiók mindig teljes hozzáféréssel rendelkezik. Mindenki más csak azokat a menüpontokat ("szobákat") látja, amiket itt kifejezetten megkap.</p>
     <div class="table-wrap"><table>
-      <thead><tr><th>USSS ID</th><th>Név</th><th>Szerepkör</th><th>Hozzáférési kód</th>${isAdmin ? "<th></th>" : ""}</tr></thead>
+      <thead><tr><th>USSS ID</th><th>Név</th><th>Szerepkör</th><th>Hozzáférési kód</th><th>Jogosultságok</th>${canManage ? "<th></th>" : ""}</tr></thead>
       <tbody>
         ${codes.length ? codes.map((c) => {
           const p = personnel.find((x) => x.usssId === c.usssId);
+          const owner = c.usssId === SUPER_ADMIN_ID;
+          const sectionCount = (c.sections || []).length;
           return `<tr>
             <td style="font-family:var(--font-mono)">${esc(c.usssId)}</td>
             <td>${esc(p?.name || "—")}</td>
             <td><span class="badge badge-gold">${esc(ROLES[c.role]?.label || c.role)}</span></td>
             <td style="font-family:var(--font-mono)">${esc(c.code)}</td>
-            ${isAdmin ? `<td><div class="flex gap-1"><button class="btn btn-sm" data-edit="${esc(c.usssId)}">Szerkeszt</button><button class="btn btn-sm btn-danger" data-revoke="${esc(c.usssId)}">Visszavonás</button></div></td>` : ""}
+            <td>${owner ? `<span class="badge badge-orange">Teljes (Super Admin)</span>` : sectionCount ? `<span class="text-mid small">${sectionCount} / ${SECTIONS.length} szoba</span>` : `<span class="text-low small">Nincs jogosultság</span>`}</td>
+            ${canManage ? `<td><div class="flex gap-1"><button class="btn btn-sm" data-edit="${esc(c.usssId)}">Szerkeszt</button>${owner ? "" : `<button class="btn btn-sm btn-danger" data-revoke="${esc(c.usssId)}">Visszavonás</button>`}</div></td>` : ""}
           </tr>`;
-        }).join("") : `<tr><td colspan="5"><div class="empty-state"><h3>Nincs rögzített hozzáférés</h3></div></td></tr>`}
+        }).join("") : `<tr><td colspan="6"><div class="empty-state"><h3>Nincs rögzített hozzáférés</h3></div></td></tr>`}
       </tbody>
     </table></div>
   `;
 
-  if (isAdmin) {
+  if (canManage) {
     document.getElementById("new-access").addEventListener("click", () => openAccessForm(personnel));
     content.querySelectorAll("[data-edit]").forEach((b) =>
       b.addEventListener("click", () => openAccessForm(personnel, codes.find((c) => c.usssId === b.getAttribute("data-edit"))))
@@ -268,6 +273,10 @@ function renderAccessTab(content, isAdmin) {
 
 function openAccessForm(personnel, entry) {
   const isNew = !entry;
+  const owner = entry?.usssId === SUPER_ADMIN_ID;
+  const selectedSections = new Set(entry?.sections || []);
+  const groups = [...new Set(SECTIONS.filter((s) => s.id !== "dashboard").map((s) => s.group))];
+
   openModal(`
     <div class="modal-head"><h3>${isNew ? "Új hozzáférés" : "Hozzáférés szerkesztése"}</h3><button class="modal-close" data-close-modal>×</button></div>
     <form id="access-form">
@@ -287,6 +296,23 @@ function openAccessForm(personnel, entry) {
         <label>Hozzáférési kód</label>
         <div class="flex gap-1"><input id="af-code" value="${esc(entry?.code || generateCode())}" style="flex:1; font-family:var(--font-mono)" /><button type="button" class="btn btn-sm" id="af-regen">Új kód</button></div>
       </div>
+      ${owner ? `
+      <div class="field"><label>Szobánkénti jogosultságok</label><p class="text-low small">Ez a fiók (${esc(SUPER_ADMIN_ID)}) mindig teljes hozzáféréssel rendelkezik — itt nincs mit beállítani.</p></div>
+      ` : `
+      <div class="field">
+        <label>Szobánkénti jogosultságok</label>
+        <div class="flex gap-1 mb-1"><button type="button" class="btn btn-sm" id="af-select-all">Mind kijelöl</button><button type="button" class="btn btn-sm" id="af-select-none">Mind töröl</button></div>
+        <div style="max-height:260px; overflow-y:auto; border:1px solid var(--line-soft); border-radius:var(--radius-sm); padding:10px;">
+          ${groups.map((g) => `
+            <div class="card-title mb-1 mt-1">${esc(g)}</div>
+            ${SECTIONS.filter((s) => s.group === g).map((s) => `
+              <label class="flex items-center gap-1 small text-mid" style="cursor:pointer; padding:3px 0;">
+                <input type="checkbox" class="af-section" value="${esc(s.id)}" ${selectedSections.has(s.id) ? "checked" : ""} /> ${esc(s.label)}
+              </label>`).join("")}
+          `).join("")}
+        </div>
+      </div>
+      `}
       <div class="flex justify-between mt-2">
         <button type="button" class="btn" data-close-modal>Mégse</button>
         <button type="submit" class="btn btn-gold">Mentés</button>
@@ -297,13 +323,21 @@ function openAccessForm(personnel, entry) {
   document.getElementById("af-regen").addEventListener("click", () => {
     document.getElementById("af-code").value = generateCode();
   });
+  document.getElementById("af-select-all")?.addEventListener("click", () => {
+    document.querySelectorAll(".af-section").forEach((cb) => { cb.checked = true; });
+  });
+  document.getElementById("af-select-none")?.addEventListener("click", () => {
+    document.querySelectorAll(".af-section").forEach((cb) => { cb.checked = false; });
+  });
 
   document.getElementById("access-form").addEventListener("submit", (e) => {
     e.preventDefault();
+    const sections = owner ? undefined : [...document.querySelectorAll(".af-section:checked")].map((cb) => cb.value);
     upsertAccessCode({
       usssId: document.getElementById("af-person").value,
       role: document.getElementById("af-role").value,
       code: document.getElementById("af-code").value.trim(),
+      ...(sections ? { sections } : {}),
     }, actorLabel());
     toast("Hozzáférés mentve");
     closeModal();
@@ -387,6 +421,7 @@ function renderSystemTab(content) {
 
 const BRANDING_ASSETS = [
   { file: "hero-command.jpg", label: "Fő háttérkép", usage: "Bejelentkező képernyő, Vezérlőpult fejléc, teljes alkalmazás háttere" },
+  { file: "hero-command-ops.jpg", label: "Parancsnoki Központ hero", usage: "Command Center (Jelentések, Fenyegetésértékelés stb.) oldalak fejléce" },
   { file: "hero-training.jpg", label: "Kiképzés hero", usage: "Kiképzési tervek oldal fejléce" },
   { file: "hero-covert.jpg", label: "Fedett műveletek hero", usage: "Fedett Műveletek oldal fejléce" },
   { file: "strip-ops.jpg", label: "Műveleti fotósáv", usage: "Kiképzési Áttekintés oldal fejléce" },
@@ -396,7 +431,6 @@ const BRANDING_ASSETS = [
 const BRANDING_WISHLIST = [
   "Belső Vizsgálatok oldal fejléce — pl. akta/dosszié vagy iroda hangulatú fotó",
   "Felvételi (toborzás) oldal fejléce — pl. eskütétel / kiképzés-avatás jelenet",
-  "Parancsnoki Központ (Command Center) fejléc — pl. híradó/irányítóterem hangulat",
   "Valódi Los Santos térkép-kép az assets/maps/ mappába (lásd assets/maps/README.md) — enélkül a Térkép oldal helyőrző felületet mutat",
   "Nagyfelbontású jelvény/pecsét PNG a favicon és a bejelentkező pecsét cseréjéhez (jelenleg egyszerű SVG-rajz)",
   "Néhány semleges, arctalan/egyenruhás 'agent' portré alapértelmezett profilképnek, azok számára, akik nem töltenek fel sajátot",

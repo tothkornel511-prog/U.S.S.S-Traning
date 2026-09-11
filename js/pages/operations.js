@@ -22,6 +22,13 @@ export function renderOperations(container, type = "reports") {
   const records = getOperationRecords(type);
   const canEdit = hasRole("TRAINING");
   container.innerHTML = `
+    <div class="page-banner page-banner-command">
+      <div class="page-banner-body">
+        <div class="eyebrow">PARANCSNOKI KÖZPONT</div>
+        <h2>${esc(meta.label)}</h2>
+        <p>Strukturált védelmi nyilvántartás — minden módosítás auditálva.</p>
+      </div>
+    </div>
     <div class="classification-strip">U.S.S.S. PARANCSNOKI KÖZPONT · ${esc(meta.label)}</div>
     <div class="command-page-head">
       <div><div class="eyebrow">MŰVELETI OSZTÁLY / ELLENŐRZÖTT NYILVÁNTARTÁS</div><h2>${esc(meta.label)}</h2><p class="text-low small">Strukturált védelmi nyilvántartás · minden módosítás auditálva.</p></div>

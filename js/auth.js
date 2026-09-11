@@ -6,9 +6,15 @@
    (lásd a lenti "TODO backend" jelzéseket).
    ========================================================================== */
 
-import { findAccessCode, getPerson } from "./store.js?v=53";
+import { findAccessCode, getPerson } from "./store.js?v=57";
 
 const SESSION_KEY = "usss_ets_v1_session";
+
+/* Ez az egyetlen fiók, amely mindig teljes hozzáféréssel rendelkezik,
+   függetlenül attól, hogy mit tárol az access-code lista — mindenki más
+   (Admin szerepkörrel is!) csak azokhoz a "szobákhoz" (menüpontokhoz) fér
+   hozzá, amit ehhez a fiókhoz kifejezetten hozzárendeltek. */
+export const SUPER_ADMIN_ID = "USSS-118";
 
 export const ROLES = {
   ADMIN: { label: "Admin", level: 3 },
@@ -24,6 +30,7 @@ export function login(usssId, code) {
   const session = {
     usssId: entry.usssId,
     role: entry.role,
+    sections: entry.sections || [],
     name: person ? person.name : entry.usssId,
     loginAt: new Date().toISOString(),
   };
@@ -48,12 +55,28 @@ export function isAuthenticated() {
   return !!currentSession();
 }
 
+export function isSuperAdmin() {
+  const s = currentSession();
+  return !!s && s.usssId === SUPER_ADMIN_ID;
+}
+
 export function hasRole(minRole) {
   const s = currentSession();
   if (!s) return false;
+  if (s.usssId === SUPER_ADMIN_ID) return true;
   const min = ROLES[minRole]?.level ?? 99;
   const mine = ROLES[s.role]?.level ?? 0;
   return mine >= min;
+}
+
+/* Szobánkénti (menüpontonkénti) hozzáférés — lásd SUPER_ADMIN_ID. A "dashboard"
+   mindenki számára elérhető, aki be tud jelentkezni. */
+export function hasSection(sectionId) {
+  const s = currentSession();
+  if (!s) return false;
+  if (sectionId === "dashboard") return true;
+  if (s.usssId === SUPER_ADMIN_ID) return true;
+  return (s.sections || []).includes(sectionId);
 }
 
 export function actorLabel() {
