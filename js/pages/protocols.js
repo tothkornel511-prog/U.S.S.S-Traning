@@ -1,4 +1,4 @@
-import { getProtocols, getProtocol, getPersonnel, createProtocol, ref, moduleByCode } from "../store.js?v=20";
+import { getProtocols, getProtocol, getPersonnel, createProtocol, moduleByCode, allModulesFlat } from "../store.js?v=42";
 import { hasRole, actorLabel } from "../auth.js?v=20";
 import { esc, fmtDate, fmtDateTime, toast, openModal, closeModal } from "../utils.js?v=20";
 import { navigate } from "../router.js?v=20";
@@ -6,11 +6,7 @@ import { navigate } from "../router.js?v=20";
 export function renderProtocolsList(container) {
   const canEdit = hasRole("TRAINING");
   const protocols = getProtocols();
-  const allModules = [
-    ...new Map(
-      Object.entries(ref.LEVEL_MODULE_ORDER).flatMap(([, codes]) => codes).map((c) => [c, moduleByCode(c)])
-    ).values(),
-  ];
+  const allModules = allModulesFlat();
 
   container.innerHTML = `
     <div class="section-head">
@@ -43,9 +39,11 @@ function participantSummary(participants) {
   return ` <span class="text-low small">(${pass ? `${pass} sikeres` : ""}${pass && fail ? ", " : ""}${fail ? `${fail} sikertelen` : ""})</span>`;
 }
 
-function openProtocolForm(allModules) {
+export function openProtocolForm(allModules, preset = {}) {
   const personnel = getPersonnel();
-  let selected = [];
+  let selected = (preset.participants || [])
+    .filter((usssId) => personnel.some((p) => p.usssId === usssId))
+    .map((usssId) => ({ usssId, examined: false, examResult: null, note: "" }));
 
   const overlay = openModal(`
     <div class="modal-head"><h3>Új jegyzőkönyv</h3><button class="modal-close" data-close-modal>×</button></div>
@@ -54,10 +52,10 @@ function openProtocolForm(allModules) {
         <div class="field"><label>Vizsga / oktatás</label>
           <select id="pr-module" required>
             <option value="">Válasszon…</option>
-            ${allModules.map((m) => `<option value="${esc(m.code)}">${esc(m.code)} — ${esc(m.name)}</option>`).join("")}
+            ${allModules.map((m) => `<option value="${esc(m.code)}" ${preset.moduleCode === m.code ? "selected" : ""}>${esc(m.code)} — ${esc(m.name)}</option>`).join("")}
           </select>
         </div>
-        <div class="field"><label>Dátum</label><input type="date" id="pr-date" required value="${new Date().toISOString().slice(0,10)}" /></div>
+        <div class="field"><label>Dátum</label><input type="date" id="pr-date" required value="${esc(preset.date || new Date().toISOString().slice(0,10))}" /></div>
       </div>
       <div class="field"><label>Vizsgáztató / oktató</label>
         <select id="pr-examiner"><option value="">Válasszon…</option>${personnel.map((p) => `<option value="${esc(p.name)}">${esc(p.name)} (${esc(p.usssId)})</option>`).join("")}</select>
@@ -113,6 +111,8 @@ function openProtocolForm(allModules) {
     );
   }
 
+  redrawParticipants();
+
   document.getElementById("pr-add-participant").addEventListener("change", (e) => {
     const id = e.target.value;
     if (id && !selected.find((s) => s.usssId === id)) {
@@ -139,7 +139,8 @@ function openProtocolForm(allModules) {
     }, actorLabel());
     toast(`Jegyzőkönyv létrehozva: ${protocol.id}`);
     closeModal();
-    navigate(`/protocols/${protocol.id}`);
+    if (preset.onCreated) preset.onCreated(protocol);
+    else navigate(`/protocols/${protocol.id}`);
   });
 }
 

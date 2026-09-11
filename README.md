@@ -14,6 +14,11 @@ vanilla JS ES modulokkal, localStorage adatréteggel.
   vizsgák, vizsgatörténet, próbaidő-számítás, szintlépés jóváhagyás)
 - **Training Matrix** — vízszintesen görgethető mátrix, minden személy × minden modul,
   színkódolt állapotokkal (🔴/🟡/🟢), cellára kattintva megnyílik a modul részlete
+- **Kiképzési tervek** — jövőbeli oktatás/vizsga előzetes megtervezése (automatikus
+  azonosító, pl. KT-2026-001…): cél/napirend, tervezett résztvevők, oktató, dátum,
+  státusz (Tervezett/Folyamatban/Lezárva/Törölve); egy gombbal jegyzőkönyvvé
+  alakítható, ha a képzés megtörtént. **Fájlmelléklet** (PDF, DOCX, XLSX, kép)
+  is csatolható tervenként (max. 3 MB/fájl, legfeljebb 6 db — lásd lent)
 - **Oktatási jegyzőkönyvek** — automatikus azonosító (TR-2026-001…), résztvevők,
   amelyek a személyek képzési előzményébe is bekerülnek
 - **Védett helyszínek** — leírás, bejáratok, nagyítható/panozható térkép-előnézet
@@ -76,6 +81,14 @@ bevezetésekor csak ezeket a függvényeket kell API-hívásokra cserélni — a
 `js/auth.js` kliensoldali kódellenőrzést végez — ezt egy valódi backend
 autentikációra kell cserélni éles/versenyképes RP-környezetben, mivel a
 kódok jelenleg a böngésző oldalán, localStorage-ban tárolódnak.
+
+**Fontos a kiképzési tervek fájlmellékleteinél:** mivel nincs szerver, a
+feltöltött fájlok base64-ként kerülnek a böngésző `localStorage`-ába. Ennek
+böngészőnként kb. 5-10 MB a kemény korlátja — ezért van a 3 MB/fájl és 6
+db/terv limit. Ez csak erre a gépre/böngészőre vonatkozik (nem szinkronizál
+más eszközre), és ha megtelik a tárhely, a rendszer figyelmeztetést ad
+mentés helyett hibás/csendes adatvesztés helyett. Egy valódi backend
+bevezetésekor ez a réteg fájltárolásra (pl. object storage) cserélendő.
 
 ## GitHub Pages üzembe helyezés
 

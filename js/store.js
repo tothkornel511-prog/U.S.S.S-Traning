@@ -24,6 +24,8 @@ const KEYS = {
   auditLog: NS + "audit_log",
   seeded: NS + "seeded",
   nextProtocol: NS + "next_protocol_seq",
+  trainingPlans: NS + "training_plans",
+  nextTrainingPlan: NS + "next_training_plan_seq",
   recruitmentQuestions: NS + "recruitment_questions",
   applicants: NS + "applicants",
   exams: NS + "exams",
@@ -102,6 +104,8 @@ export function seedIfNeeded() {
     write(KEYS.nextProtocol, 1);
     write(KEYS.recruitmentQuestions, RECRUITMENT_QUESTIONS);
     write(KEYS.applicants, []);
+    write(KEYS.trainingPlans, []);
+    write(KEYS.nextTrainingPlan, 1);
     write(KEYS.seeded, true);
   }
   applyPositionPatch();
@@ -113,6 +117,17 @@ export function seedIfNeeded() {
   applyGovernmentHierarchySeedPatch();
   applyCommandCenterCatalogSeedPatch();
   applyProtecteeScopePatch();
+  applyTrainingPlansSeedPatch();
+}
+
+/* Célzott seedelés: a Kiképzési tervek (training plans) modul új
+   localStorage-kulcsokat vezet be, amiket egy már korábban seedelt böngésző
+   még nem ismer — ez a patch pótolja őket, minden mást érintetlenül hagyva. */
+function applyTrainingPlansSeedPatch() {
+  if (read(KEYS.trainingPlans, null) === null) {
+    write(KEYS.trainingPlans, []);
+    write(KEYS.nextTrainingPlan, 1);
+  }
 }
 
 /* Célzott, egyszeri pozíció-javítás — csak a felsorolt személyek "position"
@@ -276,6 +291,13 @@ export function modulesForLevel(levelId) {
 }
 export function allSpecialtyModules() {
   return modulesForLevel("SPEC");
+}
+export function allModulesFlat() {
+  return [
+    ...new Map(
+      Object.entries(LEVEL_MODULE_ORDER).flatMap(([, codes]) => codes).map((c) => [c, moduleByCode(c)])
+    ).values(),
+  ];
 }
 export function levelLabel(id) {
   const lv = LEVELS.find((l) => l.id === id);
@@ -615,6 +637,85 @@ export function createProtocol(data, actorLabel) {
 
   logAudit(actorLabel, "Jegyzőkönyv létrehozva", `${id} — ${data.moduleCode}`);
   return protocol;
+}
+
+/* ---------- Kiképzési tervek (Training Plans) --------------------------
+   Egy jövőbeli oktatás/vizsga előzetes megtervezése: cél, résztvevők,
+   oktató, időpont — még mielőtt ténylegesen megtörténne és jegyzőkönyv
+   (protocol) készülne róla. A terv és a jegyzőkönyv szándékosan külön
+   nyilvántartás: a terv "mit szeretnénk", a jegyzőkönyv "mi történt". */
+export const PLAN_STATUSES = ["TERVEZETT", "FOLYAMATBAN", "LEZÁRVA", "TÖRÖLVE"];
+
+/* A mellékletek base64-ként kerülnek a localStorage-ba (nincs szerver), ezért
+   szigorú méret- és darabszám-korlát kell, különben megtelik a böngésző
+   tárhelye, és a MENTÉS AZ EGÉSZ ALKALMAZÁSBAN elkezd hibázni. */
+export const MAX_ATTACHMENT_BYTES = 3 * 1024 * 1024;
+export const MAX_ATTACHMENTS_PER_PLAN = 6;
+export const ALLOWED_ATTACHMENT_EXT = [".pdf", ".doc", ".docx", ".xls", ".xlsx", ".png", ".jpg", ".jpeg"];
+
+export function getTrainingPlans() {
+  return read(KEYS.trainingPlans, []);
+}
+export function getTrainingPlan(id) {
+  return getTrainingPlans().find((p) => p.id === id);
+}
+function nextTrainingPlanId() {
+  const year = new Date().getFullYear();
+  const seq = read(KEYS.nextTrainingPlan, 1);
+  return { id: `KT-${year}-${String(seq).padStart(3, "0")}`, seq };
+}
+export function createTrainingPlan(data, actorLabel) {
+  const { id, seq } = nextTrainingPlanId();
+  const now = new Date().toISOString();
+  const plan = {
+    id,
+    title: (data.title || "").trim(),
+    moduleCode: data.moduleCode || "",
+    plannedDate: data.plannedDate || "",
+    location: (data.location || "").trim(),
+    instructor: (data.instructor || "").trim(),
+    participants: data.participants || [], // [usssId, ...]
+    objectives: (data.objectives || "").trim(),
+    status: data.status || "TERVEZETT",
+    notes: (data.notes || "").trim(),
+    attachments: (data.attachments || []).slice(0, MAX_ATTACHMENTS_PER_PLAN), // [{id, name, type, size, dataUrl, uploadedBy, uploadedAt}]
+    protocolId: null,
+    createdBy: actorLabel || "Rendszer",
+    createdAt: now,
+    updatedAt: now,
+    history: [{ at: now, by: actorLabel || "Rendszer", action: "Terv létrehozva" }],
+  };
+  const list = getTrainingPlans();
+  list.unshift(plan);
+  if (!write(KEYS.trainingPlans, list)) return null;
+  write(KEYS.nextTrainingPlan, seq + 1);
+  logAudit(actorLabel, "Kiképzési terv létrehozva", `${id} — ${plan.title}`);
+  return plan;
+}
+export function updateTrainingPlan(id, patch, actorLabel) {
+  const list = getTrainingPlans();
+  const plan = list.find((p) => p.id === id);
+  if (!plan) return null;
+  const previous = JSON.parse(JSON.stringify(plan));
+  const changes = Object.entries(patch).filter(([key, value]) => value !== undefined && plan[key] !== value);
+  changes.forEach(([key, value]) => { plan[key] = value; });
+  if (plan.attachments) plan.attachments = plan.attachments.slice(0, MAX_ATTACHMENTS_PER_PLAN);
+  plan.updatedAt = new Date().toISOString();
+  plan.history = plan.history || [];
+  if (changes.length) plan.history.push({ at: plan.updatedAt, by: actorLabel || "Rendszer", action: changes.map(([key]) => key).join(", ") + " módosítva" });
+  if (!write(KEYS.trainingPlans, list)) {
+    Object.assign(plan, previous);
+    return null;
+  }
+  if (changes.length) logAudit(actorLabel, "Kiképzési terv módosítva", `${id} — ${changes.map(([key]) => key).join(", ")}`);
+  return plan;
+}
+export function deleteTrainingPlan(id, actorLabel) {
+  write(KEYS.trainingPlans, getTrainingPlans().filter((p) => p.id !== id));
+  logAudit(actorLabel, "Kiképzési terv törölve", id);
+}
+export function linkTrainingPlanProtocol(id, protocolId, actorLabel) {
+  return updateTrainingPlan(id, { status: "LEZÁRVA", protocolId }, actorLabel);
 }
 
 /* ---------- Protected locations ----------------------------------------*/
@@ -1143,7 +1244,7 @@ export function examScoreSummary(exam) {
 /* ---------- Global search ------------------------------------------------*/
 export function globalSearch(query) {
   const q = query.trim().toLowerCase();
-  if (!q) return { personnel: [], modules: [], protocols: [], locations: [], operations: [] };
+  if (!q) return { personnel: [], modules: [], protocols: [], locations: [], operations: [], plans: [] };
 
   const personnel = getPersonnel().filter(
     (p) =>
@@ -1167,5 +1268,8 @@ export function globalSearch(query) {
   const operations = getOperationRecords().filter((record) =>
     [record.id, record.title, record.type, record.owner, record.location, record.protectee, record.description].join(" ").toLowerCase().includes(q)
   );
-  return { personnel, modules, protocols, locations, operations };
+  const plans = getTrainingPlans().filter((p) =>
+    [p.id, p.title, p.moduleCode, p.instructor, p.location].join(" ").toLowerCase().includes(q)
+  );
+  return { personnel, modules, protocols, locations, operations, plans };
 }

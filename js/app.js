@@ -2,7 +2,7 @@
    U.S.S.S. ELITE TRAINING SYSTEM — APP ENTRY
    ========================================================================== */
 
-import { seedIfNeeded, globalSearch, getCustomCss, getOperationRecords } from "./store.js?v=40";
+import { seedIfNeeded, globalSearch, getCustomCss, getOperationRecords } from "./store.js?v=42";
 import { isAuthenticated, currentSession, logout, hasRole, ROLES } from "./auth.js?v=20";
 import { registerRoute, resolve, startRouter, navigate, currentPath } from "./router.js?v=20";
 import { esc, sealMark } from "./utils.js?v=20";
@@ -11,7 +11,8 @@ import { renderDashboard } from "./pages/dashboard.js?v=37";
 import { renderPersonnelList } from "./pages/personnel.js?v=20";
 import { renderProfile } from "./pages/profile.js?v=20";
 import { renderMatrix } from "./pages/matrix.js?v=20";
-import { renderProtocolsList, renderProtocolDetail } from "./pages/protocols.js?v=20";
+import { renderProtocolsList, renderProtocolDetail } from "./pages/protocols.js?v=21";
+import { renderTrainingPlansList, renderTrainingPlanDetail } from "./pages/plans.js?v=1";
 import { renderLocationsList, renderLocationDetail } from "./pages/locations.js?v=20";
 import { renderMapPage } from "./pages/map.js?v=20";
 import { renderRecruitmentHub, renderApplicantDetail } from "./pages/recruitment.js?v=25";
@@ -19,7 +20,7 @@ import { renderExamList, renderExamDetail } from "./pages/exam.js?v=38";
 import { renderAdmin } from "./pages/admin.js?v=20";
 import { renderOperations } from "./pages/operations.js?v=36";
 import { renderReadiness } from "./pages/readiness.js?v=32";
-import { renderSatcom } from "./pages/satcom.js?v=41";
+import { renderSatcom } from "./pages/satcom.js?v=42";
 
 seedIfNeeded();
 applyCustomCss();
@@ -43,6 +44,7 @@ const NAV = [
   { group: "Állomány & Képzés", items: [
     { path: "/personnel", label: "Állomány", icon: "☰" },
     { path: "/matrix", label: "Kiképzési Áttekintés", icon: "▦" },
+    { path: "/plans", label: "Kiképzési tervek", icon: "✎" },
     { path: "/protocols", label: "Jegyzőkönyvek", icon: "▤" },
     { path: "/recruitment", label: "Felvételi", icon: "✎" },
   ]},
@@ -87,6 +89,7 @@ const NAV = [
 function pageTitleFor(path) {
   if (path.startsWith("/personnel/")) return { crumb: "Állomány", title: "Személyi profil" };
   if (path.startsWith("/protocols/")) return { crumb: "Jegyzőkönyvek", title: "Jegyzőkönyv részletei" };
+  if (path.startsWith("/plans/")) return { crumb: "Kiképzési tervek", title: "Kiképzési terv részletei" };
   if (path.startsWith("/recruitment/")) return { crumb: "Felvételi", title: "Jelentkező részletei" };
   if (path.startsWith("/exam/")) return { crumb: "Felvételi Vizsga", title: "Vizsga részletei" };
   if (path.startsWith("/locations/")) return { crumb: "Objektumok", title: "Helyszín részletei" };
@@ -160,7 +163,7 @@ function renderShell() {
 }
 
 function renderSearchResults(results, container) {
-  const total = results.personnel.length + results.modules.length + results.protocols.length + results.locations.length + (results.operations || []).length;
+  const total = results.personnel.length + results.modules.length + results.protocols.length + results.locations.length + (results.operations || []).length + (results.plans || []).length;
   if (!total) {
     container.innerHTML = `<div class="search-results"><div class="sr-empty">Nincs találat.</div></div>`;
     container.style.display = "block";
@@ -176,6 +179,7 @@ function renderSearchResults(results, container) {
     ${block("Állomány", results.personnel, (p) => `<div class="sr-item" data-nav="/personnel/${esc(p.usssId)}"><span>${esc(p.name)}</span><span class="text-low small">${esc(p.usssId)}</span></div>`)}
     ${block("Modulok", results.modules, (m) => `<div class="sr-item" data-nav="/matrix"><span>${esc(m.code)} — ${esc(m.name)}</span></div>`)}
     ${block("Jegyzőkönyvek", results.protocols, (p) => `<div class="sr-item" data-nav="/protocols/${esc(p.id)}"><span>${esc(p.id)}</span><span class="text-low small">${esc(p.moduleCode)}</span></div>`)}
+    ${block("Kiképzési tervek", results.plans || [], (p) => `<div class="sr-item" data-nav="/plans/${esc(p.id)}"><span>${esc(p.title)}</span><span class="text-low small">${esc(p.id)}</span></div>`)}
     ${block("Helyszínek", results.locations, (l) => `<div class="sr-item" data-nav="/locations/${esc(l.id)}"><span>${esc(l.name)}</span></div>`)}
     ${block("Command Center", results.operations || [], (r) => `<div class="sr-item" data-nav="/operations/${esc(r.type)}"><span>${esc(r.title)}</span><span class="text-low small">${esc(r.id)}</span></div>`)}
   </div>`;
@@ -214,6 +218,8 @@ registerRoute("/personnel/:id", (p) => renderProfile(document.getElementById("co
 registerRoute("/matrix", () => renderMatrix(document.getElementById("content")));
 registerRoute("/protocols", () => renderProtocolsList(document.getElementById("content")));
 registerRoute("/protocols/:id", (p) => renderProtocolDetail(document.getElementById("content"), p.id));
+registerRoute("/plans", () => renderTrainingPlansList(document.getElementById("content")));
+registerRoute("/plans/:id", (p) => renderTrainingPlanDetail(document.getElementById("content"), p.id));
 registerRoute("/recruitment", () => renderRecruitmentHub(document.getElementById("content")));
 registerRoute("/recruitment/:id", (p) => renderApplicantDetail(document.getElementById("content"), p.id));
 registerRoute("/exam", () => renderExamList(document.getElementById("content")));
