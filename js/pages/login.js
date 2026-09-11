@@ -3,6 +3,7 @@ import { esc, sealMark } from "../utils.js?v=22";
 
 export function renderLogin(root, onSuccess) {
   root.innerHTML = `
+    <div class="global-classification"><span>U.S.S.S. // RESTRICTED SYSTEM — AUTHORIZED PERSONNEL ONLY</span></div>
     <div class="login-screen">
       <div class="login-watermark">${sealMark(1100)}</div>
       <div class="login-card">

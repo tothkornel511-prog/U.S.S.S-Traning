@@ -1,6 +1,6 @@
-import { getPersonnel, getProtocols, getLocations, getOperationRecords, getReadinessState, READINESS_LEVELS, readinessPercent, ref, getExams, examScoreSummary, getExamCategories } from "../store.js?v=53";
-import { hasRole } from "../auth.js?v=20";
-import { esc, initials } from "../utils.js?v=22";
+import { getPersonnel, getProtocols, getLocations, getOperationRecords, getReadinessState, READINESS_LEVELS, readinessPercent, ref, getExams, examScoreSummary, getExamCategories } from "../store.js?v=55";
+import { hasRole, currentSession, ROLES } from "../auth.js?v=20";
+import { esc, initials, sealMark } from "../utils.js?v=22";
 import { navigate } from "../router.js?v=20";
 
 export function renderDashboard(container) {
@@ -30,8 +30,21 @@ export function renderDashboard(container) {
     .slice(0, 6);
 
   const examStats = buildExamStats();
+  const session = currentSession();
+  const todayLabel = new Date().toLocaleDateString("hu-HU", { year: "numeric", month: "long", day: "numeric" });
 
   container.innerHTML = `
+    <div class="command-hero section">
+      <div class="command-hero-seal">${sealMark(64)}</div>
+      <div class="command-hero-body">
+        <div class="eyebrow">EXECUTIVE COMMAND DASHBOARD · ${esc(todayLabel)}</div>
+        <h1 class="command-hero-title">U.S.S.S. VEZÉRLŐPULT</h1>
+        <div class="command-hero-sub">${esc(session.name)} · ${esc(ROLES[session.role]?.label || session.role)} jogosultsággal bejelentkezve</div>
+      </div>
+      <div class="command-hero-status">
+        <span class="badge badge-${READINESS_LEVELS[readiness.level].color}">${esc(READINESS_LEVELS[readiness.level].label)}</span>
+      </div>
+    </div>
     <div class="grid grid-3 section">
       <div class="card row-link" data-nav="/personnel">
         <div class="card-title">☰ Állomány</div>

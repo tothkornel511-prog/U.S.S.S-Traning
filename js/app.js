@@ -6,8 +6,8 @@ import { seedIfNeeded, globalSearch, getCustomCss, getOperationRecords } from ".
 import { isAuthenticated, currentSession, logout, hasRole, ROLES } from "./auth.js?v=20";
 import { registerRoute, resolve, startRouter, navigate, currentPath } from "./router.js?v=20";
 import { esc, sealMark, closeModal } from "./utils.js?v=22";
-import { renderLogin } from "./pages/login.js?v=21";
-import { renderDashboard } from "./pages/dashboard.js?v=41";
+import { renderLogin } from "./pages/login.js?v=22";
+import { renderDashboard } from "./pages/dashboard.js?v=42";
 import { renderPersonnelList } from "./pages/personnel.js?v=21";
 import { renderProfile } from "./pages/profile.js?v=21";
 import { renderMatrix } from "./pages/matrix.js?v=20";
@@ -95,9 +95,14 @@ function pageTitleFor(path) {
   return found ? { crumb: found.label, title: found.label } : { crumb: "", title: "U.S.S.S." };
 }
 
+function classificationRibbon(text) {
+  return `<div class="global-classification"><span>${esc(text)}</span></div>`;
+}
+
 function renderShell() {
   const session = currentSession();
   root.innerHTML = `
+    ${classificationRibbon(`U.S.S.S. // RESTRICTED SYSTEM — ${ROLES[session.role]?.label || session.role} CLEARANCE // ${session.usssId}`)}
     <div class="app-shell">
       <aside class="sidebar" id="sidebar">
         <div class="brand">
