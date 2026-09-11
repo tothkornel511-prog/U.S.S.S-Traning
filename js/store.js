@@ -125,6 +125,7 @@ export function seedIfNeeded() {
   applyProtecteeScopePatch();
   applyTrainingPlansSeedPatch();
   applyInvestigationSeedPatch();
+  applyTrainingPlanMultiModulePatch();
 }
 
 /* Célzott seedelés: a Kiképzési tervek (training plans) modul új
@@ -135,6 +136,21 @@ function applyTrainingPlansSeedPatch() {
     write(KEYS.trainingPlans, []);
     write(KEYS.nextTrainingPlan, 1);
   }
+}
+
+/* Célzott migráció: a kiképzési terveknél egy tervhez mostantól több modul
+   is rendelhető (moduleCodes tömb) az eddigi egyetlen moduleCode helyett.
+   Ez a régebbi, egy-modulos terveket alakítja át, adatvesztés nélkül. */
+function applyTrainingPlanMultiModulePatch() {
+  const list = read(KEYS.trainingPlans, []);
+  let changed = false;
+  list.forEach((p) => {
+    if (!p.moduleCodes) {
+      p.moduleCodes = p.moduleCode ? [p.moduleCode] : [];
+      changed = true;
+    }
+  });
+  if (changed) write(KEYS.trainingPlans, list);
 }
 
 /* Célzott, egyszeri pozíció-javítás — csak a felsorolt személyek "position"
@@ -821,7 +837,7 @@ export function createTrainingPlan(data, actorLabel) {
   const plan = {
     id,
     title: (data.title || "").trim(),
-    moduleCode: data.moduleCode || "",
+    moduleCodes: [...new Set(data.moduleCodes || [])].filter(Boolean),
     plannedDate: data.plannedDate || "",
     location: (data.location || "").trim(),
     instructor: (data.instructor || "").trim(),
@@ -1867,7 +1883,7 @@ export function globalSearch(query) {
     [record.id, record.title, record.type, record.owner, record.location, record.protectee, record.description].join(" ").toLowerCase().includes(q)
   );
   const plans = getTrainingPlans().filter((p) =>
-    [p.id, p.title, p.moduleCode, p.instructor, p.location].join(" ").toLowerCase().includes(q)
+    [p.id, p.title, ...(p.moduleCodes || []), p.instructor, p.location].join(" ").toLowerCase().includes(q)
   );
   return { personnel, modules, protocols, locations, operations, plans };
 }

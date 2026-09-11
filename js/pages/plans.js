@@ -2,7 +2,7 @@ import {
   getTrainingPlans, getTrainingPlan, createTrainingPlan, updateTrainingPlan, deleteTrainingPlan,
   linkTrainingPlanProtocol, PLAN_STATUSES, getPersonnel, allModulesFlat, moduleByCode,
   MAX_ATTACHMENT_BYTES, MAX_ATTACHMENTS_PER_PLAN, ALLOWED_ATTACHMENT_EXT,
-} from "../store.js?v=54";
+} from "../store.js?v=60";
 import { hasRole, actorLabel } from "../auth.js?v=20";
 import { esc, fmtDate, fmtDateTime, toast, openModal, closeModal, applyBranding } from "../utils.js?v=23";
 import { navigate } from "../router.js?v=20";
@@ -60,7 +60,7 @@ export function renderTrainingPlansList(container) {
           <tr class="row-link" data-nav="/plans/${esc(p.id)}">
             <td class="text-gold" style="font-family:var(--font-mono)">${esc(p.id)}</td>
             <td>${esc(p.title)}</td>
-            <td>${p.moduleCode ? `${esc(p.moduleCode)} — ${esc(moduleByCode(p.moduleCode)?.name || "")}` : "—"}</td>
+            <td>${(p.moduleCodes || []).length ? esc(p.moduleCodes.join(", ")) : "—"}</td>
             <td>${p.plannedDate ? fmtDate(p.plannedDate) : "—"}</td>
             <td>${esc(p.instructor || "—")}</td>
             <td>${p.participants.length} fő</td>
@@ -80,20 +80,18 @@ function openPlanForm(allModules, existing = null) {
   const personnel = getPersonnel();
   let selected = (existing?.participants || []).slice();
   let attachments = (existing?.attachments || []).slice();
+  let selectedModules = (existing?.moduleCodes || []).slice();
 
   const overlay = openModal(`
     <div class="modal-head"><h3>${existing ? "Kiképzési terv szerkesztése" : "Új kiképzési terv"}</h3><button class="modal-close" data-close-modal>×</button></div>
     <form id="plan-form">
       <div class="field"><label>Cím</label><input id="pl-title" required autofocus value="${esc(existing?.title || "")}" /></div>
-      <div class="grid grid-2">
-        <div class="field"><label>Modul / vizsga (opcionális)</label>
-          <select id="pl-module">
-            <option value="">Nincs kiválasztva</option>
-            ${allModules.map((m) => `<option value="${esc(m.code)}" ${existing?.moduleCode === m.code ? "selected" : ""}>${esc(m.code)} — ${esc(m.name)}</option>`).join("")}
-          </select>
-        </div>
-        <div class="field"><label>Tervezett dátum</label><input type="date" id="pl-date" value="${esc(existing?.plannedDate || new Date().toISOString().slice(0,10))}" /></div>
+      <div class="field">
+        <label>Modulok / vizsgák (opcionális, több is választható)</label>
+        <select id="pl-add-module"><option value="">+ Modul hozzáadása…</option>${allModules.map((m) => `<option value="${esc(m.code)}">${esc(m.code)} — ${esc(m.name)}</option>`).join("")}</select>
+        <div id="pl-modules" class="mt-1"></div>
       </div>
+      <div class="field"><label>Tervezett dátum</label><input type="date" id="pl-date" value="${esc(existing?.plannedDate || new Date().toISOString().slice(0,10))}" /></div>
       <div class="grid grid-2">
         <div class="field"><label>Oktató</label>
           <select id="pl-instructor"><option value="">Válasszon…</option>${personnel.map((p) => `<option value="${esc(p.name)}" ${existing?.instructor === p.name ? "selected" : ""}>${esc(p.name)} (${esc(p.usssId)})</option>`).join("")}</select>
@@ -181,6 +179,27 @@ function openPlanForm(allModules, existing = null) {
     }
   });
 
+  const moduleList = document.getElementById("pl-modules");
+  function redrawModules() {
+    moduleList.innerHTML = selectedModules.length ? selectedModules.map((code, i) => `
+      <div class="participant-row">
+        <div class="flex justify-between items-center">
+          <span class="text-hi">${esc(code)} — ${esc(moduleByCode(code)?.name || "")}</span>
+          <button type="button" class="btn btn-sm" data-remove-module-idx="${i}">×</button>
+        </div>
+      </div>`).join("") : `<div class="small text-low mt-1">Nincs modul kiválasztva.</div>`;
+    moduleList.querySelectorAll("[data-remove-module-idx]").forEach((b) =>
+      b.addEventListener("click", () => { selectedModules.splice(Number(b.getAttribute("data-remove-module-idx")), 1); redrawModules(); })
+    );
+  }
+  redrawModules();
+
+  document.getElementById("pl-add-module").addEventListener("change", (e) => {
+    const code = e.target.value;
+    if (code && !selectedModules.includes(code)) { selectedModules.push(code); redrawModules(); }
+    e.target.value = "";
+  });
+
   const partList = document.getElementById("pl-participants");
   function redrawParticipants() {
     partList.innerHTML = selected.map((usssId, i) => `
@@ -208,7 +227,7 @@ function openPlanForm(allModules, existing = null) {
     if (!title) return toast("Adjon meg egy címet.", "warn");
     const data = {
       title,
-      moduleCode: document.getElementById("pl-module").value,
+      moduleCodes: selectedModules,
       plannedDate: document.getElementById("pl-date").value,
       instructor: document.getElementById("pl-instructor").value,
       location: document.getElementById("pl-location").value,
@@ -242,7 +261,7 @@ export function renderTrainingPlanDetail(container, id) {
   }
   const canEdit = hasRole("TRAINING");
   const personnel = getPersonnel();
-  const mod = plan.moduleCode ? moduleByCode(plan.moduleCode) : null;
+  const planModules = (plan.moduleCodes || []).map((code) => ({ code, def: moduleByCode(code) }));
   const allModules = allModulesFlat();
 
   container.innerHTML = `
@@ -257,7 +276,7 @@ export function renderTrainingPlanDetail(container, id) {
       </div>
       <div class="grid grid-2 mb-2">
         <div><div class="card-title">Azonosító</div><div class="text-hi" style="font-family:var(--font-mono)">${esc(plan.id)}</div></div>
-        <div><div class="card-title">Modul / vizsga</div><div class="text-hi">${mod ? `${esc(plan.moduleCode)} — ${esc(mod.name)}` : "—"}</div></div>
+        <div><div class="card-title">Modulok / vizsgák</div><div class="text-hi">${planModules.length ? planModules.map((m) => `${esc(m.code)}${m.def ? ` — ${esc(m.def.name)}` : ""}`).join(", ") : "—"}</div></div>
         <div><div class="card-title">Tervezett dátum</div><div class="text-hi">${plan.plannedDate ? fmtDate(plan.plannedDate) : "—"}</div></div>
         <div><div class="card-title">Helyszín</div><div class="text-hi">${esc(plan.location || "—")}</div></div>
         <div><div class="card-title">Oktató</div><div class="text-hi">${esc(plan.instructor || "—")}</div></div>
@@ -293,7 +312,7 @@ export function renderTrainingPlanDetail(container, id) {
   });
   document.getElementById("convert-plan")?.addEventListener("click", () => {
     openProtocolForm(allModules, {
-      moduleCode: plan.moduleCode,
+      moduleCode: (plan.moduleCodes || [])[0] || "",
       date: plan.plannedDate,
       participants: plan.participants,
       onCreated: (protocol) => {
