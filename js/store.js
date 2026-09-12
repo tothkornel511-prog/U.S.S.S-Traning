@@ -43,6 +43,8 @@ const KEYS = {
   channelQuestions: NS + "ch_questions",
   trainingCategories: NS + "tc_categories",
   trainingFiles: NS + "tc_files",
+  medicalRecords: NS + "medical_records",
+  medicalIntervals: NS + "medical_intervals",
 };
 
 /* Elméleti vizsgánál ez alatt a százalék alatt a modul nem számít teljesítettnek. */
@@ -409,6 +411,7 @@ const STORAGE_LABELS = {
   audit_log: "Eseménynapló", training_plans: "Kiképzési tervek", recruitment_questions: "Felvételi kérdésbank",
   applicants: "Jelentkezők", exams: "Felvételi vizsgák", operations: "Command Center rekordok",
   readiness: "Készültségi állapot", investigations: "Belső vizsgálatok", covert_ops: "Fedett műveletek",
+  medical_records: "Orvosi bejegyzések", medical_intervals: "Orvosi időközök",
 };
 export function getStorageReport() {
   const all = allOwnKeys().map((key) => {
@@ -444,6 +447,7 @@ export const SECTIONS = [
   { id: "plans", label: "Kiképzési tervek", icon: "✎", group: "Állomány & Képzés" },
   { id: "protocols", label: "Jegyzőkönyvek", icon: "▤", group: "Állomány & Képzés" },
   { id: "recruitment", label: "Felvételi", icon: "✎", group: "Állomány & Képzés" },
+  { id: "medical", label: "Orvosi alkalmasság", icon: "✚", group: "Állomány & Képzés" },
   { id: "locations", label: "Védett helyszínek", icon: "◆", group: "Objektumok" },
   { id: "map", label: "Térkép", icon: "⛶", group: "Objektumok" },
   { id: "readiness", label: "Készültségi rendszer", icon: "◉", group: "Vezetői irányítás" },
@@ -2164,6 +2168,86 @@ export function deleteTrainingFile(id, actorLabel) {
   const file = getAllTrainingFiles().find((f) => f.id === id);
   write(KEYS.trainingFiles, getAllTrainingFiles().filter((f) => f.id !== id));
   logAudit(actorLabel, "Training Center fájl törölve", file?.label || id);
+}
+
+/* ---------- Orvosi alkalmasság --------------------------------------------
+   Fokozatonként admin által beállítható időköz (hónapban) — amikor valakinél
+   rögzítesz egy elvégzett orvosi vizsgálatot, a rendszer az Ő AKKORI
+   fokozata alapján számolja ki és véglegesen eltárolja a bejegyzésen a
+   következő esedékességet (egy utólagos fokozatváltás nem írja át a már
+   rögzített, korábbi bejegyzések esedékességét — csak a KÖVETKEZŐ vizsgálat
+   rögzítésekor számol az akkor érvényes fokozattal/időközzel). */
+const DEFAULT_MEDICAL_INTERVAL_MONTHS = 12;
+export function getMedicalIntervals() {
+  const stored = read(KEYS.medicalIntervals, null);
+  if (stored) return stored;
+  const defaults = {};
+  LEVELS.forEach((l) => { defaults[l.id] = DEFAULT_MEDICAL_INTERVAL_MONTHS; });
+  return defaults;
+}
+export function setMedicalInterval(levelId, months, actorLabel) {
+  const intervals = getMedicalIntervals();
+  intervals[levelId] = Math.max(1, Number(months) || DEFAULT_MEDICAL_INTERVAL_MONTHS);
+  write(KEYS.medicalIntervals, intervals);
+  logAudit(actorLabel, "Orvosi időköz módosítva", `${levelId} fokozat → ${intervals[levelId]} hónap`);
+}
+
+/* Tisztán UTC-ben számol, hogy elkerülje az "new Date(string)" (UTC-ként
+   értelmezett) és a ".setMonth()" (helyi időzóna szerint módosító) keverése
+   miatti, időzóna-függő egy napos csúszást a dátumban. */
+function addMonths(dateStr, months) {
+  const [y, m, d] = dateStr.split("-").map(Number);
+  return new Date(Date.UTC(y, m - 1 + months, d)).toISOString().slice(0, 10);
+}
+
+function getAllMedicalRecords() {
+  return read(KEYS.medicalRecords, []);
+}
+export function getMedicalRecords(usssId) {
+  return getAllMedicalRecords()
+    .filter((r) => r.usssId === usssId)
+    .sort((a, b) => new Date(b.examDate) - new Date(a.examDate));
+}
+export function getLatestMedicalRecord(usssId) {
+  return getMedicalRecords(usssId)[0] || null;
+}
+export function createMedicalRecord(usssId, data, actorLabel) {
+  const person = getPerson(usssId);
+  if (!person) return null;
+  const examDate = data.examDate || new Date().toISOString().slice(0, 10);
+  const intervals = getMedicalIntervals();
+  const months = intervals[person.level] ?? DEFAULT_MEDICAL_INTERVAL_MONTHS;
+  const record = {
+    id: uid("MED"),
+    usssId,
+    examDate,
+    nextDueDate: addMonths(examDate, months),
+    levelAtExam: person.level,
+    examinedBy: (data.examinedBy || "").trim(),
+    notes: (data.notes || "").trim(),
+    createdBy: actorLabel || "Rendszer",
+    createdAt: new Date().toISOString(),
+  };
+  const list = getAllMedicalRecords();
+  list.push(record);
+  if (!write(KEYS.medicalRecords, list)) return null;
+  logAudit(actorLabel, "Orvosi vizsgálat rögzítve", `${person.name} (${usssId}) — ${examDate}`);
+  return record;
+}
+export function deleteMedicalRecord(id, actorLabel) {
+  const record = getAllMedicalRecords().find((r) => r.id === id);
+  write(KEYS.medicalRecords, getAllMedicalRecords().filter((r) => r.id !== id));
+  logAudit(actorLabel, "Orvosi bejegyzés törölve", record ? `${record.usssId} — ${record.examDate}` : id);
+}
+/* Állapot: "nincs-adat" (soha nem volt rögzítve), "lejart" (a következő
+   esedékesség már elmúlt), "hamarosan" (30 napon belül esedékes), "rendben". */
+export function medicalStatusFor(usssId) {
+  const latest = getLatestMedicalRecord(usssId);
+  if (!latest) return "nincs-adat";
+  const dueInDays = (new Date(latest.nextDueDate) - new Date(new Date().toISOString().slice(0, 10))) / (1000 * 60 * 60 * 24);
+  if (dueInDays < 0) return "lejart";
+  if (dueInDays <= 30) return "hamarosan";
+  return "rendben";
 }
 
 /* ---------- Global search ------------------------------------------------*/

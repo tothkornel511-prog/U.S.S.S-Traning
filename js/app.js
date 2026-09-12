@@ -2,7 +2,7 @@
    U.S.S.S. ELITE TRAINING SYSTEM — APP ENTRY
    ========================================================================== */
 
-import { seedIfNeeded, globalSearch, getCustomCss, getOperationRecords, SECTIONS } from "./store.js?v=67";
+import { seedIfNeeded, globalSearch, getCustomCss, getOperationRecords, SECTIONS } from "./store.js?v=69";
 import { isAuthenticated, currentSession, logout, hasSection, isSuperAdmin, ROLES } from "./auth.js?v=23";
 import { registerRoute, resolve, startRouter, navigate, currentPath } from "./router.js?v=20";
 import { esc, sealMark, closeModal, applyBranding } from "./utils.js?v=31";
@@ -24,6 +24,7 @@ import { renderInvestigationList, renderInvestigationDetail } from "./pages/inve
 import { renderCovertOpList, renderCovertOpDetail } from "./pages/covert-ops.js?v=12";
 import { renderChannelsCategories, renderChannelsCategory, renderChannelsDoc } from "./pages/channels.js?v=5";
 import { renderTrainingCenterCategories, renderTrainingCenterCategory } from "./pages/training-center.js?v=3";
+import { renderMedicalList } from "./pages/medical.js?v=1";
 
 seedIfNeeded();
 applyCustomCss();
@@ -208,6 +209,7 @@ registerRoute("/plans", () => renderTrainingPlansList(document.getElementById("c
 registerRoute("/plans/:id", (p) => renderTrainingPlanDetail(document.getElementById("content"), p.id));
 registerRoute("/recruitment", () => renderRecruitmentHub(document.getElementById("content")));
 registerRoute("/recruitment/:id", (p) => renderApplicantDetail(document.getElementById("content"), p.id));
+registerRoute("/medical", () => renderMedicalList(document.getElementById("content")));
 registerRoute("/exam", () => renderExamList(document.getElementById("content")));
 registerRoute("/exam/:id", (p) => renderExamDetail(document.getElementById("content"), p.id));
 registerRoute("/locations", () => renderLocationsList(document.getElementById("content")));
