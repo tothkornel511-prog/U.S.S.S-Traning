@@ -393,7 +393,11 @@ export const ref = { LEVELS, SERVICE_STATUSES, MODULES, LEVEL_MODULE_ORDER, MAPS
 /* ---------- Szobánkénti hozzáférés (menüpontok / "rooms") ---------------
    Egyetlen forrás mind a navigációhoz (app.js), mind az admin felület
    jogosultság-kezelő űrlapjához (admin.js) — így a kettő sosem futhat szét.
-   Az id egyben az útvonal is ("/" + id), a "dashboard" mindenkinek jár. */
+   Az id egyben az útvonal is ("/" + id), a "dashboard" mindenkinek jár.
+   A Training Center és a Csatornák SZÁNDÉKOSAN nincs ebben a listában —
+   ezeket senkinek nem lehet kiosztani, kizárólag a Super Admin (USSS-118)
+   éri el őket (lásd app.js onRouteChange és a channels.js / training-center.js
+   saját isSuperAdmin() ellenőrzését). */
 export const SECTIONS = [
   { id: "dashboard", label: "Vezérlőpult", icon: "◈", group: "Áttekintés" },
   { id: "personnel", label: "Állomány", icon: "☰", group: "Állomány & Képzés" },
@@ -401,7 +405,6 @@ export const SECTIONS = [
   { id: "plans", label: "Kiképzési tervek", icon: "✎", group: "Állomány & Képzés" },
   { id: "protocols", label: "Jegyzőkönyvek", icon: "▤", group: "Állomány & Képzés" },
   { id: "recruitment", label: "Felvételi", icon: "✎", group: "Állomány & Képzés" },
-  { id: "channels", label: "Csatornák", icon: "▧", group: "Állomány & Képzés" },
   { id: "locations", label: "Védett helyszínek", icon: "◆", group: "Objektumok" },
   { id: "map", label: "Térkép", icon: "⛶", group: "Objektumok" },
   { id: "readiness", label: "Készültségi rendszer", icon: "◉", group: "Vezetői irányítás" },

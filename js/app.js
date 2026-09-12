@@ -22,7 +22,7 @@ import { renderOperations } from "./pages/operations.js?v=39";
 import { renderReadiness } from "./pages/readiness.js?v=32";
 import { renderInvestigationList, renderInvestigationDetail } from "./pages/investigations.js?v=8";
 import { renderCovertOpList, renderCovertOpDetail } from "./pages/covert-ops.js?v=10";
-import { renderChannelsHub } from "./pages/channels.js?v=1";
+import { renderChannelsHub } from "./pages/channels.js?v=2";
 import { renderTrainingCenterCategories, renderTrainingCenterCategory, renderTrainingCenterDoc } from "./pages/training-center.js?v=1";
 
 seedIfNeeded();
@@ -62,6 +62,7 @@ function pageTitleFor(path) {
   if (path.startsWith("/operations/")) return { crumb: "Command Center", title: "Operációs központ" };
   if (path.startsWith("/investigations/")) return { crumb: "Belső Vizsgálatok", title: "Vizsgálat részletei" };
   if (path.startsWith("/covert-ops/")) return { crumb: "Fedett Műveletek", title: "Művelet részletei" };
+  if (path === "/channels") return { crumb: "Csatornák", title: "Csatornák" };
   if (path.startsWith("/channels/")) return { crumb: "Csatornák", title: "Csatorna" };
   if (path.startsWith("/training-center")) return { crumb: "Training Center", title: "Oktatási Központ" };
   if (path.startsWith("/map")) return { crumb: "Objektumok", title: "Térkép" };
@@ -185,7 +186,10 @@ function renderNav() {
       </div>`;
   }).join("") + (isSuperAdmin() ? `
       <div class="nav-group">
-        <div class="nav-group-label">Oktatási Központ</div>
+        <div class="nav-group-label">Csak Super Admin</div>
+        <a href="#/channels" class="nav-link ${path === "/channels" || path.startsWith("/channels/") ? "active" : ""}">
+          <span class="ic">▧</span>Csatornák
+        </a>
         <a href="#/training-center" class="nav-link ${path === "/training-center" || path.startsWith("/training-center/") ? "active" : ""}">
           <span class="ic">🎓</span>Training Center
         </a>
@@ -244,7 +248,8 @@ function onRouteChange() {
   renderNav();
   if (!match) { navigate("/dashboard"); return; }
   const section = sectionForPath(currentPath());
-  const allowed = section === "training-center" ? isSuperAdmin() : hasSection(section);
+  const superAdminOnly = section === "training-center" || section === "channels";
+  const allowed = superAdminOnly ? isSuperAdmin() : hasSection(section);
   if (!allowed) {
     content.innerHTML = `<div class="denied"><div class="ic">⚠</div><h3>Hozzáférés megtagadva</h3><p class="text-low">Ehhez a részhez nincs jogosultságod. Kérj hozzáférést egy adminisztrátortól.</p></div>`;
     return;

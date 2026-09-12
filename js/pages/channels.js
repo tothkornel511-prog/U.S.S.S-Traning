@@ -3,9 +3,11 @@ import {
   getChannelPosts, createChannelPost, deleteChannelPost,
   isImageAttachment, formatFileSize, ATTACHMENT_MAX_UPLOAD_BYTES,
 } from "../store.js?v=64";
-import { hasRole, actorLabel } from "../auth.js?v=20";
-import { esc, fmtDateTime, toast, openModal, closeModal } from "../utils.js?v=23";
+import { isSuperAdmin, actorLabel } from "../auth.js?v=23";
+import { esc, fmtDateTime, toast, openModal, closeModal } from "../utils.js?v=24";
 import { navigate } from "../router.js?v=20";
+
+const DENIED = `<div class="denied"><div class="ic">⚠</div><h3>Hozzáférés megtagadva</h3><p class="text-low">A Csatornák kizárólag a Super Admin fiók számára elérhetők.</p></div>`;
 
 function readFileAsDataUrl(file) {
   return new Promise((resolve, reject) => {
@@ -17,14 +19,15 @@ function readFileAsDataUrl(file) {
 }
 
 export function renderChannelsHub(container, channelId) {
-  const canEdit = hasRole("TRAINING");
+  if (!isSuperAdmin()) { container.innerHTML = DENIED; return; }
+  const canEdit = true;
   const channels = getChannels();
   const active = getChannel(channelId) || channels[0] || null;
   const posts = active ? getChannelPosts(active.id) : [];
 
   container.innerHTML = `
-    <div class="classification-strip">U.S.S.S. BELSŐ CSATORNÁK · CSAPAT KOMMUNIKÁCIÓ</div>
-    <p class="text-low small mb-2">Saját szervezésű tartalom-szobák jegyzeteknek és mellékleteknek. <strong>Fontos:</strong> nincs szerver — minden csatorna és bejegyzés kizárólag ebben a böngészőben létezik, nem szinkronizál automatikusan más eszközre vagy felhasználóra.</p>
+    <div class="classification-strip">U.S.S.S. BELSŐ CSATORNÁK · KIZÁRÓLAG SUPER ADMIN HOZZÁFÉRÉS</div>
+    <p class="text-low small mb-2">Saját szervezésű tartalom-szobák jegyzeteknek és mellékleteknek — kizárólag ez a fiók éri el. <strong>Fontos:</strong> nincs szerver — minden csatorna és bejegyzés kizárólag ebben a böngészőben létezik, nem szinkronizál automatikusan más eszközre vagy felhasználóra.</p>
     <div class="channels-layout">
       <aside class="channels-sidebar">
         <div class="card-title mb-1">Csatornák</div>
