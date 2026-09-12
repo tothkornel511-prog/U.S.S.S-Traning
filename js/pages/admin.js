@@ -1,5 +1,5 @@
 import { getAccessCodes, upsertAccessCode, revokeAccessCode, generateCode, getAuditLog, getPersonnel, resetAllData, ref, getPositionEntries, addPosition, removePosition, getCustomCss, setCustomCss, getInvestigationCategories, addInvestigationCategory, removeInvestigationCategory, getCovertOpClassifications, addCovertOpClassification, removeCovertOpClassification, exportAllData, importAllData, getStorageReport, SECTIONS, BRANDING_SLOTS, MAX_BRANDING_BYTES, getBrandingUrl, getBrandingOverride, setBrandingOverride, clearBrandingOverride } from "../store.js?v=59";
-import { hasRole, isSuperAdmin, SUPER_ADMIN_ID, actorLabel, ROLES } from "../auth.js?v=21";
+import { hasRole, isSuperAdmin, SUPER_ADMIN_ID, actorLabel, ROLES, hasSuperAdminPin, clearSuperAdminPin } from "../auth.js?v=22";
 import { esc, fmtDateTime, toast, openModal, closeModal, applyBranding } from "../utils.js?v=23";
 
 function readFileAsDataUrl(file) {
@@ -376,6 +376,11 @@ function renderAuditTab(content) {
 function renderSystemTab(content) {
   content.innerHTML = `
     <div class="card mb-2">
+      <div class="card-title mb-1">Kétlépcsős azonosítás (Super Admin PIN)</div>
+      <p class="text-mid small mb-1">${hasSuperAdminPin() ? "Jelenleg aktív — minden USSS-118-as belépéskor a hozzáférési kód után is be kell írni." : "Jelenleg nincs beállítva — legközelebbi kilépés+belépéskor kéri majd a rendszer az első PIN beállítását."}</p>
+      ${hasSuperAdminPin() ? `<button class="btn btn-sm btn-danger" id="clear-pin">PIN törlése (2FA kikapcsolása)</button>` : ""}
+    </div>
+    <div class="card mb-2">
       <div class="card-title mb-1">Egyéni CSS (fejlesztői)</div>
       <p class="text-mid small mb-1">Ide bármilyen CSS-t beilleszthetsz — azonnal, kód-push és várakozás nélkül alkalmazódik az oldalra. Ez a legközelebbi eszköz ahhoz, hogy a böngészőből "belenyúlj a kódba": vizuális finomítások (színek, méretek, elrendezés-részletek) igen, de teljes JS/HTML-szerkesztés statikus GitHub Pages oldalon nem lehetséges biztonságosan backend nélkül.</p>
       <textarea id="custom-css-input" rows="10" style="width:100%; font-family:var(--font-mono); font-size:12.5px; background:var(--bg-base); border:1px solid var(--line-soft); border-radius:var(--radius-sm); color:var(--text-hi); padding:12px;" placeholder="/* pl. .btn-gold { border-radius: 4px; } */">${esc(getCustomCss())}</textarea>
@@ -394,6 +399,13 @@ function renderSystemTab(content) {
       <button class="btn btn-danger" id="reset-data">Minden adat visszaállítása alapértelmezettre</button>
     </div>
   `;
+
+  document.getElementById("clear-pin")?.addEventListener("click", () => {
+    if (!confirm("Biztosan kikapcsolja a kétlépcsős azonosítást? Legközelebbi belépéskor újra be lehet állítani.")) return;
+    clearSuperAdminPin();
+    toast("PIN törölve — a 2FA kikapcsolva");
+    renderSystemTab(content);
+  });
 
   function applyCssLive(css) {
     let styleEl = document.getElementById("custom-css");

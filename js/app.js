@@ -2,11 +2,11 @@
    U.S.S.S. ELITE TRAINING SYSTEM — APP ENTRY
    ========================================================================== */
 
-import { seedIfNeeded, globalSearch, getCustomCss, getOperationRecords, SECTIONS } from "./store.js?v=62";
-import { isAuthenticated, currentSession, logout, hasSection, ROLES } from "./auth.js?v=21";
+import { seedIfNeeded, globalSearch, getCustomCss, getOperationRecords, SECTIONS } from "./store.js?v=63";
+import { isAuthenticated, currentSession, logout, hasSection, isSuperAdmin, ROLES } from "./auth.js?v=22";
 import { registerRoute, resolve, startRouter, navigate, currentPath } from "./router.js?v=20";
-import { esc, sealMark, closeModal, applyBranding } from "./utils.js?v=23";
-import { renderLogin } from "./pages/login.js?v=23";
+import { esc, sealMark, closeModal, applyBranding } from "./utils.js?v=24";
+import { renderLogin } from "./pages/login.js?v=24";
 import { renderDashboard } from "./pages/dashboard.js?v=46";
 import { renderPersonnelList } from "./pages/personnel.js?v=22";
 import { renderProfile } from "./pages/profile.js?v=22";
@@ -17,12 +17,13 @@ import { renderLocationsList, renderLocationDetail } from "./pages/locations.js?
 import { renderMapPage } from "./pages/map.js?v=21";
 import { renderRecruitmentHub, renderApplicantDetail } from "./pages/recruitment.js?v=26";
 import { renderExamList, renderExamDetail } from "./pages/exam.js?v=40";
-import { renderAdmin } from "./pages/admin.js?v=29";
+import { renderAdmin } from "./pages/admin.js?v=30";
 import { renderOperations } from "./pages/operations.js?v=39";
 import { renderReadiness } from "./pages/readiness.js?v=32";
 import { renderInvestigationList, renderInvestigationDetail } from "./pages/investigations.js?v=8";
 import { renderCovertOpList, renderCovertOpDetail } from "./pages/covert-ops.js?v=10";
 import { renderChannelsHub } from "./pages/channels.js?v=1";
+import { renderTrainingCenterCategories, renderTrainingCenterCategory, renderTrainingCenterDoc } from "./pages/training-center.js?v=1";
 
 seedIfNeeded();
 applyCustomCss();
@@ -62,6 +63,7 @@ function pageTitleFor(path) {
   if (path.startsWith("/investigations/")) return { crumb: "Belső Vizsgálatok", title: "Vizsgálat részletei" };
   if (path.startsWith("/covert-ops/")) return { crumb: "Fedett Műveletek", title: "Művelet részletei" };
   if (path.startsWith("/channels/")) return { crumb: "Csatornák", title: "Csatorna" };
+  if (path.startsWith("/training-center")) return { crumb: "Training Center", title: "Oktatási Központ" };
   if (path.startsWith("/map")) return { crumb: "Objektumok", title: "Térkép" };
   const flat = NAV.flatMap((g) => g.items);
   const found = flat.find((i) => i.path === path);
@@ -181,7 +183,13 @@ function renderNav() {
             <span class="ic">${i.icon}</span>${esc(i.label)}${i.path === "/operations/notifications" && alertCount ? `<span class="nav-alert-count">${alertCount}</span>` : ""}
           </a>`).join("")}
       </div>`;
-  }).join("");
+  }).join("") + (isSuperAdmin() ? `
+      <div class="nav-group">
+        <div class="nav-group-label">Oktatási Központ</div>
+        <a href="#/training-center" class="nav-link ${path === "/training-center" || path.startsWith("/training-center/") ? "active" : ""}">
+          <span class="ic">🎓</span>Training Center
+        </a>
+      </div>` : "");
 }
 
 /* ---------- Routes -------------------------------------------------- */
@@ -210,6 +218,9 @@ registerRoute("/covert-ops", () => renderCovertOpList(document.getElementById("c
 registerRoute("/covert-ops/:id", (p) => renderCovertOpDetail(document.getElementById("content"), p.id));
 registerRoute("/channels", () => renderChannelsHub(document.getElementById("content")));
 registerRoute("/channels/:channelId", (p) => renderChannelsHub(document.getElementById("content"), p.channelId));
+registerRoute("/training-center", () => renderTrainingCenterCategories(document.getElementById("content")));
+registerRoute("/training-center/:categoryId", (p) => renderTrainingCenterCategory(document.getElementById("content"), p.categoryId));
+registerRoute("/training-center/:categoryId/:docId", (p) => renderTrainingCenterDoc(document.getElementById("content"), p.categoryId, p.docId));
 
 /* Az útvonal első (operations esetén első két) szegmenséből számolja ki,
    melyik "szoba" felel meg neki — ugyanaz az id, mint a SECTIONS-ban. */
@@ -232,7 +243,9 @@ function onRouteChange() {
   document.getElementById("page-title").textContent = title;
   renderNav();
   if (!match) { navigate("/dashboard"); return; }
-  if (!hasSection(sectionForPath(currentPath()))) {
+  const section = sectionForPath(currentPath());
+  const allowed = section === "training-center" ? isSuperAdmin() : hasSection(section);
+  if (!allowed) {
     content.innerHTML = `<div class="denied"><div class="ic">⚠</div><h3>Hozzáférés megtagadva</h3><p class="text-low">Ehhez a részhez nincs jogosultságod. Kérj hozzáférést egy adminisztrátortól.</p></div>`;
     return;
   }

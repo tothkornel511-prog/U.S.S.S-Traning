@@ -40,6 +40,9 @@ const KEYS = {
   covertOpClassifications: NS + "covert_op_classifications",
   channels: NS + "channels",
   channelPosts: NS + "channel_posts",
+  trainingCategories: NS + "tc_categories",
+  trainingDocs: NS + "tc_docs",
+  trainingQuestions: NS + "tc_questions",
 };
 
 /* Elméleti vizsgánál ez alatt a százalék alatt a modul nem számít teljesítettnek. */
@@ -129,6 +132,26 @@ export function seedIfNeeded() {
   applyInvestigationSeedPatch();
   applyTrainingPlanMultiModulePatch();
   applyChannelsSeedPatch();
+  applyTrainingCenterSeedPatch();
+}
+
+/* Célzott seedelés: az Oktatási Központ (Training Center) modul — csak a
+   Super Admin számára elérhető dokumentációs rendszer. Alapértelmezett
+   kategóriákat hoz létre, ha még egy sincs. */
+const TRAINING_CATEGORY_SEED = [
+  "Alapvető ismeretek", "Kommunikáció", "Rádióhasználat", "Védelem", "Sofőri képzés",
+  "Taktikai képzés", "Védett személyek", "Védett helyszínek", "Konvoj", "Vészhelyzetek",
+  "Erőhasználat", "Fegyverismeret", "Egyéb oktatási anyagok",
+];
+function applyTrainingCenterSeedPatch() {
+  if (read(KEYS.trainingCategories, null) === null) {
+    write(KEYS.trainingCategories, []);
+    write(KEYS.trainingDocs, []);
+    write(KEYS.trainingQuestions, []);
+  }
+  if (read(KEYS.trainingCategories, []).length === 0) {
+    TRAINING_CATEGORY_SEED.forEach((name) => createTrainingCategory(name, "Rendszer"));
+  }
 }
 
 /* Célzott seedelés: a Kiképzési tervek (training plans) modul új
@@ -1945,6 +1968,144 @@ export function createChannelPost(channelId, data, actorLabel) {
 export function deleteChannelPost(postId, actorLabel) {
   write(KEYS.channelPosts, getAllChannelPosts().filter((p) => p.id !== postId));
   logAudit(actorLabel, "Csatorna-bejegyzés törölve", postId);
+}
+
+/* ---------- Oktatási Központ (Training Center) --------------------------
+   Strukturált dokumentáció-rendszer: Kategóriák → Dokumentumok → Kérdések.
+   Kizárólag a Super Admin (lásd auth.js SUPER_ADMIN_ID) számára elérhető —
+   ezt az app.js route-védelme és navigációja is külön, a hasSection()
+   rendszertől függetlenül kényszeríti ki. Ugyanaz a szerver nélküli,
+   localStorage-alapú korlát vonatkozik rá, mint minden más modulra. */
+export const TRAINING_DOC_STATUSES = ["Piszkozat", "Belső", "Publikált", "Archivált"];
+
+export function getTrainingCategories() {
+  return read(KEYS.trainingCategories, []);
+}
+export function getTrainingCategory(id) {
+  return getTrainingCategories().find((c) => c.id === id);
+}
+export function createTrainingCategory(name, actorLabel) {
+  const trimmed = (name || "").trim();
+  if (!trimmed) return null;
+  const slug = trimmed.toLowerCase()
+    .normalize("NFD").replace(/[̀-ͯ]/g, "")
+    .replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "") || "kategoria";
+  const list = getTrainingCategories();
+  let id = slug, n = 2;
+  while (list.some((c) => c.id === id)) id = `${slug}-${n++}`;
+  const category = { id, name: trimmed, createdBy: actorLabel || "Rendszer", createdAt: new Date().toISOString() };
+  list.push(category);
+  write(KEYS.trainingCategories, list);
+  logAudit(actorLabel, "Oktatási kategória létrehozva", trimmed);
+  return category;
+}
+export function renameTrainingCategory(id, name, actorLabel) {
+  const trimmed = (name || "").trim();
+  if (!trimmed) return;
+  const list = getTrainingCategories();
+  const cat = list.find((c) => c.id === id);
+  if (!cat) return;
+  const oldName = cat.name;
+  cat.name = trimmed;
+  write(KEYS.trainingCategories, list);
+  logAudit(actorLabel, "Oktatási kategória átnevezve", `${oldName} → ${trimmed}`);
+}
+export function deleteTrainingCategory(id, actorLabel) {
+  const category = getTrainingCategory(id);
+  write(KEYS.trainingCategories, getTrainingCategories().filter((c) => c.id !== id));
+  const docs = getTrainingDocs(id);
+  docs.forEach((doc) => deleteTrainingDoc(doc.id, actorLabel));
+  logAudit(actorLabel, "Oktatási kategória törölve", category?.name || id);
+}
+
+function getAllTrainingDocs() {
+  return read(KEYS.trainingDocs, []);
+}
+export function getTrainingDocs(categoryId) {
+  return getAllTrainingDocs()
+    .filter((d) => d.categoryId === categoryId)
+    .sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
+}
+export function getTrainingDoc(id) {
+  return getAllTrainingDocs().find((d) => d.id === id);
+}
+export function createTrainingDoc(categoryId, data, actorLabel) {
+  const now = new Date().toISOString();
+  const doc = {
+    id: uid("DOC"),
+    categoryId,
+    title: (data.title || "Névtelen dokumentum").trim(),
+    description: (data.description || "").trim(),
+    content: (data.content || "").trim(),
+    coverImage: data.coverImage || null,
+    gallery: (data.gallery || []).slice(0, 20),
+    status: TRAINING_DOC_STATUSES.includes(data.status) ? data.status : "Piszkozat",
+    createdBy: actorLabel || "Rendszer",
+    createdAt: now,
+    updatedBy: actorLabel || "Rendszer",
+    updatedAt: now,
+  };
+  const list = getAllTrainingDocs();
+  list.push(doc);
+  if (!write(KEYS.trainingDocs, list)) return null;
+  logAudit(actorLabel, "Oktatási dokumentum létrehozva", doc.title);
+  return doc;
+}
+export function updateTrainingDoc(id, patch, actorLabel) {
+  const list = getAllTrainingDocs();
+  const doc = list.find((d) => d.id === id);
+  if (!doc) return null;
+  const previous = JSON.parse(JSON.stringify(doc));
+  Object.entries(patch).forEach(([key, value]) => { if (value !== undefined) doc[key] = value; });
+  doc.updatedAt = new Date().toISOString();
+  doc.updatedBy = actorLabel || "Rendszer";
+  if (!write(KEYS.trainingDocs, list)) {
+    Object.assign(doc, previous);
+    return null;
+  }
+  return doc;
+}
+export function deleteTrainingDoc(id, actorLabel) {
+  const doc = getTrainingDoc(id);
+  write(KEYS.trainingDocs, getAllTrainingDocs().filter((d) => d.id !== id));
+  write(KEYS.trainingQuestions, read(KEYS.trainingQuestions, []).filter((q) => q.docId !== id));
+  logAudit(actorLabel, "Oktatási dokumentum törölve", doc?.title || id);
+}
+
+function getAllTrainingQuestions() {
+  return read(KEYS.trainingQuestions, []);
+}
+export function getTrainingQuestions(docId) {
+  return getAllTrainingQuestions().filter((q) => q.docId === docId);
+}
+export function createTrainingQuestion(docId, data, actorLabel) {
+  const question = {
+    id: uid("Q"),
+    docId,
+    question: (data.question || "").trim(),
+    options: (data.options || []).map((o) => (o || "").trim()).filter(Boolean),
+    correctAnswer: (data.correctAnswer || "").trim(),
+    explanation: (data.explanation || "").trim(),
+    createdAt: new Date().toISOString(),
+  };
+  if (!question.question) return null;
+  const list = getAllTrainingQuestions();
+  list.push(question);
+  write(KEYS.trainingQuestions, list);
+  logAudit(actorLabel, "Oktatási kérdés létrehozva", question.question.slice(0, 60));
+  return question;
+}
+export function updateTrainingQuestion(id, patch, actorLabel) {
+  const list = getAllTrainingQuestions();
+  const q = list.find((x) => x.id === id);
+  if (!q) return null;
+  Object.entries(patch).forEach(([key, value]) => { if (value !== undefined) q[key] = value; });
+  write(KEYS.trainingQuestions, list);
+  return q;
+}
+export function deleteTrainingQuestion(id, actorLabel) {
+  write(KEYS.trainingQuestions, getAllTrainingQuestions().filter((q) => q.id !== id));
+  logAudit(actorLabel, "Oktatási kérdés törölve", id);
 }
 
 /* ---------- Global search ------------------------------------------------*/

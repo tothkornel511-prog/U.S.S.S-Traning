@@ -1,4 +1,4 @@
-import { login } from "../auth.js?v=20";
+import { login, finalizeLogin, hasSuperAdminPin, setSuperAdminPin, verifySuperAdminPin } from "../auth.js?v=22";
 import { esc, sealMark, applyBranding } from "../utils.js?v=23";
 
 export function renderLogin(root, onSuccess) {
@@ -41,6 +41,63 @@ export function renderLogin(root, onSuccess) {
       errBox.innerHTML = `<div class="login-error">⚠ ${esc(result.error)}</div>`;
       return;
     }
+    if (result.requiresPin) {
+      renderPinStep(root, result.session, onSuccess);
+      return;
+    }
+    onSuccess();
+  });
+}
+
+function renderPinStep(root, session, onSuccess) {
+  const isNewPin = !hasSuperAdminPin();
+  root.innerHTML = `
+    <div class="global-classification"><span>U.S.S.S. // RESTRICTED SYSTEM — AUTHORIZED PERSONNEL ONLY</span></div>
+    <div class="login-screen">
+      <div class="login-watermark">${sealMark(1100)}</div>
+      <div class="login-card">
+        <div class="login-seal">${sealMark(74)}</div>
+        <div class="login-title">U.S.S.S.</div>
+        <div class="login-sub">${isNewPin ? "Kétlépcsős azonosítás beállítása" : "Kétlépcsős azonosítás"}</div>
+        <div id="pin-error"></div>
+        ${isNewPin ? `<p class="text-mid small mb-2">Ez a Super Admin fiók (${esc(session.usssId)}) még nincs kétlépcsős azonosítással védve. Állíts be egy PIN kódot — ezt mostantól minden belépéskor be kell írnod az azonosító+kód után.</p>` : ""}
+        <form id="pin-form">
+          <div class="field">
+            <label>${isNewPin ? "Új PIN kód (min. 4 karakter)" : "PIN kód"}</label>
+            <input type="password" id="pin" placeholder="••••••" autocomplete="off" required minlength="4" autofocus />
+          </div>
+          ${isNewPin ? `<div class="field"><label>PIN megerősítése</label><input type="password" id="pin-confirm" placeholder="••••••" autocomplete="off" required minlength="4" /></div>` : ""}
+          <button type="submit" class="btn btn-gold btn-block">${isNewPin ? "PIN beállítása és belépés" : "Belépés"}</button>
+        </form>
+        <div class="login-demo">
+          A PIN csak ebben a böngészőben van eltárolva (kódolt formában), és nem helyettesíti a valódi szerveroldali hitelesítést.
+        </div>
+      </div>
+    </div>
+  `;
+  applyBranding(root.querySelector(".login-screen"), "hero-main");
+
+  document.getElementById("pin-form").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const errBox = document.getElementById("pin-error");
+    const pin = document.getElementById("pin").value;
+    if (isNewPin) {
+      const confirmPin = document.getElementById("pin-confirm").value;
+      if (pin !== confirmPin) {
+        errBox.innerHTML = `<div class="login-error">⚠ A két PIN nem egyezik.</div>`;
+        return;
+      }
+      await setSuperAdminPin(pin);
+      finalizeLogin(session);
+      onSuccess();
+      return;
+    }
+    const ok = await verifySuperAdminPin(pin);
+    if (!ok) {
+      errBox.innerHTML = `<div class="login-error">⚠ Érvénytelen PIN kód.</div>`;
+      return;
+    }
+    finalizeLogin(session);
     onSuccess();
   });
 }

@@ -34,8 +34,43 @@ export function login(usssId, code) {
     name: person ? person.name : entry.usssId,
     loginAt: new Date().toISOString(),
   };
+  if (entry.usssId === SUPER_ADMIN_ID) {
+    return { ok: true, session, requiresPin: true };
+  }
   sessionStorage.setItem(SESSION_KEY, JSON.stringify(session));
   return { ok: true, session };
+}
+
+export function finalizeLogin(session) {
+  sessionStorage.setItem(SESSION_KEY, JSON.stringify(session));
+}
+
+/* ---------- Kétlépcsős azonosítás a Super Admin (USSS-118) fióknak --------
+   FONTOS, őszintén: ez a rendszer szerver nélküli statikus oldal — ez nem
+   valódi kriptográfiai 2FA (nincs külön eszköz/authenticator-app), csak egy
+   MÁSODIK, csak a helyi böngészőben (SHA-256 hash-elve) tárolt PIN kód, amit
+   az elsődleges azonosító+kód után is be kell írni. Ez érdemben megnehezíti
+   a fiók illetéktelen használatát, de nem helyettesíti a valódi szerveroldali
+   hitelesítést, mivel a forráskód és a localStorage bárki számára olvasható,
+   aki hozzáfér a géphez/böngészőhöz. */
+const PIN_KEY = "usss_ets_super_admin_pin_hash";
+
+async function sha256Hex(text) {
+  const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(text));
+  return Array.from(new Uint8Array(buf)).map((b) => b.toString(16).padStart(2, "0")).join("");
+}
+export function hasSuperAdminPin() {
+  return !!localStorage.getItem(PIN_KEY);
+}
+export async function setSuperAdminPin(pin) {
+  localStorage.setItem(PIN_KEY, await sha256Hex(pin));
+}
+export async function verifySuperAdminPin(pin) {
+  const stored = localStorage.getItem(PIN_KEY);
+  return !!stored && (await sha256Hex(pin)) === stored;
+}
+export function clearSuperAdminPin() {
+  localStorage.removeItem(PIN_KEY);
 }
 
 export function logout() {

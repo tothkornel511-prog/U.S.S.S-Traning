@@ -2,7 +2,7 @@
    U.S.S.S. ELITE TRAINING SYSTEM — UI SEGÉDFÜGGVÉNYEK
    ========================================================================== */
 
-import { getBrandingOverride } from "./store.js?v=59";
+import { getBrandingOverride } from "./store.js?v=63";
 
 /* Ha az admin lecserélt egy márka-képet, ez állítja be a --brand-img egyéni
    CSS tulajdonságot az adott elemen — felülírás nélkül a CSS-ben megadott
@@ -21,6 +21,34 @@ export function esc(str) {
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;");
+}
+
+/* Könnyű, saját "jegyzet-szintaxis" oktatási dokumentumokhoz — nem teljes
+   Markdown, csak annyi, amennyi egy digitális kézikönyvhez kell: címsorok,
+   felsorolás, idézet/kiemelt doboz, elválasztó, félkövér/dőlt szöveg.
+   Mindig esc()-elt szövegből épül, HTML befecskendezés nem lehetséges. */
+export function renderRichText(text) {
+  if (!text) return "";
+  const inline = (s) => esc(s)
+    .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
+    .replace(/(?<!\*)\*([^*]+?)\*(?!\*)/g, "<em>$1</em>");
+  let html = "", inList = false, inQuote = false;
+  const closeList = () => { if (inList) { html += "</ul>"; inList = false; } };
+  const closeQuote = () => { if (inQuote) { html += "</blockquote>"; inQuote = false; } };
+  String(text).replace(/\r\n/g, "\n").split("\n").forEach((raw) => {
+    const line = raw.trim();
+    if (!line) { closeList(); closeQuote(); return; }
+    if (line === "---") { closeList(); closeQuote(); html += "<hr/>"; return; }
+    if (line.startsWith("### ")) { closeList(); closeQuote(); html += `<h4>${inline(line.slice(4))}</h4>`; return; }
+    if (line.startsWith("## ")) { closeList(); closeQuote(); html += `<h3>${inline(line.slice(3))}</h3>`; return; }
+    if (line.startsWith("# ")) { closeList(); closeQuote(); html += `<h2>${inline(line.slice(2))}</h2>`; return; }
+    if (line.startsWith("> ")) { closeList(); if (!inQuote) { html += "<blockquote>"; inQuote = true; } html += `<p>${inline(line.slice(2))}</p>`; return; }
+    if (line.startsWith("- ") || line.startsWith("* ")) { closeQuote(); if (!inList) { html += "<ul>"; inList = true; } html += `<li>${inline(line.slice(2))}</li>`; return; }
+    closeList(); closeQuote();
+    html += `<p>${inline(line)}</p>`;
+  });
+  closeList(); closeQuote();
+  return html;
 }
 
 export function fmtDate(iso) {

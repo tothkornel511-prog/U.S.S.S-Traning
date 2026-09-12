@@ -991,3 +991,38 @@ body.printing-cert #cert-print-root { display: block; }
 .channel-post-meta { color: var(--text-low); font-size: 11px; white-space: nowrap; }
 .channel-post-body { color: var(--text-mid); white-space: pre-wrap; font-size: 13.5px; line-height: 1.6; }
 @media (max-width: 760px) { .channels-layout { grid-template-columns: 1fr; } .channels-sidebar { position: static; } }
+
+/* Oktatási Központ (Training Center) — kategória/dokumentum kártyák + tartalom */
+.tc-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 16px; }
+.tc-card {
+  position: relative; overflow: hidden; border-radius: var(--radius-lg); cursor: pointer;
+  border: 1px solid rgba(198,166,100,0.25); background: rgba(18,20,27,0.6);
+  transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease;
+}
+.tc-card:hover { transform: translateY(-3px); border-color: rgba(198,166,100,.45); box-shadow: 0 18px 40px rgba(0,0,0,.4), 0 0 26px rgba(198,166,100,.1); }
+.tc-card-cover { height: 110px; background: linear-gradient(160deg,#1c1810,#0d0c08); background-size: cover; background-position: center; display: flex; align-items: center; justify-content: center; position: relative; }
+.tc-card-cover .ic { font-size: 26px; opacity: .5; }
+.tc-card-cover::after { content:""; position:absolute; inset:0; background: linear-gradient(180deg, transparent 40%, rgba(6,7,10,.75) 100%); }
+.tc-card-body { padding: 14px 16px; position: relative; z-index: 1; }
+.tc-card-title { color: var(--gold-bright); font-family: var(--font-display); font-size: 16px; margin-bottom: 4px; }
+.tc-card-meta { color: var(--text-low); font-size: 11.5px; }
+.doc-content { color: var(--text-mid); font-size: 14px; line-height: 1.75; }
+.doc-content h2 { font-size: 20px; margin: 20px 0 10px; color: var(--gold-bright); }
+.doc-content h3 { font-size: 16.5px; margin: 16px 0 8px; color: var(--gold-bright); }
+.doc-content h4 { font-size: 13.5px; margin: 12px 0 6px; color: var(--gold); text-transform: uppercase; letter-spacing: .06em; }
+.doc-content p { margin: 0 0 10px; }
+.doc-content ul { margin: 0 0 10px; padding-left: 20px; }
+.doc-content li { margin-bottom: 4px; }
+.doc-content hr { border: none; border-top: 1px solid var(--line-soft); margin: 18px 0; }
+.doc-content blockquote {
+  margin: 0 0 12px; padding: 10px 14px; border-left: 3px solid var(--orange);
+  background: rgba(217,122,53,0.08); border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+}
+.doc-content blockquote p { margin: 0; color: var(--text-hi); }
+.doc-content strong { color: var(--text-hi); }
+.doc-cover { width: 100%; max-height: 280px; object-fit: cover; border-radius: var(--radius-lg); border: 1px solid rgba(198,166,100,.3); margin-bottom: 16px; }
+.doc-editor-toolbar { display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 6px; }
+.doc-editor-toolbar button { padding: 4px 9px; font-size: 11px; }
+.save-indicator { font-size: 11px; color: var(--text-low); transition: color .2s ease; }
+.save-indicator.saved { color: #7fd19c; }
+.save-indicator.saving { color: var(--gold); }
