@@ -6,7 +6,7 @@ import {
   archiveOperationRecord,
 } from "../store.js?v=66";
 import { actorLabel, hasRole } from "../auth.js?v=20";
-import { esc, fmtDate, toast, openModal, closeModal, applyBranding } from "../utils.js?v=23";
+import { esc, fmtDate, toast, openModal, closeModal, applyBranding } from "../utils.js?v=25";
 import { navigate } from "../router.js?v=20";
 
 const STATUS = ["OPEN", "IN REVIEW", "APPROVED", "REJECTED", "COMPLETED"];

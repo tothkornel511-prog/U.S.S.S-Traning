@@ -122,6 +122,50 @@ export function closeModal() {
   if (el) el.remove();
 }
 
+/* PDF/DOCX mellékletek megnyitása KÖZVETLENÜL az oldalon belül, nem
+   letöltésként. PDF-nél a böngésző saját, natív PDF-nézetét ágyazzuk be
+   (iframe) — ez minden modern böngészőben működik data: URL-re és sima
+   linkre is. DOCX-nél nincs natív böngésző-támogatás, ezért a mammoth.js
+   könyvtárral (lásd index.html, CDN-ről betöltve) alakítjuk HTML-lé
+   kliensoldalon — nem kell hozzá szerver, és nem futtat semmilyen kódot
+   a dokumentumból, csak a szöveges/formázási tartalmát olvassa ki. */
+function attachmentFileType(label, url) {
+  const s = `${label || ""} ${url || ""}`.toLowerCase();
+  if (s.includes("application/pdf") || s.includes(".pdf")) return "pdf";
+  if (s.includes("wordprocessingml") || s.includes(".docx")) return "docx";
+  return "other";
+}
+
+export async function previewAttachment(label, url) {
+  const type = attachmentFileType(label, url);
+  if (type === "pdf") {
+    openModal(`
+      <div class="modal-head"><h3>${esc(label)}</h3><button class="modal-close" data-close-modal>×</button></div>
+      <iframe src="${esc(url)}" style="width:100%; height:75vh; border:none; border-radius:var(--radius-sm); background:#fff;"></iframe>
+      <div class="flex justify-end mt-1"><a href="${esc(url)}" target="_blank" rel="noopener noreferrer" class="btn btn-sm">Megnyitás új fülön</a></div>
+    `);
+    return;
+  }
+  if (type === "docx") {
+    openModal(`
+      <div class="modal-head"><h3>${esc(label)}</h3><button class="modal-close" data-close-modal>×</button></div>
+      <div id="docx-preview-body" style="max-height:75vh; overflow-y:auto; background:#fff; color:#141414; padding:24px; border-radius:var(--radius-sm); font-family:var(--font-body, sans-serif);">Betöltés…</div>
+    `);
+    try {
+      if (!window.mammoth) throw new Error("mammoth-missing");
+      const buf = await (await fetch(url)).arrayBuffer();
+      const result = await window.mammoth.convertToHtml({ arrayBuffer: buf });
+      const body = document.getElementById("docx-preview-body");
+      if (body) body.innerHTML = result.value;
+    } catch {
+      const body = document.getElementById("docx-preview-body");
+      if (body) body.innerHTML = `<p>Nem sikerült megnyitni előnézetben. <a href="${esc(url)}" target="_blank" rel="noopener noreferrer">Megnyitás/letöltés közvetlenül</a>.</p>`;
+    }
+    return;
+  }
+  window.open(url, "_blank", "noopener,noreferrer");
+}
+
 export function statusBadge(color, label) {
   return `<span class="badge badge-${esc(color)}">${esc(label)}</span>`;
 }

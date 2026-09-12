@@ -5,7 +5,7 @@ import {
   TRAINING_DOC_STATUSES, ATTACHMENT_MAX_UPLOAD_BYTES, formatFileSize,
 } from "../store.js?v=66";
 import { isSuperAdmin, actorLabel } from "../auth.js?v=22";
-import { esc, fmtDateTime, toast, openModal, closeModal, renderRichText } from "../utils.js?v=24";
+import { esc, fmtDateTime, toast, openModal, closeModal, renderRichText } from "../utils.js?v=25";
 import { navigate } from "../router.js?v=20";
 
 const DENIED = `<div class="denied"><div class="ic">⚠</div><h3>Hozzáférés megtagadva</h3><p class="text-low">Az Oktatási Központ kizárólag a Super Admin fiók számára elérhető.</p></div>`;

@@ -7,7 +7,7 @@ import {
   INVESTIGATION_SEVERITIES, INVESTIGATION_STATUSES, INVESTIGATION_CLOSED_STATUSES, INVESTIGATION_OUTCOMES, INVESTIGATION_ORIGINS,
 } from "../store.js?v=66";
 import { hasRole, actorLabel } from "../auth.js?v=20";
-import { esc, fmtDate, fmtDateTime, toast, openModal, closeModal, applyBranding } from "../utils.js?v=23";
+import { esc, fmtDate, fmtDateTime, toast, openModal, closeModal, applyBranding, previewAttachment } from "../utils.js?v=25";
 import { navigate } from "../router.js?v=20";
 
 const SEVERITY_BADGE = { "Alacsony": "gray", "Közepes": "yellow", "Súlyos": "red", "Kritikus": "red" };
@@ -212,9 +212,9 @@ export function renderInvestigationDetail(container, id) {
       <p class="text-low small mb-1">Bizonyítékok, dokumentumok — közvetlenül feltöltve (böngésző helyi tárolójában) vagy külső helyen (Discord, Drive, Dropbox) tárolt hivatkozásként. Kép típusú csatolmányok előnézettel jelennek meg.</p>
       ${(inv.attachments || []).length ? `<div class="attachment-grid">${inv.attachments.map((a, i) => `
         <div class="attachment-card">
-          ${isImageAttachment(a) ? `<a href="${esc(a.url)}" target="_blank" rel="noopener noreferrer"><img src="${esc(a.url)}" alt="${esc(a.label)}" class="attachment-thumb" /></a>` : `<div class="attachment-file-icon">📄</div>`}
+          ${isImageAttachment(a) ? `<a href="${esc(a.url)}" target="_blank" rel="noopener noreferrer"><img src="${esc(a.url)}" alt="${esc(a.label)}" class="attachment-thumb" /></a>` : `<a href="#" data-preview-attach="${i}" class="attachment-file-icon">📄</a>`}
           <div class="attachment-meta">
-            <a href="${esc(a.url)}" target="_blank" rel="noopener noreferrer" class="text-gold small">${esc(a.label)}</a>
+            <a href="#" data-preview-attach="${i}" class="text-gold small">${esc(a.label)}</a>
             <span class="text-low" style="font-size:11px">${a.kind === "upload" ? `Feltöltve${a.size ? ` · ${formatFileSize(a.size)}` : ""}` : "Külső hivatkozás"}</span>
           </div>
           ${canEdit ? `<button class="btn btn-sm btn-danger" data-remove-attachment="${i}">×</button>` : ""}
@@ -340,6 +340,13 @@ export function renderInvestigationDetail(container, id) {
       removeInvestigationAttachment(inv.id, Number(b.getAttribute("data-remove-attachment")), actorLabel());
       toast("Csatolmány eltávolítva");
       renderInvestigationDetail(container, inv.id);
+    })
+  );
+  container.querySelectorAll("[data-preview-attach]").forEach((a) =>
+    a.addEventListener("click", (e) => {
+      e.preventDefault();
+      const att = (inv.attachments || [])[Number(a.getAttribute("data-preview-attach"))];
+      if (att) previewAttachment(att.label, att.url);
     })
   );
 

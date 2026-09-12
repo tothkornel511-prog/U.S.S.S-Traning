@@ -3,7 +3,7 @@ import {
   SUPER_ADMIN_ID, setSuperAdminCode,
 } from "../auth.js?v=23";
 import { getPerson } from "../store.js?v=66";
-import { esc, sealMark, applyBranding } from "../utils.js?v=23";
+import { esc, sealMark, applyBranding } from "../utils.js?v=25";
 
 export function renderLogin(root, onSuccess) {
   root.innerHTML = `

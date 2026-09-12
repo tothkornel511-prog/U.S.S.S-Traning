@@ -1,6 +1,6 @@
 import { getPersonnel, getProtocols, getLocations, getOperationRecords, getReadinessState, READINESS_LEVELS, readinessPercent, ref, getExams, examScoreSummary, getExamCategories } from "../store.js?v=66";
 import { hasRole, currentSession, ROLES } from "../auth.js?v=20";
-import { esc, avatarContent, sealMark, applyBranding } from "../utils.js?v=23";
+import { esc, avatarContent, sealMark, applyBranding } from "../utils.js?v=25";
 import { navigate } from "../router.js?v=20";
 
 export function renderDashboard(container) {

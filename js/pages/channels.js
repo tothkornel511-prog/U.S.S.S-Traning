@@ -4,7 +4,7 @@ import {
   isImageAttachment, formatFileSize, ATTACHMENT_MAX_UPLOAD_BYTES,
 } from "../store.js?v=66";
 import { isSuperAdmin, actorLabel } from "../auth.js?v=23";
-import { esc, fmtDateTime, toast, openModal, closeModal } from "../utils.js?v=24";
+import { esc, fmtDateTime, toast, openModal, closeModal, previewAttachment } from "../utils.js?v=25";
 import { navigate } from "../router.js?v=20";
 
 const DENIED = `<div class="denied"><div class="ic">⚠</div><h3>Hozzáférés megtagadva</h3><p class="text-low">A Csatornák kizárólag a Super Admin fiók számára elérhetők.</p></div>`;
@@ -52,6 +52,14 @@ export function renderChannelsHub(container, channelId) {
   `;
 
   container.querySelectorAll("[data-nav]").forEach((n) => n.addEventListener("click", () => navigate(n.getAttribute("data-nav"))));
+  container.querySelectorAll("[data-preview-post-attach]").forEach((a) =>
+    a.addEventListener("click", (e) => {
+      e.preventDefault();
+      const [postId, idx] = a.getAttribute("data-preview-post-attach").split(":");
+      const att = posts.find((p) => p.id === postId)?.attachments?.[Number(idx)];
+      if (att) previewAttachment(att.label, att.url);
+    })
+  );
   container.querySelectorAll("[data-delete-post]").forEach((b) =>
     b.addEventListener("click", () => {
       if (!confirm("Biztosan törli ezt a bejegyzést?")) return;
@@ -107,11 +115,11 @@ function renderPost(post) {
         </div>
       </div>
       ${post.body ? `<div class="channel-post-body">${esc(post.body)}</div>` : ""}
-      ${(post.attachments || []).length ? `<div class="attachment-grid">${post.attachments.map((a) => `
+      ${(post.attachments || []).length ? `<div class="attachment-grid">${post.attachments.map((a, i) => `
         <div class="attachment-card">
-          ${isImageAttachment(a) ? `<a href="${esc(a.url)}" target="_blank" rel="noopener noreferrer"><img src="${esc(a.url)}" alt="${esc(a.label)}" class="attachment-thumb" /></a>` : `<a href="${esc(a.url)}" target="_blank" rel="noopener noreferrer" class="attachment-file-icon">📄</a>`}
+          ${isImageAttachment(a) ? `<a href="${esc(a.url)}" target="_blank" rel="noopener noreferrer"><img src="${esc(a.url)}" alt="${esc(a.label)}" class="attachment-thumb" /></a>` : `<a href="#" data-preview-post-attach="${esc(post.id)}:${i}" class="attachment-file-icon">📄</a>`}
           <div class="attachment-meta">
-            <a href="${esc(a.url)}" target="_blank" rel="noopener noreferrer" class="text-gold small">${esc(a.label)}</a>
+            <a href="#" data-preview-post-attach="${esc(post.id)}:${i}" class="text-gold small">${esc(a.label)}</a>
             <span class="text-low" style="font-size:11px">${a.kind === "upload" ? `Feltöltve${a.size ? ` · ${formatFileSize(a.size)}` : ""}` : "Külső hivatkozás"}</span>
           </div>
         </div>`).join("")}</div>` : ""}

@@ -4,7 +4,7 @@ import {
   MAX_ATTACHMENT_BYTES, MAX_ATTACHMENTS_PER_PLAN, ALLOWED_ATTACHMENT_EXT,
 } from "../store.js?v=66";
 import { hasRole, actorLabel } from "../auth.js?v=20";
-import { esc, fmtDate, fmtDateTime, toast, openModal, closeModal, applyBranding } from "../utils.js?v=23";
+import { esc, fmtDate, fmtDateTime, toast, openModal, closeModal, applyBranding, previewAttachment } from "../utils.js?v=25";
 import { navigate } from "../router.js?v=20";
 import { openProtocolForm } from "./protocols.js?v=22";
 
@@ -125,7 +125,7 @@ function openPlanForm(allModules, existing = null) {
     attachList.innerHTML = attachments.length ? attachments.map((a, i) => `
       <div class="participant-row">
         <div class="flex justify-between items-center">
-          <a class="text-hi" href="${a.dataUrl}" download="${esc(a.name)}">📎 ${esc(a.name)}</a>
+          <a class="text-hi" href="#" data-preview-attach-idx="${i}">📎 ${esc(a.name)}</a>
           <div class="flex items-center gap-1">
             <span class="text-low small">${formatBytes(a.size)}</span>
             <button type="button" class="btn btn-sm" data-remove-attach-idx="${i}">×</button>
@@ -134,6 +134,13 @@ function openPlanForm(allModules, existing = null) {
       </div>`).join("") : `<div class="small text-low mt-1">Nincs csatolt fájl.</div>`;
     attachList.querySelectorAll("[data-remove-attach-idx]").forEach((b) =>
       b.addEventListener("click", () => { attachments.splice(Number(b.getAttribute("data-remove-attach-idx")), 1); redrawAttachments(); })
+    );
+    attachList.querySelectorAll("[data-preview-attach-idx]").forEach((a) =>
+      a.addEventListener("click", (e) => {
+        e.preventDefault();
+        const att = attachments[Number(a.getAttribute("data-preview-attach-idx"))];
+        previewAttachment(att.name, att.dataUrl);
+      })
     );
   }
   redrawAttachments();
@@ -290,7 +297,7 @@ export function renderTrainingPlanDetail(container, id) {
       }).join("") : `<div class="text-low small">Nincs még hozzárendelt résztvevő.</div>`}
       ${plan.objectives ? `<div class="divider"></div><div class="card-title mb-1">Célok / napirend</div><div class="text-mid" style="white-space:pre-wrap">${esc(plan.objectives)}</div>` : ""}
       ${(plan.attachments || []).length ? `<div class="divider"></div><div class="card-title mb-1">Mellékletek (${plan.attachments.length})</div>
-        ${plan.attachments.map((a) => `<div class="history-item"><a class="text-hi" href="${a.dataUrl}" download="${esc(a.name)}">📎 ${esc(a.name)}</a><span class="text-low small">${formatBytes(a.size)} · ${esc(a.uploadedBy || "")} · ${fmtDateTime(a.uploadedAt)}</span></div>`).join("")}` : ""}
+        ${plan.attachments.map((a, i) => `<div class="history-item"><a class="text-hi" href="#" data-preview-attach="${i}">📎 ${esc(a.name)}</a><span class="text-low small">${formatBytes(a.size)} · ${esc(a.uploadedBy || "")} · ${fmtDateTime(a.uploadedAt)}</span></div>`).join("")}` : ""}
       ${plan.notes ? `<div class="divider"></div><div class="card-title mb-1">Megjegyzések</div><div class="text-mid" style="white-space:pre-wrap">${esc(plan.notes)}</div>` : ""}
       ${(plan.protocolIds || []).length ? `<div class="divider"></div><div class="card-title mb-1">Kapcsolódó jegyzőkönyvek (${plan.protocolIds.length})</div>
         ${plan.protocolIds.map((pid) => `<div class="history-item"><a class="text-hi" href="#/protocols/${esc(pid)}">${esc(pid)}</a></div>`).join("")}` : ""}
@@ -304,6 +311,13 @@ export function renderTrainingPlanDetail(container, id) {
     </div>
   `;
 
+  container.querySelectorAll("[data-preview-attach]").forEach((a) =>
+    a.addEventListener("click", (e) => {
+      e.preventDefault();
+      const att = plan.attachments[Number(a.getAttribute("data-preview-attach"))];
+      previewAttachment(att.name, att.dataUrl);
+    })
+  );
   document.getElementById("edit-plan")?.addEventListener("click", () => openPlanForm(allModules, plan));
   document.getElementById("delete-plan")?.addEventListener("click", () => {
     if (!confirm(`Biztosan törli a(z) ${plan.id} kiképzési tervet?`)) return;
