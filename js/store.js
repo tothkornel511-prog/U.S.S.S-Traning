@@ -142,16 +142,18 @@ export function seedIfNeeded() {
    Kiképzési Áttekintés is használ — nem egy külön, témák szerinti listát. */
 const TRAINING_CATEGORY_SEED = [
   ...LEVELS.map((l) => l.label),
-  "Adminisztráció",
+  "Önkormányzati adminisztráció",
+  "Adóhatósági szolgálat (LSNTA)",
 ];
-/* A korábbi (téma szerinti) alapértelmezett lista — csak azért kell még,
-   hogy felismerjük és lecseréljük azokon a böngészőkön, ahol már lefutott
-   a régi seed, de még nem került bele valódi tartalom. */
+/* Korábbi alapértelmezett listák — csak azért kellenek még, hogy felismerjük
+   és lecseréljük azokon a böngészőkön, ahol már lefutott egy régebbi seed,
+   de még nem került bele valódi tartalom. */
 const OLD_TOPIC_TRAINING_CATEGORY_SEED = [
   "Alapvető ismeretek", "Kommunikáció", "Rádióhasználat", "Védelem", "Sofőri képzés",
   "Taktikai képzés", "Védett személyek", "Védett helyszínek", "Konvoj", "Vészhelyzetek",
   "Erőhasználat", "Fegyverismeret", "Egyéb oktatási anyagok",
 ];
+const OLD_RANK_ONLY_TRAINING_CATEGORY_SEED = [...LEVELS.map((l) => l.label), "Adminisztráció"];
 function applyTrainingCenterSeedPatch() {
   if (read(KEYS.trainingCategories, null) === null) {
     write(KEYS.trainingCategories, []);
@@ -162,16 +164,20 @@ function applyTrainingCenterSeedPatch() {
     TRAINING_CATEGORY_SEED.forEach((name) => createTrainingCategory(name, "Rendszer"));
   }
 }
-function applyTrainingCenterRankCategoriesPatch() {
-  const categories = read(KEYS.trainingCategories, []);
-  const names = categories.map((c) => c.name);
-  const isUntouchedOldSeed = names.length === OLD_TOPIC_TRAINING_CATEGORY_SEED.length &&
-    OLD_TOPIC_TRAINING_CATEGORY_SEED.every((n) => names.includes(n));
+function replaceUntouchedTrainingCategories(oldSeed) {
+  const names = read(KEYS.trainingCategories, []).map((c) => c.name);
+  const isUntouched = names.length === oldSeed.length && oldSeed.every((n) => names.includes(n));
   const hasAnyContent = read(KEYS.trainingDocs, []).length > 0;
-  if (isUntouchedOldSeed && !hasAnyContent) {
+  if (isUntouched && !hasAnyContent) {
     write(KEYS.trainingCategories, []);
     TRAINING_CATEGORY_SEED.forEach((name) => createTrainingCategory(name, "Rendszer"));
+    return true;
   }
+  return false;
+}
+function applyTrainingCenterRankCategoriesPatch() {
+  replaceUntouchedTrainingCategories(OLD_TOPIC_TRAINING_CATEGORY_SEED) ||
+    replaceUntouchedTrainingCategories(OLD_RANK_ONLY_TRAINING_CATEGORY_SEED);
 }
 
 /* Célzott seedelés: a Kiképzési tervek (training plans) modul új
