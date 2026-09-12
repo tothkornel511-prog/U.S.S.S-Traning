@@ -192,6 +192,20 @@ export async function previewAttachment(label, url) {
     return;
   }
 
+  // DOCX: ha a fájlnak van valódi, nyilvánosan elérhető URL-je (minden
+  // GitHub-ra feltöltött fájlnak van), a Microsoft saját, valódi Word-
+  // motorral működő Office Online Viewer-ét ágyazzuk be — ez sokkal
+  // hívebb, "komolyabb" megjelenítés, mint bármilyen saját konvertálás,
+  // és eleve csak megtekintésre való. Csak a régebbi, data: URL-ként
+  // tárolt (nem GitHub-on lévő) fájloknál esünk vissza a mammoth.js-es
+  // kliensoldali átalakításra, mert a Microsoft-szolgáltatás data: URL-t
+  // nem tud lekérni.
+  if (!url.startsWith("data:")) {
+    const embedUrl = `https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(url)}`;
+    body.innerHTML = `<iframe src="${esc(embedUrl)}" style="width:100%; height:100%; border:none;"></iframe>`;
+    return;
+  }
+
   try {
     if (!window.mammoth) throw new Error("mammoth-missing");
     const buf = await (await fetch(url)).arrayBuffer();
