@@ -78,17 +78,36 @@ function renderActivationStep(root, onSuccess) {
         <div id="activate-error"></div>
         <p class="text-mid small mb-2">Ez a fiók (${esc(SUPER_ADMIN_ID)}) ezen a böngészőn még nincs aktiválva. Állíts be egy csak általad ismert belépési kódot és PIN kódot — ezentúl kizárólag ezek fognak működni, a korábbi belépési kód többé nem érvényes.</p>
         <p class="text-mid small mb-2" style="color:var(--orange, #d98b3f)">Ha ezt nem te kezdeményezted most, valaki más próbálja aktiválni a fiókodat — zárd be az oldalt, és ne add meg itt semmilyen adatot.</p>
-        <form id="activate-form">
-          <div class="field"><label>Új belépési kód</label><input type="text" id="act-code" autocomplete="off" required minlength="4" autofocus /></div>
-          <div class="field"><label>Belépési kód megerősítése</label><input type="text" id="act-code-confirm" autocomplete="off" required minlength="4" /></div>
-          <div class="field"><label>Új PIN kód (min. 4 karakter)</label><input type="password" id="act-pin" autocomplete="off" required minlength="4" /></div>
-          <div class="field"><label>PIN megerősítése</label><input type="password" id="act-pin-confirm" autocomplete="off" required minlength="4" /></div>
+        <form id="activate-form" autocomplete="off">
+          <div class="field"><label>Új belépési kód</label><input type="text" id="act-code" name="usss-new-code" autocomplete="new-password" autocapitalize="off" autocorrect="off" spellcheck="false" data-lpignore="true" required minlength="4" autofocus /></div>
+          <div class="field"><label>Belépési kód megerősítése</label><input type="text" id="act-code-confirm" name="usss-new-code-confirm" autocomplete="new-password" autocapitalize="off" autocorrect="off" spellcheck="false" data-lpignore="true" required minlength="4" /></div>
+          <div class="field"><label>Új PIN kód (min. 4 karakter)</label><input type="password" id="act-pin" name="usss-new-pin" autocomplete="new-password" data-lpignore="true" required minlength="4" /></div>
+          <div class="field"><label>PIN megerősítése</label><input type="password" id="act-pin-confirm" name="usss-new-pin-confirm" autocomplete="new-password" data-lpignore="true" required minlength="4" /></div>
+          <div id="act-match-hint" class="text-low small" style="min-height:16px; margin-top:-8px; margin-bottom:8px;"></div>
           <button type="submit" class="btn btn-gold btn-block">Fiók aktiválása</button>
         </form>
       </div>
     </div>
   `;
   applyBranding(root.querySelector(".login-screen"), "hero-main");
+
+  const matchHint = document.getElementById("act-match-hint");
+  function updateMatchHint() {
+    const code = document.getElementById("act-code").value.trim();
+    const codeConfirm = document.getElementById("act-code-confirm").value.trim();
+    const pin = document.getElementById("act-pin").value;
+    const pinConfirm = document.getElementById("act-pin-confirm").value;
+    if (codeConfirm && code !== codeConfirm) {
+      matchHint.innerHTML = `<span style="color:var(--orange, #d98b3f)">⚠ A belépési kód még nem egyezik a megerősítéssel — ha ezt a böngésző töltötte ki automatikusan, töröld ki és írd be kézzel.</span>`;
+    } else if (pinConfirm && pin !== pinConfirm) {
+      matchHint.innerHTML = `<span style="color:var(--orange, #d98b3f)">⚠ A PIN még nem egyezik a megerősítéssel.</span>`;
+    } else {
+      matchHint.innerHTML = "";
+    }
+  }
+  ["act-code", "act-code-confirm", "act-pin", "act-pin-confirm"].forEach((id) =>
+    document.getElementById(id).addEventListener("input", updateMatchHint)
+  );
 
   document.getElementById("activate-form").addEventListener("submit", async (e) => {
     e.preventDefault();

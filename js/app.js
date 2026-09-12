@@ -6,7 +6,7 @@ import { seedIfNeeded, globalSearch, getCustomCss, getOperationRecords, SECTIONS
 import { isAuthenticated, currentSession, logout, hasSection, isSuperAdmin, ROLES } from "./auth.js?v=23";
 import { registerRoute, resolve, startRouter, navigate, currentPath } from "./router.js?v=20";
 import { esc, sealMark, closeModal, applyBranding } from "./utils.js?v=31";
-import { renderLogin } from "./pages/login.js?v=26";
+import { renderLogin } from "./pages/login.js?v=27";
 import { renderDashboard } from "./pages/dashboard.js?v=46";
 import { renderPersonnelList } from "./pages/personnel.js?v=22";
 import { renderProfile } from "./pages/profile.js?v=22";
