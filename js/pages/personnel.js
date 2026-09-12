@@ -1,6 +1,6 @@
 import { getPersonnel, upsertPerson, deletePerson, readinessPercent, ref, probationInfo, getPositions, MAX_PHOTO_BYTES } from "../store.js?v=67";
 import { hasRole, actorLabel } from "../auth.js?v=20";
-import { esc, avatarContent, toast, openModal, closeModal } from "../utils.js?v=28";
+import { esc, avatarContent, toast, openModal, closeModal } from "../utils.js?v=29";
 import { navigate } from "../router.js?v=20";
 
 function readFileAsDataUrl(file) {

@@ -555,6 +555,11 @@ tbody tr:hover { background: rgba(198,166,100,0.05); }
   animation: modal-pop .22s cubic-bezier(.2,.8,.3,1.1) both;
 }
 @keyframes modal-pop { from { opacity: 0; transform: translateY(10px) scale(.97); } to { opacity: 1; transform: translateY(0) scale(1); } }
+.modal-panel-lg { max-width: 96vw; width: 1100px; max-height: 94vh; }
+/* A DOCX/PDF előnézet fehér "papír" háttere fölött a globális sötét témás
+   h1-h4 szín (var(--text-hi), közel fehér) láthatatlanná tenné a címeket —
+   itt felülírjuk sötétre. */
+#preview-body h1, #preview-body h2, #preview-body h3, #preview-body h4 { color: #161616 !important; text-shadow: none !important; }
 .modal-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; }
 .modal-close { color: var(--text-low); font-size: 20px; line-height: 1; border: none; background: none; }
 .modal-close:hover { color: var(--gold); }

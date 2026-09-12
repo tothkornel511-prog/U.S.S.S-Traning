@@ -5,7 +5,7 @@ import {
   CHANNEL_DOC_STATUSES, ATTACHMENT_MAX_UPLOAD_BYTES, formatFileSize,
 } from "../store.js?v=67";
 import { isSuperAdmin, actorLabel } from "../auth.js?v=23";
-import { esc, fmtDateTime, toast, openModal, closeModal, renderRichText, uploadFileToGitHub } from "../utils.js?v=28";
+import { esc, fmtDateTime, toast, openModal, closeModal, renderRichText, uploadFileToGitHub } from "../utils.js?v=29";
 import { navigate } from "../router.js?v=20";
 
 const DENIED = `<div class="denied"><div class="ic">⚠</div><h3>Hozzáférés megtagadva</h3><p class="text-low">A Csatornák kizárólag a Super Admin fiók számára elérhetők.</p></div>`;
