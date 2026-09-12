@@ -4,6 +4,36 @@
 
 import { getBrandingOverride } from "./store.js?v=67";
 
+/* Fájlfeltöltés a GitHub repóba egy Cloudflare Worker proxin keresztül,
+   ahelyett hogy a fájl base64-ként a localStorage-ban végezné (ami az 5 MB-os
+   böngésző-korlátba ütközik). A WORKER_SECRET itt, a publikus kliens-kódban
+   szándékosan látható — lásd worker/worker.js teteje: ez csak egy szűk,
+   korlátozott képességet (uploads/ mappába írás) tár fel, nem a GITHUB_TOKEN-t,
+   ami kizárólag a Worker titkosított tárolójában él. */
+const GITHUB_UPLOAD_URL = "https://u-s-s-s-traning.tothkornel511.workers.dev/";
+const GITHUB_UPLOAD_SECRET = "Bhq751orJyX0wqHR8fC0Adt_J29YdF23";
+
+function fileToBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(String(reader.result).split(",")[1] || "");
+    reader.onerror = () => reject(reader.error);
+    reader.readAsDataURL(file);
+  });
+}
+
+export async function uploadFileToGitHub(file) {
+  const contentBase64 = await fileToBase64(file);
+  const res = await fetch(GITHUB_UPLOAD_URL, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", "X-Worker-Secret": GITHUB_UPLOAD_SECRET },
+    body: JSON.stringify({ filename: file.name, contentBase64 }),
+  });
+  if (!res.ok) throw new Error(await res.text().catch(() => res.statusText));
+  const data = await res.json();
+  return data.url;
+}
+
 /* Ha az admin lecserélt egy márka-képet, ez állítja be a --brand-img egyéni
    CSS tulajdonságot az adott elemen — felülírás nélkül a CSS-ben megadott
    alapértelmezett kép (var(--brand-img, url(...))) marad érvényben. */

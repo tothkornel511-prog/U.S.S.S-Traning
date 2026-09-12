@@ -4,7 +4,7 @@ import {
   MAX_ATTACHMENT_BYTES, MAX_ATTACHMENTS_PER_PLAN, ALLOWED_ATTACHMENT_EXT,
 } from "../store.js?v=67";
 import { hasRole, actorLabel } from "../auth.js?v=20";
-import { esc, fmtDate, fmtDateTime, toast, openModal, closeModal, applyBranding, previewAttachment } from "../utils.js?v=27";
+import { esc, fmtDate, fmtDateTime, toast, openModal, closeModal, applyBranding, previewAttachment, uploadFileToGitHub } from "../utils.js?v=28";
 import { navigate } from "../router.js?v=20";
 import { openProtocolForm } from "./protocols.js?v=22";
 
@@ -25,15 +25,6 @@ function formatBytes(bytes) {
 function fileExt(name) {
   const i = name.lastIndexOf(".");
   return i >= 0 ? name.slice(i).toLowerCase() : "";
-}
-
-function readFileAsDataUrl(file) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(reader.result);
-    reader.onerror = () => reject(reader.error);
-    reader.readAsDataURL(file);
-  });
 }
 
 export function renderTrainingPlansList(container) {
@@ -163,10 +154,10 @@ function openPlanForm(allModules, existing = null) {
       return toast(`"${rejected.name}" nem támogatott fájltípus.`, "warn");
     }
     submitBtn.disabled = true;
-    submitBtn.textContent = "Feltöltés…";
+    submitBtn.textContent = "Feltöltés a GitHub-ra…";
     try {
       for (const file of files) {
-        const dataUrl = await readFileAsDataUrl(file);
+        const dataUrl = await uploadFileToGitHub(file);
         attachments.push({
           id: `ATT-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 6)}`,
           name: file.name,
@@ -179,7 +170,7 @@ function openPlanForm(allModules, existing = null) {
       }
       redrawAttachments();
     } catch {
-      toast("Nem sikerült beolvasni a fájlt.", "warn");
+      toast("Nem sikerült feltölteni a GitHub-ra.", "warn");
     } finally {
       submitBtn.disabled = false;
       submitBtn.textContent = existing ? "Mentés" : "Terv létrehozása";

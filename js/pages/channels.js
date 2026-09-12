@@ -5,19 +5,10 @@ import {
   CHANNEL_DOC_STATUSES, ATTACHMENT_MAX_UPLOAD_BYTES, formatFileSize,
 } from "../store.js?v=67";
 import { isSuperAdmin, actorLabel } from "../auth.js?v=23";
-import { esc, fmtDateTime, toast, openModal, closeModal, renderRichText } from "../utils.js?v=27";
+import { esc, fmtDateTime, toast, openModal, closeModal, renderRichText, uploadFileToGitHub } from "../utils.js?v=28";
 import { navigate } from "../router.js?v=20";
 
 const DENIED = `<div class="denied"><div class="ic">⚠</div><h3>Hozzáférés megtagadva</h3><p class="text-low">A Csatornák kizárólag a Super Admin fiók számára elérhetők.</p></div>`;
-
-function readFileAsDataUrl(file) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(reader.result);
-    reader.onerror = () => reject(reader.error);
-    reader.readAsDataURL(file);
-  });
-}
 
 export function renderChannelsCategories(container) {
   if (!isSuperAdmin()) { container.innerHTML = DENIED; return; }
@@ -303,14 +294,15 @@ function wireDocEditor(container, categoryId, doc) {
     e.target.value = "";
     if (!file) return;
     if (file.size > ATTACHMENT_MAX_UPLOAD_BYTES) return toast(`A kép túl nagy (max. ${formatFileSize(ATTACHMENT_MAX_UPLOAD_BYTES)}).`, "warn");
+    toast("Feltöltés a GitHub-ra…");
     try {
-      const dataUrl = await readFileAsDataUrl(file);
+      const dataUrl = await uploadFileToGitHub(file);
       const result = updateChannelDoc(doc.id, { coverImage: dataUrl }, actorLabel());
-      if (!result) return toast("Nem sikerült menteni — megtelt a böngésző helyi tárhelye.", "warn");
+      if (!result) return toast("Nem sikerült menteni.", "warn");
       toast("Borítókép frissítve");
       renderChannelsDoc(container, categoryId, doc.id);
     } catch {
-      toast("Nem sikerült beolvasni a képet.", "warn");
+      toast("Nem sikerült feltölteni a GitHub-ra.", "warn");
     }
   });
   document.getElementById("remove-cover")?.addEventListener("click", () => {
@@ -347,14 +339,15 @@ function wireDocEditor(container, categoryId, doc) {
     e.target.value = "";
     if (!file) return;
     if (file.size > ATTACHMENT_MAX_UPLOAD_BYTES) return toast(`A fájl túl nagy (max. ${formatFileSize(ATTACHMENT_MAX_UPLOAD_BYTES)}).`, "warn");
+    toast("Feltöltés a GitHub-ra…");
     try {
-      const dataUrl = await readFileAsDataUrl(file);
+      const dataUrl = await uploadFileToGitHub(file);
       const label = document.getElementById("gallery-label").value.trim() || file.name;
       gallery.push({ label, url: dataUrl, kind: "upload", size: file.size });
       document.getElementById("gallery-label").value = "";
       persistGallery();
     } catch {
-      toast("Nem sikerült beolvasni a képet.", "warn");
+      toast("Nem sikerült feltölteni a GitHub-ra.", "warn");
     }
   });
 

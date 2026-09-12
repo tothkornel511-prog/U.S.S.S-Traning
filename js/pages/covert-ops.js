@@ -7,7 +7,7 @@ import {
   CO_STATUSES, CO_CLOSED_STATUSES,
 } from "../store.js?v=67";
 import { hasRole, actorLabel } from "../auth.js?v=20";
-import { esc, fmtDate, fmtDateTime, toast, openModal, closeModal, applyBranding, previewAttachment } from "../utils.js?v=27";
+import { esc, fmtDate, fmtDateTime, toast, openModal, closeModal, applyBranding, previewAttachment, uploadFileToGitHub } from "../utils.js?v=28";
 import { navigate } from "../router.js?v=20";
 
 const CLASS_BADGE = { "Bizalmas": "gray", "Titkos": "yellow", "Szigorúan titkos": "red" };
@@ -377,16 +377,14 @@ export function renderCovertOpDetail(container, id) {
       return;
     }
     document.getElementById("op-attachment-file-name").textContent = file.name;
-    const reader = new FileReader();
-    reader.onload = () => {
+    toast("Feltöltés a GitHub-ra…");
+    uploadFileToGitHub(file).then((url) => {
       const labelInput = document.getElementById("op-attachment-label");
       const label = labelInput.value.trim() || file.name;
-      addCovertOpAttachment(op.id, { label, url: reader.result, kind: "upload", size: file.size }, actorLabel());
+      addCovertOpAttachment(op.id, { label, url, kind: "upload", size: file.size }, actorLabel());
       toast("Fájl feltöltve");
       renderCovertOpDetail(container, op.id);
-    };
-    reader.onerror = () => toast("Nem sikerült beolvasni a fájlt", "error");
-    reader.readAsDataURL(file);
+    }).catch(() => toast("Nem sikerült feltölteni a GitHub-ra", "error"));
   });
   container.querySelectorAll("[data-remove-attachment]").forEach((b) =>
     b.addEventListener("click", () => {

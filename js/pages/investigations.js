@@ -7,7 +7,7 @@ import {
   INVESTIGATION_SEVERITIES, INVESTIGATION_STATUSES, INVESTIGATION_CLOSED_STATUSES, INVESTIGATION_OUTCOMES, INVESTIGATION_ORIGINS,
 } from "../store.js?v=67";
 import { hasRole, actorLabel } from "../auth.js?v=20";
-import { esc, fmtDate, fmtDateTime, toast, openModal, closeModal, applyBranding, previewAttachment } from "../utils.js?v=27";
+import { esc, fmtDate, fmtDateTime, toast, openModal, closeModal, applyBranding, previewAttachment, uploadFileToGitHub } from "../utils.js?v=28";
 import { navigate } from "../router.js?v=20";
 
 const SEVERITY_BADGE = { "Alacsony": "gray", "Közepes": "yellow", "Súlyos": "red", "Kritikus": "red" };
@@ -324,16 +324,14 @@ export function renderInvestigationDetail(container, id) {
       return;
     }
     document.getElementById("inv-attachment-file-name").textContent = file.name;
-    const reader = new FileReader();
-    reader.onload = () => {
+    toast("Feltöltés a GitHub-ra…");
+    uploadFileToGitHub(file).then((url) => {
       const labelInput = document.getElementById("inv-attachment-label");
       const label = labelInput.value.trim() || file.name;
-      addInvestigationAttachment(inv.id, { label, url: reader.result, kind: "upload", size: file.size }, actorLabel());
+      addInvestigationAttachment(inv.id, { label, url, kind: "upload", size: file.size }, actorLabel());
       toast("Fájl feltöltve");
       renderInvestigationDetail(container, inv.id);
-    };
-    reader.onerror = () => toast("Nem sikerült beolvasni a fájlt", "error");
-    reader.readAsDataURL(file);
+    }).catch(() => toast("Nem sikerült feltölteni a GitHub-ra", "error"));
   });
   container.querySelectorAll("[data-remove-attachment]").forEach((b) =>
     b.addEventListener("click", () => {
