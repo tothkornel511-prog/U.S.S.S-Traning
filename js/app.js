@@ -2,7 +2,7 @@
    U.S.S.S. ELITE TRAINING SYSTEM — APP ENTRY
    ========================================================================== */
 
-import { seedIfNeeded, globalSearch, getCustomCss, getOperationRecords, SECTIONS } from "./store.js?v=61";
+import { seedIfNeeded, globalSearch, getCustomCss, getOperationRecords, SECTIONS } from "./store.js?v=62";
 import { isAuthenticated, currentSession, logout, hasSection, ROLES } from "./auth.js?v=21";
 import { registerRoute, resolve, startRouter, navigate, currentPath } from "./router.js?v=20";
 import { esc, sealMark, closeModal, applyBranding } from "./utils.js?v=23";
@@ -22,6 +22,7 @@ import { renderOperations } from "./pages/operations.js?v=39";
 import { renderReadiness } from "./pages/readiness.js?v=32";
 import { renderInvestigationList, renderInvestigationDetail } from "./pages/investigations.js?v=8";
 import { renderCovertOpList, renderCovertOpDetail } from "./pages/covert-ops.js?v=10";
+import { renderChannelsHub } from "./pages/channels.js?v=1";
 
 seedIfNeeded();
 applyCustomCss();
@@ -60,6 +61,7 @@ function pageTitleFor(path) {
   if (path.startsWith("/operations/")) return { crumb: "Command Center", title: "Operációs központ" };
   if (path.startsWith("/investigations/")) return { crumb: "Belső Vizsgálatok", title: "Vizsgálat részletei" };
   if (path.startsWith("/covert-ops/")) return { crumb: "Fedett Műveletek", title: "Művelet részletei" };
+  if (path.startsWith("/channels/")) return { crumb: "Csatornák", title: "Csatorna" };
   if (path.startsWith("/map")) return { crumb: "Objektumok", title: "Térkép" };
   const flat = NAV.flatMap((g) => g.items);
   const found = flat.find((i) => i.path === path);
@@ -206,6 +208,8 @@ registerRoute("/investigations", () => renderInvestigationList(document.getEleme
 registerRoute("/investigations/:id", (p) => renderInvestigationDetail(document.getElementById("content"), p.id));
 registerRoute("/covert-ops", () => renderCovertOpList(document.getElementById("content")));
 registerRoute("/covert-ops/:id", (p) => renderCovertOpDetail(document.getElementById("content"), p.id));
+registerRoute("/channels", () => renderChannelsHub(document.getElementById("content")));
+registerRoute("/channels/:channelId", (p) => renderChannelsHub(document.getElementById("content"), p.channelId));
 
 /* Az útvonal első (operations esetén első két) szegmenséből számolja ki,
    melyik "szoba" felel meg neki — ugyanaz az id, mint a SECTIONS-ban. */

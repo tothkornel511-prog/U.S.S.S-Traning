@@ -966,3 +966,28 @@ body.printing-cert #cert-print-root { display: block; }
 .attachment-meta { display: flex; flex-direction: column; gap: 2px; overflow-wrap: anywhere; }
 .attachment-card [data-remove-attachment] { position: absolute; top: 6px; right: 6px; }
 @media (max-width: 600px) { .attachment-grid { grid-template-columns: repeat(2, 1fr); } }
+
+/* Csatornák — Discord-szerű "szoba" lista + tartalom, de statikus/helyi adat */
+.channels-layout { display: grid; grid-template-columns: 220px 1fr; gap: 18px; align-items: start; }
+.channels-sidebar {
+  border: 1px solid var(--line-soft); border-radius: var(--radius-lg);
+  background: rgba(18,20,27,0.5); backdrop-filter: blur(10px); padding: 14px;
+  position: sticky; top: 100px;
+}
+.channel-link {
+  display: flex; align-items: center; gap: 8px; padding: 8px 10px; border-radius: var(--radius-sm);
+  color: var(--text-mid); font-size: 13px; font-weight: 500; margin-bottom: 3px; cursor: pointer;
+  border: 1px solid transparent; transition: background .15s ease, color .15s ease;
+}
+.channel-link::before { content: "#"; color: var(--gold-dim); font-weight: 700; }
+.channel-link:hover { background: var(--bg-panel-2); color: var(--text-hi); }
+.channel-link.active { background: rgba(198,166,100,0.12); border-color: rgba(198,166,100,0.3); color: var(--gold-bright); }
+.channel-post {
+  border: 1px solid var(--line-soft); border-radius: var(--radius-lg);
+  background: rgba(18,20,27,0.5); backdrop-filter: blur(10px); padding: 16px 18px; margin-bottom: 14px;
+}
+.channel-post-head { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; margin-bottom: 8px; }
+.channel-post-title { color: var(--gold-bright); font-family: var(--font-display); font-size: 17px; }
+.channel-post-meta { color: var(--text-low); font-size: 11px; white-space: nowrap; }
+.channel-post-body { color: var(--text-mid); white-space: pre-wrap; font-size: 13.5px; line-height: 1.6; }
+@media (max-width: 760px) { .channels-layout { grid-template-columns: 1fr; } .channels-sidebar { position: static; } }

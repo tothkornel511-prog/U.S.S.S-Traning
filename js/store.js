@@ -38,6 +38,8 @@ const KEYS = {
   covertOps: NS + "covert_ops",
   nextCovertOpSeq: NS + "next_covert_op_seq",
   covertOpClassifications: NS + "covert_op_classifications",
+  channels: NS + "channels",
+  channelPosts: NS + "channel_posts",
 };
 
 /* Elméleti vizsgánál ez alatt a százalék alatt a modul nem számít teljesítettnek. */
@@ -126,6 +128,7 @@ export function seedIfNeeded() {
   applyTrainingPlansSeedPatch();
   applyInvestigationSeedPatch();
   applyTrainingPlanMultiModulePatch();
+  applyChannelsSeedPatch();
 }
 
 /* Célzott seedelés: a Kiképzési tervek (training plans) modul új
@@ -287,6 +290,19 @@ function applyInvestigationSeedPatch() {
   }
 }
 
+/* Célzott seedelés: a Csatornák modul új localStorage-kulcsokat vezet be —
+   ez pótolja őket egy már korábban seedelt böngészőben, és létrehoz egy
+   alapértelmezett "Vizsga anyagok" csatornát, ha még egy sincs. */
+function applyChannelsSeedPatch() {
+  if (read(KEYS.channels, null) === null) {
+    write(KEYS.channels, []);
+    write(KEYS.channelPosts, []);
+  }
+  if (read(KEYS.channels, []).length === 0) {
+    createChannel("Vizsga anyagok", "Rendszer");
+  }
+}
+
 export function resetAllData() {
   Object.values(KEYS).forEach((k) => localStorage.removeItem(k));
   seedIfNeeded();
@@ -359,6 +375,7 @@ export const SECTIONS = [
   { id: "plans", label: "Kiképzési tervek", icon: "✎", group: "Állomány & Képzés" },
   { id: "protocols", label: "Jegyzőkönyvek", icon: "▤", group: "Állomány & Képzés" },
   { id: "recruitment", label: "Felvételi", icon: "✎", group: "Állomány & Képzés" },
+  { id: "channels", label: "Csatornák", icon: "▧", group: "Állomány & Képzés" },
   { id: "locations", label: "Védett helyszínek", icon: "◆", group: "Objektumok" },
   { id: "map", label: "Térkép", icon: "⛶", group: "Objektumok" },
   { id: "readiness", label: "Készültségi rendszer", icon: "◉", group: "Vezetői irányítás" },
@@ -1861,6 +1878,73 @@ export function unlinkCovertOp(investigationId, opId, actorLabel) {
 }
 export function getInvestigationsLinkedToOp(opId) {
   return getInvestigations().filter((i) => (i.linkedOps || []).includes(opId));
+}
+
+/* ---------- Csatornák (Channels) ----------------------------------------
+   Belső, szabadon elnevezhető "szobák" bejegyzésekhez és mellékletekhez —
+   admin/oktatásvezető hozza létre és tölti fel őket (pl. "Vizsga anyagok").
+   FONTOS: ez az egész rendszer szerver nélküli, statikus oldal — minden
+   csatorna és bejegyzés KIZÁRÓLAG abban a böngészőben létezik, ahol
+   létrehozták. Nem szinkronizál automatikusan más eszközre/felhasználóra
+   (arra valódi backend kellene). Nagy fájlokhoz (a feltöltési korlát
+   fölött) ezért "link" típusú melléklet is választható — pont úgy, mint a
+   Belső Vizsgálatoknál/Fedett Műveleteknél: egy külső (pl. Discord CDN,
+   Drive) hivatkozás, amit a rendszer nem tárol, csak megjelenít. */
+export function getChannels() {
+  return read(KEYS.channels, []);
+}
+export function getChannel(id) {
+  return getChannels().find((c) => c.id === id);
+}
+export function createChannel(name, actorLabel) {
+  const trimmed = (name || "").trim();
+  if (!trimmed) return null;
+  const slug = trimmed.toLowerCase()
+    .normalize("NFD").replace(/[̀-ͯ]/g, "")
+    .replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "") || "csatorna";
+  const list = getChannels();
+  let id = slug, n = 2;
+  while (list.some((c) => c.id === id)) id = `${slug}-${n++}`;
+  const channel = { id, name: trimmed, createdBy: actorLabel || "Rendszer", createdAt: new Date().toISOString() };
+  list.push(channel);
+  write(KEYS.channels, list);
+  logAudit(actorLabel, "Csatorna létrehozva", trimmed);
+  return channel;
+}
+export function deleteChannel(id, actorLabel) {
+  const channel = getChannel(id);
+  write(KEYS.channels, getChannels().filter((c) => c.id !== id));
+  write(KEYS.channelPosts, getChannelPosts().filter((p) => p.channelId !== id));
+  logAudit(actorLabel, "Csatorna törölve", channel?.name || id);
+}
+function getAllChannelPosts() {
+  return read(KEYS.channelPosts, []);
+}
+export function getChannelPosts(channelId) {
+  return getAllChannelPosts()
+    .filter((p) => p.channelId === channelId)
+    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+}
+export function createChannelPost(channelId, data, actorLabel) {
+  const now = new Date().toISOString();
+  const post = {
+    id: uid("POST"),
+    channelId,
+    title: (data.title || "").trim(),
+    body: (data.body || "").trim(),
+    attachments: (data.attachments || []).slice(0, 10),
+    createdBy: actorLabel || "Rendszer",
+    createdAt: now,
+  };
+  const list = getAllChannelPosts();
+  list.push(post);
+  if (!write(KEYS.channelPosts, list)) return null;
+  logAudit(actorLabel, "Csatorna-bejegyzés létrehozva", `${getChannel(channelId)?.name || channelId} — ${post.title || "(cím nélkül)"}`);
+  return post;
+}
+export function deleteChannelPost(postId, actorLabel) {
+  write(KEYS.channelPosts, getAllChannelPosts().filter((p) => p.id !== postId));
+  logAudit(actorLabel, "Csatorna-bejegyzés törölve", postId);
 }
 
 /* ---------- Global search ------------------------------------------------*/
