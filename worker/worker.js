@@ -47,31 +47,14 @@ async function gh(githubToken, path, options = {}) {
   return res.json();
 }
 
-/* A GitHub Contents API (PUT /contents/{path}) kb. 1 MB-ig megbízható;
-   ennél nagyobb (nálunk akár ~4 MB base64-es) fájlokhoz a Git Data API-t
-   kell használni: blob → tree → commit → ref frissítés, ugyanaz, amit a
-   `git add && git commit` is csinál a háttérben. */
+/* A GitHub fine-grained personal access tokenek NEM támogatják a Git Data
+   API-t (blob/tree/commit/ref közvetlen létrehozása) — csak a magasabb
+   szintű Contents API-t (PUT /contents/{path}), ami egyetlen hívással
+   commitol egy fájlt egyenesen a megadott branch-re. */
 async function commitFile(githubToken, path, base64Content, message) {
-  const blob = await gh(githubToken, `/repos/${OWNER}/${REPO}/git/blobs`, {
-    method: "POST",
-    body: JSON.stringify({ content: base64Content, encoding: "base64" }),
-  });
-  const ref = await gh(githubToken, `/repos/${OWNER}/${REPO}/git/refs/heads/${BRANCH}`);
-  const baseCommit = await gh(githubToken, `/repos/${OWNER}/${REPO}/git/commits/${ref.object.sha}`);
-  const tree = await gh(githubToken, `/repos/${OWNER}/${REPO}/git/trees`, {
-    method: "POST",
-    body: JSON.stringify({
-      base_tree: baseCommit.tree.sha,
-      tree: [{ path, mode: "100644", type: "blob", sha: blob.sha }],
-    }),
-  });
-  const commit = await gh(githubToken, `/repos/${OWNER}/${REPO}/git/commits`, {
-    method: "POST",
-    body: JSON.stringify({ message, tree: tree.sha, parents: [ref.object.sha] }),
-  });
-  await gh(githubToken, `/repos/${OWNER}/${REPO}/git/refs/heads/${BRANCH}`, {
-    method: "PATCH",
-    body: JSON.stringify({ sha: commit.sha }),
+  await gh(githubToken, `/repos/${OWNER}/${REPO}/contents/${path}`, {
+    method: "PUT",
+    body: JSON.stringify({ message, content: base64Content, branch: BRANCH }),
   });
   return path;
 }
