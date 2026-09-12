@@ -6,7 +6,7 @@
    (lásd a lenti "TODO backend" jelzéseket).
    ========================================================================== */
 
-import { findAccessCode, getPerson } from "./store.js?v=57";
+import { findAccessCode, getPerson } from "./store.js?v=64";
 
 const SESSION_KEY = "usss_ets_v1_session";
 
@@ -22,9 +22,31 @@ export const ROLES = {
   VIEWER: { label: "Megfigyelő", level: 1 },
 };
 
-export function login(usssId, code) {
+/* A Super Admin fiókot szándékosan NEM az ACCESS_CODES listából hitelesítjük
+   (az a forráskódban, mindenki számára olvashatóan szállítódik) — a belépési
+   kódját is csak hash-elve, kizárólag a böngésző localStorage-ában tároljuk,
+   ugyanúgy, mint a lenti PIN-t. Lásd a részletes indoklást lejjebb. */
+export async function login(usssId, code) {
   // TODO backend: cserélje le egy /auth/login API hívásra.
-  const entry = findAccessCode(usssId.trim(), code.trim());
+  const trimmedId = usssId.trim();
+  if (trimmedId.toUpperCase() === SUPER_ADMIN_ID.toUpperCase()) {
+    if (!hasSuperAdminCode()) {
+      return { ok: false, needsActivation: true };
+    }
+    const validCode = await verifySuperAdminCode(code.trim());
+    if (!validCode) return { ok: false, error: "Érvénytelen azonosító vagy hozzáférési kód." };
+    const person = getPerson(SUPER_ADMIN_ID);
+    const session = {
+      usssId: SUPER_ADMIN_ID,
+      role: "ADMIN",
+      sections: [],
+      name: person ? person.name : SUPER_ADMIN_ID,
+      loginAt: new Date().toISOString(),
+    };
+    return { ok: true, session, requiresPin: true };
+  }
+
+  const entry = findAccessCode(trimmedId, code.trim());
   if (!entry) return { ok: false, error: "Érvénytelen azonosító vagy hozzáférési kód." };
   const person = getPerson(entry.usssId);
   const session = {
@@ -34,9 +56,6 @@ export function login(usssId, code) {
     name: person ? person.name : entry.usssId,
     loginAt: new Date().toISOString(),
   };
-  if (entry.usssId === SUPER_ADMIN_ID) {
-    return { ok: true, session, requiresPin: true };
-  }
   sessionStorage.setItem(SESSION_KEY, JSON.stringify(session));
   return { ok: true, session };
 }
@@ -54,6 +73,7 @@ export function finalizeLogin(session) {
    hitelesítést, mivel a forráskód és a localStorage bárki számára olvasható,
    aki hozzáfér a géphez/böngészőhöz. */
 const PIN_KEY = "usss_ets_super_admin_pin_hash";
+const CODE_KEY = "usss_ets_super_admin_code_hash";
 
 async function sha256Hex(text) {
   const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(text));
@@ -71,6 +91,30 @@ export async function verifySuperAdminPin(pin) {
 }
 export function clearSuperAdminPin() {
   localStorage.removeItem(PIN_KEY);
+}
+
+/* A Super Admin belépési kódja NINCS benne a forráskódban (data.js-ben)
+   plaintext-ként — csak a hash-e él a böngésző localStorage-ában, akárcsak
+   a PIN. Az első valaha történő bejelentkezés ("aktiválás") ezen a fiókon
+   ezen a böngészőn kéri be a végleges kódot és PIN-t egyszerre, kétszeri
+   beírással megerősítve — onnantól csak ezek működnek.
+   ŐSZINTÉN: ez nem old meg mindent — ha valaki MÁS aktiválja a fiókot
+   előbb (mielőtt a jogos tulajdonos megtenné ugyanazon a telepítésen),
+   ő fogja birtokolni. Ez az ún. "trust on first use" korlátja bármilyen
+   szerver nélküli, statikus oldalon. A lényegi javulás a jelenlegihez
+   képest: a kód többé nem olvasható ki egyszerűen a publikus JS-fájlból. */
+export function hasSuperAdminCode() {
+  return !!localStorage.getItem(CODE_KEY);
+}
+export async function setSuperAdminCode(code) {
+  localStorage.setItem(CODE_KEY, await sha256Hex(code));
+}
+export async function verifySuperAdminCode(code) {
+  const stored = localStorage.getItem(CODE_KEY);
+  return !!stored && (await sha256Hex(code)) === stored;
+}
+export function clearSuperAdminCode() {
+  localStorage.removeItem(CODE_KEY);
 }
 
 export function logout() {

@@ -2,7 +2,7 @@
    U.S.S.S. ELITE TRAINING SYSTEM — UI SEGÉDFÜGGVÉNYEK
    ========================================================================== */
 
-import { getBrandingOverride } from "./store.js?v=63";
+import { getBrandingOverride } from "./store.js?v=64";
 
 /* Ha az admin lecserélt egy márka-képet, ez állítja be a --brand-img egyéni
    CSS tulajdonságot az adott elemen — felülírás nélkül a CSS-ben megadott

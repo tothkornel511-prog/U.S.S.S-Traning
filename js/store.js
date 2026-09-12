@@ -10,7 +10,7 @@ import {
   LEVELS, SERVICE_STATUSES, POSITIONS, MODULES, LEVEL_MODULE_ORDER,
   PERSONNEL, ACCESS_CODES, PROTECTED_LOCATIONS, AUDIT_LOG_SEED, MAPS, DISTRICTS,
   RECRUITMENT_QUESTIONS, EXAM_QUESTIONS, EXAM_CATEGORIES,
-} from "./data.js?v=24";
+} from "./data.js?v=25";
 
 /* v7: Roxwood/Cayo Perico eltávolítva, csak Los Santos térkép maradt. */
 const NS = "usss_ets_v7_";
@@ -341,7 +341,10 @@ function allOwnKeys() {
   const keys = [];
   for (let i = 0; i < localStorage.length; i++) {
     const key = localStorage.key(i);
-    if (key && key.startsWith(STORAGE_PREFIX)) keys.push(key);
+    // A super_admin_ előtagú kulcsok (belépési kód / PIN hash) biztonsági
+    // anyagok, nem alkalmazásadatok — se export/backup, se a tárhely-riport
+    // ne tartalmazza őket.
+    if (key && key.startsWith(STORAGE_PREFIX) && !key.includes("_super_admin_")) keys.push(key);
   }
   return keys;
 }

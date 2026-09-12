@@ -1,5 +1,5 @@
-import { getAccessCodes, upsertAccessCode, revokeAccessCode, generateCode, getAuditLog, getPersonnel, resetAllData, ref, getPositionEntries, addPosition, removePosition, getCustomCss, setCustomCss, getInvestigationCategories, addInvestigationCategory, removeInvestigationCategory, getCovertOpClassifications, addCovertOpClassification, removeCovertOpClassification, exportAllData, importAllData, getStorageReport, SECTIONS, BRANDING_SLOTS, MAX_BRANDING_BYTES, getBrandingUrl, getBrandingOverride, setBrandingOverride, clearBrandingOverride } from "../store.js?v=59";
-import { hasRole, isSuperAdmin, SUPER_ADMIN_ID, actorLabel, ROLES, hasSuperAdminPin, clearSuperAdminPin } from "../auth.js?v=22";
+import { getAccessCodes, upsertAccessCode, revokeAccessCode, generateCode, getAuditLog, getPersonnel, resetAllData, ref, getPositionEntries, addPosition, removePosition, getCustomCss, setCustomCss, getInvestigationCategories, addInvestigationCategory, removeInvestigationCategory, getCovertOpClassifications, addCovertOpClassification, removeCovertOpClassification, exportAllData, importAllData, getStorageReport, SECTIONS, BRANDING_SLOTS, MAX_BRANDING_BYTES, getBrandingUrl, getBrandingOverride, setBrandingOverride, clearBrandingOverride } from "../store.js?v=64";
+import { hasRole, isSuperAdmin, SUPER_ADMIN_ID, actorLabel, ROLES, hasSuperAdminPin, clearSuperAdminPin, hasSuperAdminCode, clearSuperAdminCode } from "../auth.js?v=23";
 import { esc, fmtDateTime, toast, openModal, closeModal, applyBranding } from "../utils.js?v=23";
 
 function readFileAsDataUrl(file) {
@@ -376,9 +376,13 @@ function renderAuditTab(content) {
 function renderSystemTab(content) {
   content.innerHTML = `
     <div class="card mb-2">
-      <div class="card-title mb-1">Kétlépcsős azonosítás (Super Admin PIN)</div>
-      <p class="text-mid small mb-1">${hasSuperAdminPin() ? "Jelenleg aktív — minden USSS-118-as belépéskor a hozzáférési kód után is be kell írni." : "Jelenleg nincs beállítva — legközelebbi kilépés+belépéskor kéri majd a rendszer az első PIN beállítását."}</p>
-      ${hasSuperAdminPin() ? `<button class="btn btn-sm btn-danger" id="clear-pin">PIN törlése (2FA kikapcsolása)</button>` : ""}
+      <div class="card-title mb-1">Super Admin belépési kód és PIN</div>
+      <p class="text-mid small mb-1">A ${esc(SUPER_ADMIN_ID)} fiók belépési kódja és PIN-je nincs a forráskódban — csak ennek a böngészőnek a tárhelyén, hash-elve. ${hasSuperAdminCode() ? "A belépési kód jelenleg be van állítva." : "A belépési kód még nincs beállítva — a következő bejelentkezéskor a rendszer aktiválást kér."} ${hasSuperAdminPin() ? "A PIN jelenleg aktív." : "A PIN még nincs beállítva."}</p>
+      <p class="text-mid small mb-1" style="color:var(--orange, #d98b3f)">Ha bármelyiket itt törlöd, a legközelebbi USSS-118 bejelentkezéskor újra be kell állítani — addig senki sem tud belépni ezzel a fiókkal ezen a gépen.</p>
+      <div class="flex gap-1">
+        ${hasSuperAdminCode() ? `<button class="btn btn-sm btn-danger" id="clear-code">Belépési kód törlése</button>` : ""}
+        ${hasSuperAdminPin() ? `<button class="btn btn-sm btn-danger" id="clear-pin">PIN törlése</button>` : ""}
+      </div>
     </div>
     <div class="card mb-2">
       <div class="card-title mb-1">Egyéni CSS (fejlesztői)</div>
@@ -401,9 +405,15 @@ function renderSystemTab(content) {
   `;
 
   document.getElementById("clear-pin")?.addEventListener("click", () => {
-    if (!confirm("Biztosan kikapcsolja a kétlépcsős azonosítást? Legközelebbi belépéskor újra be lehet állítani.")) return;
+    if (!confirm("Biztosan törli a PIN-t? A legközelebbi belépéskor újra be lehet (kell) állítani.")) return;
     clearSuperAdminPin();
-    toast("PIN törölve — a 2FA kikapcsolva");
+    toast("PIN törölve");
+    renderSystemTab(content);
+  });
+  document.getElementById("clear-code")?.addEventListener("click", () => {
+    if (!confirm("Biztosan törli a belépési kódot? A legközelebbi USSS-118 bejelentkezési kísérlet fogja újra aktiválni a fiókot (kód + PIN megadásával) — addig senki sem tud belépni vele.")) return;
+    clearSuperAdminCode();
+    toast("Belépési kód törölve — a fiók inaktív, amíg újra nem aktiválják");
     renderSystemTab(content);
   });
 

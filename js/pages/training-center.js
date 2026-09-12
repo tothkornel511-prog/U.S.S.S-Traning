@@ -3,7 +3,7 @@ import {
   getTrainingDocs, getTrainingDoc, createTrainingDoc, updateTrainingDoc, deleteTrainingDoc,
   getTrainingQuestions, createTrainingQuestion, deleteTrainingQuestion,
   TRAINING_DOC_STATUSES, ATTACHMENT_MAX_UPLOAD_BYTES, formatFileSize,
-} from "../store.js?v=63";
+} from "../store.js?v=64";
 import { isSuperAdmin, actorLabel } from "../auth.js?v=22";
 import { esc, fmtDateTime, toast, openModal, closeModal, renderRichText } from "../utils.js?v=24";
 import { navigate } from "../router.js?v=20";

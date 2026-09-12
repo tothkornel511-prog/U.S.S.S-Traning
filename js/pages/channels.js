@@ -2,7 +2,7 @@ import {
   getChannels, getChannel, createChannel, deleteChannel,
   getChannelPosts, createChannelPost, deleteChannelPost,
   isImageAttachment, formatFileSize, ATTACHMENT_MAX_UPLOAD_BYTES,
-} from "../store.js?v=62";
+} from "../store.js?v=64";
 import { hasRole, actorLabel } from "../auth.js?v=20";
 import { esc, fmtDateTime, toast, openModal, closeModal } from "../utils.js?v=23";
 import { navigate } from "../router.js?v=20";

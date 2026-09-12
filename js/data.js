@@ -121,9 +121,12 @@ export const PERSONNEL = [
   { usssId: "USSS-109", name: "Dr. Lakatos László",             position: "Secretary of Health",           level: "0", status: "Újonc" },
 ];
 
-/* Kezdeti hozzáférési kódok (Admin később szerkesztheti / generálhatja / visszavonhatja) */
+/* Kezdeti hozzáférési kódok (Admin később szerkesztheti / generálhatja / visszavonhatja).
+   A Super Admin fiók (USSS-118) SZÁNDÉKOSAN nincs itt — annak belépési kódját
+   és PIN-jét kizárólag hash-elve, a böngésző localStorage-ában tároljuk (lásd
+   js/auth.js), hogy ne szerepeljen plaintextként ebben a publikusan olvasható
+   forrásfájlban. */
 export const ACCESS_CODES = [
-  { usssId: "USSS-118", code: "kornel08002", role: "ADMIN" },  // Dominic Hayes
   { usssId: "USSS-004", code: "3MVD-9GHC", role: "ADMIN" },    // Tyron Wolf
   { usssId: "USSS-98",  code: "5PLZ-8XWQ", role: "TRAINING" }, // Christoph Norbert Kleinemann
 ];
