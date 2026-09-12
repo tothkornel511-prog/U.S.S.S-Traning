@@ -2,7 +2,7 @@
    U.S.S.S. ELITE TRAINING SYSTEM — UI SEGÉDFÜGGVÉNYEK
    ========================================================================== */
 
-import { getBrandingOverride } from "./store.js?v=66";
+import { getBrandingOverride } from "./store.js?v=67";
 
 /* Ha az admin lecserélt egy márka-képet, ez állítja be a --brand-img egyéni
    CSS tulajdonságot az adott elemen — felülírás nélkül a CSS-ben megadott
@@ -122,13 +122,14 @@ export function closeModal() {
   if (el) el.remove();
 }
 
-/* PDF/DOCX mellékletek megnyitása KÖZVETLENÜL az oldalon belül, nem
-   letöltésként. PDF-nél a böngésző saját, natív PDF-nézetét ágyazzuk be
-   (iframe) — ez minden modern böngészőben működik data: URL-re és sima
-   linkre is. DOCX-nél nincs natív böngésző-támogatás, ezért a mammoth.js
-   könyvtárral (lásd index.html, CDN-ről betöltve) alakítjuk HTML-lé
-   kliensoldalon — nem kell hozzá szerver, és nem futtat semmilyen kódot
-   a dokumentumból, csak a szöveges/formázási tartalmát olvassa ki. */
+/* PDF/DOCX mellékletek megnyitása egy ÚJ böngészőfülön/ablakban, nagyban,
+   csak megtekintésre — nem letöltésként. PDF-nél a böngésző saját, natív
+   PDF-nézője nyílik meg (ez data: URL-re és sima linkre is működik minden
+   modern böngészőben). DOCX-nél nincs natív böngésző-támogatás, ezért a
+   mammoth.js könyvtárral (lásd index.html, CDN-ről betöltve) alakítjuk
+   HTML-lé kliensoldalon, majd egy önálló, egyszerű HTML-oldalként nyitjuk
+   meg új fülön — nem kell hozzá szerver, és nem futtat semmilyen kódot a
+   dokumentumból, csak a szöveges/formázási tartalmát olvassa ki. */
 function attachmentFileType(label, url) {
   const s = `${label || ""} ${url || ""}`.toLowerCase();
   if (s.includes("application/pdf") || s.includes(".pdf")) return "pdf";
@@ -138,32 +139,42 @@ function attachmentFileType(label, url) {
 
 export async function previewAttachment(label, url) {
   const type = attachmentFileType(label, url);
-  if (type === "pdf") {
-    openModal(`
-      <div class="modal-head"><h3>${esc(label)}</h3><button class="modal-close" data-close-modal>×</button></div>
-      <iframe src="${esc(url)}" style="width:100%; height:75vh; border:none; border-radius:var(--radius-sm); background:#fff;"></iframe>
-      <div class="flex justify-end mt-1"><a href="${esc(url)}" target="_blank" rel="noopener noreferrer" class="btn btn-sm">Megnyitás új fülön</a></div>
-    `);
+  const isDataUrl = url.startsWith("data:");
+
+  // Sima külső link (nem feltöltött fájl, nem DOCX) — natívan, szinkron
+  // módon nyílik meg, nincs szükség semmilyen átalakításra.
+  if (type !== "docx" && !isDataUrl) {
+    window.open(url, "_blank", "noopener,noreferrer");
     return;
   }
-  if (type === "docx") {
-    openModal(`
-      <div class="modal-head"><h3>${esc(label)}</h3><button class="modal-close" data-close-modal>×</button></div>
-      <div id="docx-preview-body" style="max-height:75vh; overflow-y:auto; background:#fff; color:#141414; padding:24px; border-radius:var(--radius-sm); font-family:var(--font-body, sans-serif);">Betöltés…</div>
-    `);
-    try {
+
+  // Feltöltött fájl (data: URL) vagy DOCX: a Chromium biztonsági okból
+  // blokkolja, ha egy window.open() közvetlenül egy data: URL-re navigál —
+  // ezért előbb (még a kattintás-eseményen belül, szinkron módon) nyitunk
+  // egy üres fület, és csak utána, a blob előkészülte után navigálunk oda.
+  const win = window.open("", "_blank");
+  try {
+    let target = url;
+    if (type === "docx") {
       if (!window.mammoth) throw new Error("mammoth-missing");
       const buf = await (await fetch(url)).arrayBuffer();
       const result = await window.mammoth.convertToHtml({ arrayBuffer: buf });
-      const body = document.getElementById("docx-preview-body");
-      if (body) body.innerHTML = result.value;
-    } catch {
-      const body = document.getElementById("docx-preview-body");
-      if (body) body.innerHTML = `<p>Nem sikerült megnyitni előnézetben. <a href="${esc(url)}" target="_blank" rel="noopener noreferrer">Megnyitás/letöltés közvetlenül</a>.</p>`;
+      const html = `<!doctype html><html lang="hu"><head><meta charset="utf-8"/><title>${esc(label)}</title>
+        <style>body{background:#f4f2ee;color:#161616;margin:0;padding:48px 24px;font-family:Georgia,"Times New Roman",serif;line-height:1.7;}
+        .doc-wrap{max-width:820px;margin:0 auto;background:#fff;padding:56px;box-shadow:0 0 24px rgba(0,0,0,.15);}
+        img{max-width:100%;} h1,h2,h3{font-family:sans-serif;}</style></head>
+        <body><div class="doc-wrap">${result.value}</div></body></html>`;
+      target = URL.createObjectURL(new Blob([html], { type: "text/html" }));
+    } else if (isDataUrl) {
+      const blob = await (await fetch(url)).blob();
+      target = URL.createObjectURL(blob);
     }
-    return;
+    if (win) win.location.href = target;
+    else window.open(target, "_blank");
+  } catch {
+    if (win) win.close();
+    toast("Nem sikerült megnyitni előnézetben.", "warn");
   }
-  window.open(url, "_blank", "noopener,noreferrer");
 }
 
 export function statusBadge(color, label) {

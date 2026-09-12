@@ -2,10 +2,10 @@
    U.S.S.S. ELITE TRAINING SYSTEM — APP ENTRY
    ========================================================================== */
 
-import { seedIfNeeded, globalSearch, getCustomCss, getOperationRecords, SECTIONS } from "./store.js?v=66";
+import { seedIfNeeded, globalSearch, getCustomCss, getOperationRecords, SECTIONS } from "./store.js?v=67";
 import { isAuthenticated, currentSession, logout, hasSection, isSuperAdmin, ROLES } from "./auth.js?v=23";
 import { registerRoute, resolve, startRouter, navigate, currentPath } from "./router.js?v=20";
-import { esc, sealMark, closeModal, applyBranding } from "./utils.js?v=25";
+import { esc, sealMark, closeModal, applyBranding } from "./utils.js?v=27";
 import { renderLogin } from "./pages/login.js?v=25";
 import { renderDashboard } from "./pages/dashboard.js?v=46";
 import { renderPersonnelList } from "./pages/personnel.js?v=22";
@@ -22,8 +22,8 @@ import { renderOperations } from "./pages/operations.js?v=39";
 import { renderReadiness } from "./pages/readiness.js?v=32";
 import { renderInvestigationList, renderInvestigationDetail } from "./pages/investigations.js?v=9";
 import { renderCovertOpList, renderCovertOpDetail } from "./pages/covert-ops.js?v=11";
-import { renderChannelsHub } from "./pages/channels.js?v=3";
-import { renderTrainingCenterCategories, renderTrainingCenterCategory, renderTrainingCenterDoc } from "./pages/training-center.js?v=1";
+import { renderChannelsCategories, renderChannelsCategory, renderChannelsDoc } from "./pages/channels.js?v=4";
+import { renderTrainingCenterCategories, renderTrainingCenterCategory } from "./pages/training-center.js?v=2";
 
 seedIfNeeded();
 applyCustomCss();
@@ -63,8 +63,9 @@ function pageTitleFor(path) {
   if (path.startsWith("/investigations/")) return { crumb: "Belső Vizsgálatok", title: "Vizsgálat részletei" };
   if (path.startsWith("/covert-ops/")) return { crumb: "Fedett Műveletek", title: "Művelet részletei" };
   if (path === "/channels") return { crumb: "Csatornák", title: "Csatornák" };
-  if (path.startsWith("/channels/")) return { crumb: "Csatornák", title: "Csatorna" };
-  if (path.startsWith("/training-center")) return { crumb: "Training Center", title: "Oktatási Központ" };
+  if (path.startsWith("/channels/")) return { crumb: "Csatornák", title: "Dokumentum" };
+  if (path === "/training-center") return { crumb: "Training Center", title: "Training Center" };
+  if (path.startsWith("/training-center/")) return { crumb: "Training Center", title: "Kategória" };
   if (path.startsWith("/map")) return { crumb: "Objektumok", title: "Térkép" };
   const flat = NAV.flatMap((g) => g.items);
   const found = flat.find((i) => i.path === path);
@@ -220,11 +221,11 @@ registerRoute("/investigations", () => renderInvestigationList(document.getEleme
 registerRoute("/investigations/:id", (p) => renderInvestigationDetail(document.getElementById("content"), p.id));
 registerRoute("/covert-ops", () => renderCovertOpList(document.getElementById("content")));
 registerRoute("/covert-ops/:id", (p) => renderCovertOpDetail(document.getElementById("content"), p.id));
-registerRoute("/channels", () => renderChannelsHub(document.getElementById("content")));
-registerRoute("/channels/:channelId", (p) => renderChannelsHub(document.getElementById("content"), p.channelId));
+registerRoute("/channels", () => renderChannelsCategories(document.getElementById("content")));
+registerRoute("/channels/:categoryId", (p) => renderChannelsCategory(document.getElementById("content"), p.categoryId));
+registerRoute("/channels/:categoryId/:docId", (p) => renderChannelsDoc(document.getElementById("content"), p.categoryId, p.docId));
 registerRoute("/training-center", () => renderTrainingCenterCategories(document.getElementById("content")));
 registerRoute("/training-center/:categoryId", (p) => renderTrainingCenterCategory(document.getElementById("content"), p.categoryId));
-registerRoute("/training-center/:categoryId/:docId", (p) => renderTrainingCenterDoc(document.getElementById("content"), p.categoryId, p.docId));
 
 /* Az útvonal első (operations esetén első két) szegmenséből számolja ki,
    melyik "szoba" felel meg neki — ugyanaz az id, mint a SECTIONS-ban. */

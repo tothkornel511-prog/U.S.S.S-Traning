@@ -2,8 +2,8 @@ import {
   login, finalizeLogin, hasSuperAdminPin, setSuperAdminPin, verifySuperAdminPin,
   SUPER_ADMIN_ID, setSuperAdminCode,
 } from "../auth.js?v=23";
-import { getPerson } from "../store.js?v=66";
-import { esc, sealMark, applyBranding } from "../utils.js?v=25";
+import { getPerson } from "../store.js?v=67";
+import { esc, sealMark, applyBranding } from "../utils.js?v=27";
 
 export function renderLogin(root, onSuccess) {
   root.innerHTML = `

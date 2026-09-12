@@ -2,9 +2,9 @@ import {
   getExams, getExam, createExam, setExamAnswer, setExamFinalComment, setExamCompetency, setExamRecommendation, interruptExam, finishExam, deleteExam,
   getExamQuestions, getExamCategories, examScoreSummary, EXAM_MAX_SCORE, EXAM_PASS_PCT,
   promoteExamCandidate, getPositions, ref,
-} from "../store.js?v=66";
+} from "../store.js?v=67";
 import { hasRole, actorLabel, currentSession } from "../auth.js?v=20";
-import { esc, fmtDate, fmtDateTime, toast, openModal, closeModal, sealMark } from "../utils.js?v=25";
+import { esc, fmtDate, fmtDateTime, toast, openModal, closeModal, sealMark } from "../utils.js?v=27";
 import { navigate } from "../router.js?v=20";
 
 const NOTE_TEMPLATES = ["Jó válasz", "Hiányos válasz", "Bizonytalan válasz", "Jó helyzetfelismerés", "Gyenge helyzetfelismerés", "Jó kommunikáció", "Gyenge kommunikáció", "Jó döntés", "Rossz döntés", "Kritikus hiba"];

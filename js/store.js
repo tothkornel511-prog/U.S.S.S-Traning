@@ -38,11 +38,11 @@ const KEYS = {
   covertOps: NS + "covert_ops",
   nextCovertOpSeq: NS + "next_covert_op_seq",
   covertOpClassifications: NS + "covert_op_classifications",
-  channels: NS + "channels",
-  channelPosts: NS + "channel_posts",
+  channelCategories: NS + "ch_categories",
+  channelDocs: NS + "ch_docs",
+  channelQuestions: NS + "ch_questions",
   trainingCategories: NS + "tc_categories",
-  trainingDocs: NS + "tc_docs",
-  trainingQuestions: NS + "tc_questions",
+  trainingFiles: NS + "tc_files",
 };
 
 /* Elméleti vizsgánál ez alatt a százalék alatt a modul nem számít teljesítettnek. */
@@ -131,15 +131,15 @@ export function seedIfNeeded() {
   applyTrainingPlansSeedPatch();
   applyInvestigationSeedPatch();
   applyTrainingPlanMultiModulePatch();
-  applyChannelsSeedPatch();
+  applyChannelsToDocEngineMigration();
   applyTrainingCenterSeedPatch();
   applyTrainingCenterRankCategoriesPatch();
 }
 
-/* Célzott seedelés: az Oktatási Központ (Training Center) modul — csak a
-   Super Admin számára elérhető dokumentációs rendszer. A kategóriák a
-   tényleges fokozati rendszert (ref.LEVELS) követik, ugyanazt, amit a
-   Kiképzési Áttekintés is használ — nem egy külön, témák szerinti listát. */
+/* Célzott seedelés: a Training Center (kategorizált fájlkönyvtár) modul —
+   csak a Super Admin számára elérhető. A kategóriák a tényleges fokozati
+   rendszert (ref.LEVELS) követik, ugyanazt, amit a Kiképzési Áttekintés is
+   használ — nem egy külön, témák szerinti listát. */
 const TRAINING_CATEGORY_SEED = [
   ...LEVELS.map((l) => l.label),
   "Önkormányzati adminisztráció",
@@ -147,7 +147,7 @@ const TRAINING_CATEGORY_SEED = [
 ];
 /* Korábbi alapértelmezett listák — csak azért kellenek még, hogy felismerjük
    és lecseréljük azokon a böngészőkön, ahol már lefutott egy régebbi seed,
-   de még nem került bele valódi tartalom. */
+   de még nem került bele valódi tartalom (fájl). */
 const OLD_TOPIC_TRAINING_CATEGORY_SEED = [
   "Alapvető ismeretek", "Kommunikáció", "Rádióhasználat", "Védelem", "Sofőri képzés",
   "Taktikai képzés", "Védett személyek", "Védett helyszínek", "Konvoj", "Vészhelyzetek",
@@ -157,8 +157,7 @@ const OLD_RANK_ONLY_TRAINING_CATEGORY_SEED = [...LEVELS.map((l) => l.label), "Ad
 function applyTrainingCenterSeedPatch() {
   if (read(KEYS.trainingCategories, null) === null) {
     write(KEYS.trainingCategories, []);
-    write(KEYS.trainingDocs, []);
-    write(KEYS.trainingQuestions, []);
+    write(KEYS.trainingFiles, []);
   }
   if (read(KEYS.trainingCategories, []).length === 0) {
     TRAINING_CATEGORY_SEED.forEach((name) => createTrainingCategory(name, "Rendszer"));
@@ -167,7 +166,7 @@ function applyTrainingCenterSeedPatch() {
 function replaceUntouchedTrainingCategories(oldSeed) {
   const names = read(KEYS.trainingCategories, []).map((c) => c.name);
   const isUntouched = names.length === oldSeed.length && oldSeed.every((n) => names.includes(n));
-  const hasAnyContent = read(KEYS.trainingDocs, []).length > 0;
+  const hasAnyContent = read(KEYS.trainingFiles, []).length > 0;
   if (isUntouched && !hasAnyContent) {
     write(KEYS.trainingCategories, []);
     TRAINING_CATEGORY_SEED.forEach((name) => createTrainingCategory(name, "Rendszer"));
@@ -178,6 +177,33 @@ function replaceUntouchedTrainingCategories(oldSeed) {
 function applyTrainingCenterRankCategoriesPatch() {
   replaceUntouchedTrainingCategories(OLD_TOPIC_TRAINING_CATEGORY_SEED) ||
     replaceUntouchedTrainingCategories(OLD_RANK_ONLY_TRAINING_CATEGORY_SEED);
+}
+/* Egyszeri migráció: a korábbi, egyszerű "Csatornák" funkciót (szabadon
+   elnevezett szobák bejegyzésekkel) felváltotta a gazdagabb kategória→
+   dokumentum rendszer. Az üres (bejegyzés nélküli) régi csatornák nevét
+   átmentjük új, üres kategóriaként, hogy a korábban már elvégzett
+   elnevezési munka (pl. "Vizsga anyagok") ne vesszen el — valódi tartalmú
+   (bejegyzést tartalmazó) régi csatornát viszont szándékosan nem mentünk
+   át automatikusan, mert a két adatmodell (bejegyzés vs. dokumentum) nem
+   feleltethető meg egy az egyben egymásnak. */
+function applyChannelsToDocEngineMigration() {
+  const oldChannelsKey = NS + "channels";
+  const oldPostsKey = NS + "channel_posts";
+  const raw = localStorage.getItem(oldChannelsKey);
+  if (raw === null) return;
+  let oldChannels = [];
+  let oldPosts = [];
+  try { oldChannels = JSON.parse(raw) || []; } catch { oldChannels = []; }
+  try { oldPosts = JSON.parse(localStorage.getItem(oldPostsKey) || "[]") || []; } catch { oldPosts = []; }
+  const existingNames = getChannelCategories().map((c) => c.name);
+  oldChannels.forEach((ch) => {
+    const hasPosts = oldPosts.some((p) => p.channelId === ch.id);
+    if (!hasPosts && ch.name && !existingNames.includes(ch.name)) {
+      createChannelCategory(ch.name, "Rendszer (migrálva)");
+    }
+  });
+  localStorage.removeItem(oldChannelsKey);
+  localStorage.removeItem(oldPostsKey);
 }
 
 /* Célzott seedelés: a Kiképzési tervek (training plans) modul új
@@ -336,19 +362,6 @@ function applyInvestigationSeedPatch() {
   if (read(KEYS.investigations, null) === null) {
     write(KEYS.investigations, []);
     write(KEYS.nextInvestigationSeq, 1);
-  }
-}
-
-/* Célzott seedelés: a Csatornák modul új localStorage-kulcsokat vezet be —
-   ez pótolja őket egy már korábban seedelt böngészőben, és létrehoz egy
-   alapértelmezett "Vizsga anyagok" csatornát, ha még egy sincs. */
-function applyChannelsSeedPatch() {
-  if (read(KEYS.channels, null) === null) {
-    write(KEYS.channels, []);
-    write(KEYS.channelPosts, []);
-  }
-  if (read(KEYS.channels, []).length === 0) {
-    createChannel("Vizsga anyagok", "Rendszer");
   }
 }
 
@@ -1935,81 +1948,151 @@ export function getInvestigationsLinkedToOp(opId) {
   return getInvestigations().filter((i) => (i.linkedOps || []).includes(opId));
 }
 
-/* ---------- Csatornák (Channels) ----------------------------------------
-   Belső, szabadon elnevezhető "szobák" bejegyzésekhez és mellékletekhez —
-   admin/oktatásvezető hozza létre és tölti fel őket (pl. "Vizsga anyagok").
-   FONTOS: ez az egész rendszer szerver nélküli, statikus oldal — minden
-   csatorna és bejegyzés KIZÁRÓLAG abban a böngészőben létezik, ahol
-   létrehozták. Nem szinkronizál automatikusan más eszközre/felhasználóra
-   (arra valódi backend kellene). Nagy fájlokhoz (a feltöltési korlát
-   fölött) ezért "link" típusú melléklet is választható — pont úgy, mint a
-   Belső Vizsgálatoknál/Fedett Műveleteknél: egy külső (pl. Discord CDN,
-   Drive) hivatkozás, amit a rendszer nem tárol, csak megjelenít. */
-export function getChannels() {
-  return read(KEYS.channels, []);
+/* ---------- Csatornák (Channels) — kategóriák → dokumentumok → kérdések --
+   Gazdag, szabadon szerkeszthető tartalom-rendszer: az admin maga hozza
+   létre a kategóriákat (pl. "Vizsga anyagok"), majd bennük dokumentumokat
+   ír (cím, leírás, formázott szöveg, borítókép, galéria, kapcsolódó
+   kérdések), automatikus mentéssel. Kizárólag a Super Admin éri el — lásd
+   app.js route-védelme. Ugyanaz a szerver nélküli, localStorage-alapú
+   korlát vonatkozik rá, mint minden más modulra. */
+export const CHANNEL_DOC_STATUSES = ["Piszkozat", "Belső", "Publikált", "Archivált"];
+
+export function getChannelCategories() {
+  return read(KEYS.channelCategories, []);
 }
-export function getChannel(id) {
-  return getChannels().find((c) => c.id === id);
+export function getChannelCategory(id) {
+  return getChannelCategories().find((c) => c.id === id);
 }
-export function createChannel(name, actorLabel) {
+export function createChannelCategory(name, actorLabel) {
   const trimmed = (name || "").trim();
   if (!trimmed) return null;
   const slug = trimmed.toLowerCase()
     .normalize("NFD").replace(/[̀-ͯ]/g, "")
     .replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "") || "csatorna";
-  const list = getChannels();
+  const list = getChannelCategories();
   let id = slug, n = 2;
   while (list.some((c) => c.id === id)) id = `${slug}-${n++}`;
-  const channel = { id, name: trimmed, createdBy: actorLabel || "Rendszer", createdAt: new Date().toISOString() };
-  list.push(channel);
-  write(KEYS.channels, list);
+  const category = { id, name: trimmed, createdBy: actorLabel || "Rendszer", createdAt: new Date().toISOString() };
+  list.push(category);
+  write(KEYS.channelCategories, list);
   logAudit(actorLabel, "Csatorna létrehozva", trimmed);
-  return channel;
+  return category;
 }
-export function deleteChannel(id, actorLabel) {
-  const channel = getChannel(id);
-  write(KEYS.channels, getChannels().filter((c) => c.id !== id));
-  write(KEYS.channelPosts, getChannelPosts().filter((p) => p.channelId !== id));
-  logAudit(actorLabel, "Csatorna törölve", channel?.name || id);
+export function renameChannelCategory(id, name, actorLabel) {
+  const trimmed = (name || "").trim();
+  if (!trimmed) return;
+  const list = getChannelCategories();
+  const cat = list.find((c) => c.id === id);
+  if (!cat) return;
+  const oldName = cat.name;
+  cat.name = trimmed;
+  write(KEYS.channelCategories, list);
+  logAudit(actorLabel, "Csatorna átnevezve", `${oldName} → ${trimmed}`);
 }
-function getAllChannelPosts() {
-  return read(KEYS.channelPosts, []);
+export function deleteChannelCategory(id, actorLabel) {
+  const category = getChannelCategory(id);
+  write(KEYS.channelCategories, getChannelCategories().filter((c) => c.id !== id));
+  const docs = getChannelDocs(id);
+  docs.forEach((doc) => deleteChannelDoc(doc.id, actorLabel));
+  logAudit(actorLabel, "Csatorna törölve", category?.name || id);
 }
-export function getChannelPosts(channelId) {
-  return getAllChannelPosts()
-    .filter((p) => p.channelId === channelId)
-    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+function getAllChannelDocs() {
+  return read(KEYS.channelDocs, []);
 }
-export function createChannelPost(channelId, data, actorLabel) {
+export function getChannelDocs(categoryId) {
+  return getAllChannelDocs()
+    .filter((d) => d.categoryId === categoryId)
+    .sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
+}
+export function getChannelDoc(id) {
+  return getAllChannelDocs().find((d) => d.id === id);
+}
+export function createChannelDoc(categoryId, data, actorLabel) {
   const now = new Date().toISOString();
-  const post = {
-    id: uid("POST"),
-    channelId,
-    title: (data.title || "").trim(),
-    body: (data.body || "").trim(),
-    attachments: (data.attachments || []).slice(0, 10),
+  const doc = {
+    id: uid("CHD"),
+    categoryId,
+    title: (data.title || "Névtelen dokumentum").trim(),
+    description: (data.description || "").trim(),
+    content: (data.content || "").trim(),
+    coverImage: data.coverImage || null,
+    gallery: (data.gallery || []).slice(0, 20),
+    status: CHANNEL_DOC_STATUSES.includes(data.status) ? data.status : "Piszkozat",
     createdBy: actorLabel || "Rendszer",
     createdAt: now,
+    updatedBy: actorLabel || "Rendszer",
+    updatedAt: now,
   };
-  const list = getAllChannelPosts();
-  list.push(post);
-  if (!write(KEYS.channelPosts, list)) return null;
-  logAudit(actorLabel, "Csatorna-bejegyzés létrehozva", `${getChannel(channelId)?.name || channelId} — ${post.title || "(cím nélkül)"}`);
-  return post;
+  const list = getAllChannelDocs();
+  list.push(doc);
+  if (!write(KEYS.channelDocs, list)) return null;
+  logAudit(actorLabel, "Csatorna-dokumentum létrehozva", doc.title);
+  return doc;
 }
-export function deleteChannelPost(postId, actorLabel) {
-  write(KEYS.channelPosts, getAllChannelPosts().filter((p) => p.id !== postId));
-  logAudit(actorLabel, "Csatorna-bejegyzés törölve", postId);
+export function updateChannelDoc(id, patch, actorLabel) {
+  const list = getAllChannelDocs();
+  const doc = list.find((d) => d.id === id);
+  if (!doc) return null;
+  const previous = JSON.parse(JSON.stringify(doc));
+  Object.entries(patch).forEach(([key, value]) => { if (value !== undefined) doc[key] = value; });
+  doc.updatedAt = new Date().toISOString();
+  doc.updatedBy = actorLabel || "Rendszer";
+  if (!write(KEYS.channelDocs, list)) {
+    Object.assign(doc, previous);
+    return null;
+  }
+  return doc;
+}
+export function deleteChannelDoc(id, actorLabel) {
+  const doc = getChannelDoc(id);
+  write(KEYS.channelDocs, getAllChannelDocs().filter((d) => d.id !== id));
+  write(KEYS.channelQuestions, read(KEYS.channelQuestions, []).filter((q) => q.docId !== id));
+  logAudit(actorLabel, "Csatorna-dokumentum törölve", doc?.title || id);
 }
 
-/* ---------- Oktatási Központ (Training Center) --------------------------
-   Strukturált dokumentáció-rendszer: Kategóriák → Dokumentumok → Kérdések.
-   Kizárólag a Super Admin (lásd auth.js SUPER_ADMIN_ID) számára elérhető —
-   ezt az app.js route-védelme és navigációja is külön, a hasSection()
-   rendszertől függetlenül kényszeríti ki. Ugyanaz a szerver nélküli,
-   localStorage-alapú korlát vonatkozik rá, mint minden más modulra. */
-export const TRAINING_DOC_STATUSES = ["Piszkozat", "Belső", "Publikált", "Archivált"];
+function getAllChannelQuestions() {
+  return read(KEYS.channelQuestions, []);
+}
+export function getChannelQuestions(docId) {
+  return getAllChannelQuestions().filter((q) => q.docId === docId);
+}
+export function createChannelQuestion(docId, data, actorLabel) {
+  const question = {
+    id: uid("CHQ"),
+    docId,
+    question: (data.question || "").trim(),
+    options: (data.options || []).map((o) => (o || "").trim()).filter(Boolean),
+    correctAnswer: (data.correctAnswer || "").trim(),
+    explanation: (data.explanation || "").trim(),
+    createdAt: new Date().toISOString(),
+  };
+  if (!question.question) return null;
+  const list = getAllChannelQuestions();
+  list.push(question);
+  write(KEYS.channelQuestions, list);
+  logAudit(actorLabel, "Csatorna-kérdés létrehozva", question.question.slice(0, 60));
+  return question;
+}
+export function updateChannelQuestion(id, patch, actorLabel) {
+  const list = getAllChannelQuestions();
+  const q = list.find((x) => x.id === id);
+  if (!q) return null;
+  Object.entries(patch).forEach(([key, value]) => { if (value !== undefined) q[key] = value; });
+  write(KEYS.channelQuestions, list);
+  return q;
+}
+export function deleteChannelQuestion(id, actorLabel) {
+  write(KEYS.channelQuestions, getAllChannelQuestions().filter((q) => q.id !== id));
+  logAudit(actorLabel, "Csatorna-kérdés törölve", id);
+}
 
+/* ---------- Training Center — kategorizált fájlkönyvtár -------------------
+   Egyszerű: kategóriák (a tényleges fokozati rendszert követve, lásd
+   ref.LEVELS), bennük fájlok (feltöltve vagy külső linkként) — nincs
+   kézzel írt dokumentum-szerkesztő, csak feltöltés és megnyitás (lásd
+   utils.js previewAttachment: PDF/DOCX egyaránt közvetlenül, nagyban,
+   új fülön nyílik meg, letöltés nélkül). Kizárólag a Super Admin éri el. */
 export function getTrainingCategories() {
   return read(KEYS.trainingCategories, []);
 }
@@ -2028,7 +2111,7 @@ export function createTrainingCategory(name, actorLabel) {
   const category = { id, name: trimmed, createdBy: actorLabel || "Rendszer", createdAt: new Date().toISOString() };
   list.push(category);
   write(KEYS.trainingCategories, list);
-  logAudit(actorLabel, "Oktatási kategória létrehozva", trimmed);
+  logAudit(actorLabel, "Training Center kategória létrehozva", trimmed);
   return category;
 }
 export function renameTrainingCategory(id, name, actorLabel) {
@@ -2040,104 +2123,47 @@ export function renameTrainingCategory(id, name, actorLabel) {
   const oldName = cat.name;
   cat.name = trimmed;
   write(KEYS.trainingCategories, list);
-  logAudit(actorLabel, "Oktatási kategória átnevezve", `${oldName} → ${trimmed}`);
+  logAudit(actorLabel, "Training Center kategória átnevezve", `${oldName} → ${trimmed}`);
 }
 export function deleteTrainingCategory(id, actorLabel) {
   const category = getTrainingCategory(id);
   write(KEYS.trainingCategories, getTrainingCategories().filter((c) => c.id !== id));
-  const docs = getTrainingDocs(id);
-  docs.forEach((doc) => deleteTrainingDoc(doc.id, actorLabel));
-  logAudit(actorLabel, "Oktatási kategória törölve", category?.name || id);
+  write(KEYS.trainingFiles, getAllTrainingFiles().filter((f) => f.categoryId !== id));
+  logAudit(actorLabel, "Training Center kategória törölve", category?.name || id);
 }
 
-function getAllTrainingDocs() {
-  return read(KEYS.trainingDocs, []);
+function getAllTrainingFiles() {
+  return read(KEYS.trainingFiles, []);
 }
-export function getTrainingDocs(categoryId) {
-  return getAllTrainingDocs()
-    .filter((d) => d.categoryId === categoryId)
-    .sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
+export function getTrainingFiles(categoryId) {
+  return getAllTrainingFiles()
+    .filter((f) => f.categoryId === categoryId)
+    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 }
-export function getTrainingDoc(id) {
-  return getAllTrainingDocs().find((d) => d.id === id);
-}
-export function createTrainingDoc(categoryId, data, actorLabel) {
-  const now = new Date().toISOString();
-  const doc = {
-    id: uid("DOC"),
+export function createTrainingFile(categoryId, data, actorLabel) {
+  const label = (data.label || "").trim();
+  const url = (data.url || "").trim();
+  if (!label || !url) return null;
+  const file = {
+    id: uid("TF"),
     categoryId,
-    title: (data.title || "Névtelen dokumentum").trim(),
-    description: (data.description || "").trim(),
-    content: (data.content || "").trim(),
-    coverImage: data.coverImage || null,
-    gallery: (data.gallery || []).slice(0, 20),
-    status: TRAINING_DOC_STATUSES.includes(data.status) ? data.status : "Piszkozat",
+    label,
+    url,
+    kind: data.kind === "upload" ? "upload" : "link",
+    size: data.size || null,
     createdBy: actorLabel || "Rendszer",
-    createdAt: now,
-    updatedBy: actorLabel || "Rendszer",
-    updatedAt: now,
-  };
-  const list = getAllTrainingDocs();
-  list.push(doc);
-  if (!write(KEYS.trainingDocs, list)) return null;
-  logAudit(actorLabel, "Oktatási dokumentum létrehozva", doc.title);
-  return doc;
-}
-export function updateTrainingDoc(id, patch, actorLabel) {
-  const list = getAllTrainingDocs();
-  const doc = list.find((d) => d.id === id);
-  if (!doc) return null;
-  const previous = JSON.parse(JSON.stringify(doc));
-  Object.entries(patch).forEach(([key, value]) => { if (value !== undefined) doc[key] = value; });
-  doc.updatedAt = new Date().toISOString();
-  doc.updatedBy = actorLabel || "Rendszer";
-  if (!write(KEYS.trainingDocs, list)) {
-    Object.assign(doc, previous);
-    return null;
-  }
-  return doc;
-}
-export function deleteTrainingDoc(id, actorLabel) {
-  const doc = getTrainingDoc(id);
-  write(KEYS.trainingDocs, getAllTrainingDocs().filter((d) => d.id !== id));
-  write(KEYS.trainingQuestions, read(KEYS.trainingQuestions, []).filter((q) => q.docId !== id));
-  logAudit(actorLabel, "Oktatási dokumentum törölve", doc?.title || id);
-}
-
-function getAllTrainingQuestions() {
-  return read(KEYS.trainingQuestions, []);
-}
-export function getTrainingQuestions(docId) {
-  return getAllTrainingQuestions().filter((q) => q.docId === docId);
-}
-export function createTrainingQuestion(docId, data, actorLabel) {
-  const question = {
-    id: uid("Q"),
-    docId,
-    question: (data.question || "").trim(),
-    options: (data.options || []).map((o) => (o || "").trim()).filter(Boolean),
-    correctAnswer: (data.correctAnswer || "").trim(),
-    explanation: (data.explanation || "").trim(),
     createdAt: new Date().toISOString(),
   };
-  if (!question.question) return null;
-  const list = getAllTrainingQuestions();
-  list.push(question);
-  write(KEYS.trainingQuestions, list);
-  logAudit(actorLabel, "Oktatási kérdés létrehozva", question.question.slice(0, 60));
-  return question;
+  const list = getAllTrainingFiles();
+  list.push(file);
+  if (!write(KEYS.trainingFiles, list)) return null;
+  logAudit(actorLabel, "Training Center fájl feltöltve", label);
+  return file;
 }
-export function updateTrainingQuestion(id, patch, actorLabel) {
-  const list = getAllTrainingQuestions();
-  const q = list.find((x) => x.id === id);
-  if (!q) return null;
-  Object.entries(patch).forEach(([key, value]) => { if (value !== undefined) q[key] = value; });
-  write(KEYS.trainingQuestions, list);
-  return q;
-}
-export function deleteTrainingQuestion(id, actorLabel) {
-  write(KEYS.trainingQuestions, getAllTrainingQuestions().filter((q) => q.id !== id));
-  logAudit(actorLabel, "Oktatási kérdés törölve", id);
+export function deleteTrainingFile(id, actorLabel) {
+  const file = getAllTrainingFiles().find((f) => f.id === id);
+  write(KEYS.trainingFiles, getAllTrainingFiles().filter((f) => f.id !== id));
+  logAudit(actorLabel, "Training Center fájl törölve", file?.label || id);
 }
 
 /* ---------- Global search ------------------------------------------------*/

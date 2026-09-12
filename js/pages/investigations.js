@@ -5,9 +5,9 @@ import {
   addInvestigationAttachment, removeInvestigationAttachment, formatCodename,
   isImageAttachment, formatFileSize, ATTACHMENT_MAX_UPLOAD_BYTES,
   INVESTIGATION_SEVERITIES, INVESTIGATION_STATUSES, INVESTIGATION_CLOSED_STATUSES, INVESTIGATION_OUTCOMES, INVESTIGATION_ORIGINS,
-} from "../store.js?v=66";
+} from "../store.js?v=67";
 import { hasRole, actorLabel } from "../auth.js?v=20";
-import { esc, fmtDate, fmtDateTime, toast, openModal, closeModal, applyBranding, previewAttachment } from "../utils.js?v=25";
+import { esc, fmtDate, fmtDateTime, toast, openModal, closeModal, applyBranding, previewAttachment } from "../utils.js?v=27";
 import { navigate } from "../router.js?v=20";
 
 const SEVERITY_BADGE = { "Alacsony": "gray", "Közepes": "yellow", "Súlyos": "red", "Kritikus": "red" };

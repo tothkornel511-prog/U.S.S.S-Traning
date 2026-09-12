@@ -2,9 +2,9 @@ import {
   getPerson, ref, moduleState, readinessPercent, levelProgress, probationInfo,
   setModuleTheory, setModulePractical, approveLevelUp, nextLevelId, liftProbation,
   levelLabel, moduleByCode, examStats, THEORY_PASS_THRESHOLD, deleteHistoryEntry,
-} from "../store.js?v=66";
+} from "../store.js?v=67";
 import { hasRole, actorLabel } from "../auth.js?v=20";
-import { esc, avatarContent, fmtDate, fmtDateTime, toast, openModal, closeModal } from "../utils.js?v=25";
+import { esc, avatarContent, fmtDate, fmtDateTime, toast, openModal, closeModal } from "../utils.js?v=27";
 import { navigate } from "../router.js?v=20";
 
 let activeTab = "modules";

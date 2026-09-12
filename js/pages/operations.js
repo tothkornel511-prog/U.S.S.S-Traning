@@ -4,9 +4,9 @@ import {
   createOperationRecord,
   updateOperationRecord,
   archiveOperationRecord,
-} from "../store.js?v=66";
+} from "../store.js?v=67";
 import { actorLabel, hasRole } from "../auth.js?v=20";
-import { esc, fmtDate, toast, openModal, closeModal, applyBranding } from "../utils.js?v=25";
+import { esc, fmtDate, toast, openModal, closeModal, applyBranding } from "../utils.js?v=27";
 import { navigate } from "../router.js?v=20";
 
 const STATUS = ["OPEN", "IN REVIEW", "APPROVED", "REJECTED", "COMPLETED"];

@@ -1,6 +1,6 @@
-import { getLocations, getLocation, upsertLocation, deleteLocation, ref, mapById } from "../store.js?v=66";
+import { getLocations, getLocation, upsertLocation, deleteLocation, ref, mapById } from "../store.js?v=67";
 import { hasRole, actorLabel } from "../auth.js?v=20";
-import { esc, fmtDateTime, toast, openModal, closeModal } from "../utils.js?v=25";
+import { esc, fmtDateTime, toast, openModal, closeModal } from "../utils.js?v=27";
 import { navigate } from "../router.js?v=20";
 import { createPanZoomMap } from "../mapview.js?v=21";
 import { openOnMap } from "./map.js?v=20";

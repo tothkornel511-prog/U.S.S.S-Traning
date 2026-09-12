@@ -1,6 +1,6 @@
-import { ref, mapById, locationsForMap, districtsForMap, upsertDistrict, deleteDistrict } from "../store.js?v=66";
+import { ref, mapById, locationsForMap, districtsForMap, upsertDistrict, deleteDistrict } from "../store.js?v=67";
 import { hasRole, actorLabel } from "../auth.js?v=20";
-import { esc, toast, openModal, closeModal } from "../utils.js?v=25";
+import { esc, toast, openModal, closeModal } from "../utils.js?v=27";
 import { navigate } from "../router.js?v=20";
 import { createPanZoomMap } from "../mapview.js?v=21";
 import { openLocationForm } from "./locations.js?v=20";

@@ -2,9 +2,9 @@ import {
   getTrainingPlans, getTrainingPlan, createTrainingPlan, updateTrainingPlan, deleteTrainingPlan,
   linkTrainingPlanProtocol, PLAN_STATUSES, getPersonnel, allModulesFlat, moduleByCode,
   MAX_ATTACHMENT_BYTES, MAX_ATTACHMENTS_PER_PLAN, ALLOWED_ATTACHMENT_EXT,
-} from "../store.js?v=66";
+} from "../store.js?v=67";
 import { hasRole, actorLabel } from "../auth.js?v=20";
-import { esc, fmtDate, fmtDateTime, toast, openModal, closeModal, applyBranding, previewAttachment } from "../utils.js?v=25";
+import { esc, fmtDate, fmtDateTime, toast, openModal, closeModal, applyBranding, previewAttachment } from "../utils.js?v=27";
 import { navigate } from "../router.js?v=20";
 import { openProtocolForm } from "./protocols.js?v=22";
 
