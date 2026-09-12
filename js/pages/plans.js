@@ -2,7 +2,7 @@ import {
   getTrainingPlans, getTrainingPlan, createTrainingPlan, updateTrainingPlan, deleteTrainingPlan,
   linkTrainingPlanProtocol, PLAN_STATUSES, getPersonnel, allModulesFlat, moduleByCode,
   MAX_ATTACHMENT_BYTES, MAX_ATTACHMENTS_PER_PLAN, ALLOWED_ATTACHMENT_EXT,
-} from "../store.js?v=60";
+} from "../store.js?v=61";
 import { hasRole, actorLabel } from "../auth.js?v=20";
 import { esc, fmtDate, fmtDateTime, toast, openModal, closeModal, applyBranding } from "../utils.js?v=23";
 import { navigate } from "../router.js?v=20";
@@ -292,12 +292,13 @@ export function renderTrainingPlanDetail(container, id) {
       ${(plan.attachments || []).length ? `<div class="divider"></div><div class="card-title mb-1">Mellékletek (${plan.attachments.length})</div>
         ${plan.attachments.map((a) => `<div class="history-item"><a class="text-hi" href="${a.dataUrl}" download="${esc(a.name)}">📎 ${esc(a.name)}</a><span class="text-low small">${formatBytes(a.size)} · ${esc(a.uploadedBy || "")} · ${fmtDateTime(a.uploadedAt)}</span></div>`).join("")}` : ""}
       ${plan.notes ? `<div class="divider"></div><div class="card-title mb-1">Megjegyzések</div><div class="text-mid" style="white-space:pre-wrap">${esc(plan.notes)}</div>` : ""}
-      ${plan.protocolId ? `<div class="divider"></div><div class="card-title mb-1">Kapcsolódó jegyzőkönyv</div><a class="text-hi" href="#/protocols/${esc(plan.protocolId)}">${esc(plan.protocolId)}</a>` : ""}
+      ${(plan.protocolIds || []).length ? `<div class="divider"></div><div class="card-title mb-1">Kapcsolódó jegyzőkönyvek (${plan.protocolIds.length})</div>
+        ${plan.protocolIds.map((pid) => `<div class="history-item"><a class="text-hi" href="#/protocols/${esc(pid)}">${esc(pid)}</a></div>`).join("")}` : ""}
       ${canEdit ? `
       <div class="divider"></div>
       <div class="flex gap-1" style="flex-wrap:wrap">
         <button class="btn btn-sm" id="edit-plan">Szerkesztés</button>
-        ${!plan.protocolId ? `<button class="btn btn-sm btn-gold" id="convert-plan">Jegyzőkönyv rögzítése ebből a tervből</button>` : ""}
+        <button class="btn btn-sm btn-gold" id="convert-plan">Jegyzőkönyv rögzítése ebből a tervből</button>
         <button class="btn btn-sm" id="delete-plan">Törlés</button>
       </div>` : ""}
     </div>
@@ -311,8 +312,8 @@ export function renderTrainingPlanDetail(container, id) {
     navigate("/plans");
   });
   document.getElementById("convert-plan")?.addEventListener("click", () => {
-    openProtocolForm(allModules, {
-      moduleCode: (plan.moduleCodes || [])[0] || "",
+    const startConvert = (moduleCode) => openProtocolForm(allModules, {
+      moduleCode,
       date: plan.plannedDate,
       participants: plan.participants,
       onCreated: (protocol) => {
@@ -321,5 +322,15 @@ export function renderTrainingPlanDetail(container, id) {
         renderTrainingPlanDetail(document.getElementById("content"), plan.id);
       },
     });
+    if (planModules.length <= 1) return startConvert(planModules[0]?.code || "");
+    openModal(`
+      <div class="modal-head"><h3>Melyik modulhoz készül a jegyzőkönyv?</h3><button class="modal-close" data-close-modal>×</button></div>
+      <div class="flex" style="flex-direction:column; gap:8px;">
+        ${planModules.map((m) => `<button type="button" class="btn" data-pick-module="${esc(m.code)}">${esc(m.code)} — ${esc(m.def?.name || "")}</button>`).join("")}
+      </div>
+    `);
+    document.querySelectorAll("[data-pick-module]").forEach((b) =>
+      b.addEventListener("click", () => { closeModal(); startConvert(b.getAttribute("data-pick-module")); })
+    );
   });
 }

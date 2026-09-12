@@ -430,7 +430,6 @@ function renderSystemTab(content) {
 
 const BRANDING_WISHLIST = [
   "Valódi Los Santos térkép-kép az assets/maps/ mappába (lásd assets/maps/README.md) — enélkül a Térkép oldal helyőrző felületet mutat",
-  "Nagyfelbontású jelvény/pecsét PNG a favicon és a bejelentkező pecsét cseréjéhez (jelenleg egyszerű SVG-rajz)",
   "Néhány semleges, arctalan/egyenruhás 'agent' portré alapértelmezett profilképnek, azok számára, akik nem töltenek fel sajátot",
 ];
 

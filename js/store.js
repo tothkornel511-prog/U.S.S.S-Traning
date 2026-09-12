@@ -139,14 +139,19 @@ function applyTrainingPlansSeedPatch() {
 }
 
 /* Célzott migráció: a kiképzési terveknél egy tervhez mostantól több modul
-   is rendelhető (moduleCodes tömb) az eddigi egyetlen moduleCode helyett.
-   Ez a régebbi, egy-modulos terveket alakítja át, adatvesztés nélkül. */
+   is rendelhető (moduleCodes tömb) az eddigi egyetlen moduleCode helyett,
+   és több jegyzőkönyv is kapcsolható (protocolIds tömb) az eddigi egyetlen
+   protocolId helyett. Ez a régebbi terveket alakítja át, adatvesztés nélkül. */
 function applyTrainingPlanMultiModulePatch() {
   const list = read(KEYS.trainingPlans, []);
   let changed = false;
   list.forEach((p) => {
     if (!p.moduleCodes) {
       p.moduleCodes = p.moduleCode ? [p.moduleCode] : [];
+      changed = true;
+    }
+    if (!p.protocolIds) {
+      p.protocolIds = p.protocolId ? [p.protocolId] : [];
       changed = true;
     }
   });
@@ -846,7 +851,7 @@ export function createTrainingPlan(data, actorLabel) {
     status: data.status || "TERVEZETT",
     notes: (data.notes || "").trim(),
     attachments: (data.attachments || []).slice(0, MAX_ATTACHMENTS_PER_PLAN), // [{id, name, type, size, dataUrl, uploadedBy, uploadedAt}]
-    protocolId: null,
+    protocolIds: [],
     createdBy: actorLabel || "Rendszer",
     createdAt: now,
     updatedAt: now,
@@ -882,7 +887,10 @@ export function deleteTrainingPlan(id, actorLabel) {
   logAudit(actorLabel, "Kiképzési terv törölve", id);
 }
 export function linkTrainingPlanProtocol(id, protocolId, actorLabel) {
-  return updateTrainingPlan(id, { status: "LEZÁRVA", protocolId }, actorLabel);
+  const plan = getTrainingPlan(id);
+  if (!plan) return null;
+  const protocolIds = [...new Set([...(plan.protocolIds || []), protocolId])];
+  return updateTrainingPlan(id, { status: "LEZÁRVA", protocolIds }, actorLabel);
 }
 
 /* ---------- Protected locations ----------------------------------------*/
