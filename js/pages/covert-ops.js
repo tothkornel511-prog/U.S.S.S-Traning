@@ -7,7 +7,7 @@ import {
   CO_STATUSES, CO_CLOSED_STATUSES,
 } from "../store.js?v=67";
 import { hasRole, actorLabel } from "../auth.js?v=20";
-import { esc, fmtDate, fmtDateTime, toast, openModal, closeModal, applyBranding, previewAttachment, uploadFileToGitHub } from "../utils.js?v=30";
+import { esc, fmtDate, fmtDateTime, toast, openModal, closeModal, applyBranding, previewAttachment, uploadFileToGitHub } from "../utils.js?v=31";
 import { navigate } from "../router.js?v=20";
 
 const CLASS_BADGE = { "Bizalmas": "gray", "Titkos": "yellow", "Szigorúan titkos": "red" };

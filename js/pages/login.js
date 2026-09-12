@@ -1,9 +1,9 @@
 import {
   login, finalizeLogin, hasSuperAdminPin, setSuperAdminPin, verifySuperAdminPin,
-  SUPER_ADMIN_ID, setSuperAdminCode,
+  SUPER_ADMIN_ID, setSuperAdminCode, clearSuperAdminCode, clearSuperAdminPin,
 } from "../auth.js?v=23";
 import { getPerson } from "../store.js?v=67";
-import { esc, sealMark, applyBranding } from "../utils.js?v=30";
+import { esc, sealMark, applyBranding } from "../utils.js?v=31";
 
 export function renderLogin(root, onSuccess) {
   root.innerHTML = `
@@ -29,11 +29,20 @@ export function renderLogin(root, onSuccess) {
         <div class="login-demo">
           Hozzáférés kizárólag a rendszergazda által kiadott azonosítóval és kóddal lehetséges.
         </div>
+        ${hasSuperAdminPin() ? `<a href="#" id="forgot-super-admin" class="text-low small" style="display:block; text-align:center; margin-top:14px;">Elfelejtetted a Super Admin (${esc(SUPER_ADMIN_ID)}) kódját vagy PIN-jét?</a>` : ""}
       </div>
     </div>
   `;
 
   applyBranding(root.querySelector(".login-screen"), "hero-main");
+
+  document.getElementById("forgot-super-admin")?.addEventListener("click", (e) => {
+    e.preventDefault();
+    if (!confirm(`Ez törli a jelenlegi Super Admin (${SUPER_ADMIN_ID}) belépési kódot és PIN-t EBBEN a böngészőben. A következő ${SUPER_ADMIN_ID} bejelentkezési kísérlet újra aktiválja a fiókot, teljesen új kóddal és PIN-nel — a régiek onnantól nem működnek. Csak akkor folytasd, ha te vagy a jogos tulajdonos, és tényleg elfelejtetted az adatokat. Biztosan folytatod?`)) return;
+    clearSuperAdminCode();
+    clearSuperAdminPin();
+    renderLogin(root, onSuccess);
+  });
 
   document.getElementById("login-form").addEventListener("submit", async (e) => {
     e.preventDefault();

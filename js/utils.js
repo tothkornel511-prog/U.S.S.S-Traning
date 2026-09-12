@@ -188,7 +188,19 @@ export async function previewAttachment(label, url) {
   const body = document.getElementById("preview-body");
 
   if (type === "pdf") {
-    body.innerHTML = `<iframe src="${esc(url)}" style="width:100%; height:100%; border:none;"></iframe>`;
+    // A GitHub raw fájl-kiszolgálás minden fájlt "application/octet-stream"
+    // típussal küld (biztonsági okból, nosniff-fel együtt), függetlenül a
+    // kiterjesztéstől — emiatt a böngésző nem ismerné fel PDF-ként, és
+    // letöltené megnyitás helyett. Ezért lekérjük a nyers bájtokat, és egy
+    // helyesen "application/pdf" típusú Blob-ként adjuk oda az iframe-nek.
+    try {
+      const raw = await (await fetch(url)).blob();
+      const pdfBlob = new Blob([raw], { type: "application/pdf" });
+      const blobUrl = URL.createObjectURL(pdfBlob);
+      body.innerHTML = `<iframe src="${esc(blobUrl)}" style="width:100%; height:100%; border:none;"></iframe>`;
+    } catch {
+      body.innerHTML = `<div style="padding:60px; text-align:center; color:#333;"><p>Nem sikerült megnyitni előnézetben.</p><a href="${esc(url)}" target="_blank" rel="noopener noreferrer">Megnyitás/letöltés közvetlenül</a></div>`;
+    }
     return;
   }
 
