@@ -1,3 +1,17 @@
 name = "usss-training-worker"
 main = "worker/worker.js"
 compatibility_date = "2024-11-01"
+
+# Ezek csak a KÖTÉST (binding -> secret store bejegyzés) írják le, magát az
+# értéket NEM — az kizárólag a Cloudflare titkosított tárolójában él.
+# E deklaráció nélkül a git-alapú automatikus újratelepítés minden alkalommal
+# elveszítené a dashboardon felvett kötéseket.
+[[secrets_store_secrets]]
+binding = "GITHUB_TOKEN"
+store_id = "d4ef73a27c1d44608abe4d36ed1be694"
+secret_name = "GITHUB_TOKEN"
+
+[[secrets_store_secrets]]
+binding = "WORKER_SECRET"
+store_id = "d4ef73a27c1d44608abe4d36ed1be694"
+secret_name = "WORKER_SECRET"
