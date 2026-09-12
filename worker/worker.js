@@ -29,11 +29,11 @@ const BRANCH = "main";
 const ALLOWED_ORIGIN = "https://tothkornel511-prog.github.io";
 const MAX_BASE64_LENGTH = 8 * 1024 * 1024; // ~6 MB nyers fájlméretnek felel meg
 
-async function gh(env, path, options = {}) {
+async function gh(githubToken, path, options = {}) {
   const res = await fetch(`https://api.github.com${path}`, {
     ...options,
     headers: {
-      "Authorization": `Bearer ${env.GITHUB_TOKEN}`,
+      "Authorization": `Bearer ${githubToken}`,
       "Accept": "application/vnd.github+json",
       "User-Agent": "usss-training-worker",
       "Content-Type": "application/json",
@@ -51,25 +51,25 @@ async function gh(env, path, options = {}) {
    ennél nagyobb (nálunk akár ~4 MB base64-es) fájlokhoz a Git Data API-t
    kell használni: blob → tree → commit → ref frissítés, ugyanaz, amit a
    `git add && git commit` is csinál a háttérben. */
-async function commitFile(env, path, base64Content, message) {
-  const blob = await gh(env, `/repos/${OWNER}/${REPO}/git/blobs`, {
+async function commitFile(githubToken, path, base64Content, message) {
+  const blob = await gh(githubToken, `/repos/${OWNER}/${REPO}/git/blobs`, {
     method: "POST",
     body: JSON.stringify({ content: base64Content, encoding: "base64" }),
   });
-  const ref = await gh(env, `/repos/${OWNER}/${REPO}/git/refs/heads/${BRANCH}`);
-  const baseCommit = await gh(env, `/repos/${OWNER}/${REPO}/git/commits/${ref.object.sha}`);
-  const tree = await gh(env, `/repos/${OWNER}/${REPO}/git/trees`, {
+  const ref = await gh(githubToken, `/repos/${OWNER}/${REPO}/git/refs/heads/${BRANCH}`);
+  const baseCommit = await gh(githubToken, `/repos/${OWNER}/${REPO}/git/commits/${ref.object.sha}`);
+  const tree = await gh(githubToken, `/repos/${OWNER}/${REPO}/git/trees`, {
     method: "POST",
     body: JSON.stringify({
       base_tree: baseCommit.tree.sha,
       tree: [{ path, mode: "100644", type: "blob", sha: blob.sha }],
     }),
   });
-  const commit = await gh(env, `/repos/${OWNER}/${REPO}/git/commits`, {
+  const commit = await gh(githubToken, `/repos/${OWNER}/${REPO}/git/commits`, {
     method: "POST",
     body: JSON.stringify({ message, tree: tree.sha, parents: [ref.object.sha] }),
   });
-  await gh(env, `/repos/${OWNER}/${REPO}/git/refs/heads/${BRANCH}`, {
+  await gh(githubToken, `/repos/${OWNER}/${REPO}/git/refs/heads/${BRANCH}`, {
     method: "PATCH",
     body: JSON.stringify({ sha: commit.sha }),
   });
@@ -92,7 +92,8 @@ export default {
     if (request.method !== "POST") {
       return new Response("Method not allowed", { status: 405, headers: corsHeaders() });
     }
-    if (request.headers.get("X-Worker-Secret") !== env.WORKER_SECRET) {
+    const workerSecret = await env.WORKER_SECRET.get();
+    if (request.headers.get("X-Worker-Secret") !== workerSecret) {
       return new Response("Unauthorized", { status: 401, headers: corsHeaders() });
     }
 
@@ -114,7 +115,8 @@ export default {
     const path = `uploads/${Date.now()}-${crypto.randomUUID().slice(0, 8)}-${safeName}`;
 
     try {
-      await commitFile(env, path, contentBase64, `Upload: ${safeName}`);
+      const githubToken = await env.GITHUB_TOKEN.get();
+      await commitFile(githubToken, path, contentBase64, `Upload: ${safeName}`);
       const rawUrl = `https://raw.githubusercontent.com/${OWNER}/${REPO}/${BRANCH}/${path}`;
       return new Response(JSON.stringify({ url: rawUrl, path }), {
         status: 200,
