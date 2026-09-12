@@ -2,7 +2,7 @@ import {
   login, finalizeLogin, hasSuperAdminPin, setSuperAdminPin, verifySuperAdminPin,
   SUPER_ADMIN_ID, setSuperAdminCode,
 } from "../auth.js?v=23";
-import { getPerson } from "../store.js?v=64";
+import { getPerson } from "../store.js?v=65";
 import { esc, sealMark, applyBranding } from "../utils.js?v=23";
 
 export function renderLogin(root, onSuccess) {

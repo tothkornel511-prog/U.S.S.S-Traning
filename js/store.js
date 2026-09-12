@@ -133,12 +133,21 @@ export function seedIfNeeded() {
   applyTrainingPlanMultiModulePatch();
   applyChannelsSeedPatch();
   applyTrainingCenterSeedPatch();
+  applyTrainingCenterRankCategoriesPatch();
 }
 
 /* Célzott seedelés: az Oktatási Központ (Training Center) modul — csak a
-   Super Admin számára elérhető dokumentációs rendszer. Alapértelmezett
-   kategóriákat hoz létre, ha még egy sincs. */
+   Super Admin számára elérhető dokumentációs rendszer. A kategóriák a
+   tényleges fokozati rendszert (ref.LEVELS) követik, ugyanazt, amit a
+   Kiképzési Áttekintés is használ — nem egy külön, témák szerinti listát. */
 const TRAINING_CATEGORY_SEED = [
+  ...LEVELS.map((l) => l.label),
+  "Adminisztráció",
+];
+/* A korábbi (téma szerinti) alapértelmezett lista — csak azért kell még,
+   hogy felismerjük és lecseréljük azokon a böngészőkön, ahol már lefutott
+   a régi seed, de még nem került bele valódi tartalom. */
+const OLD_TOPIC_TRAINING_CATEGORY_SEED = [
   "Alapvető ismeretek", "Kommunikáció", "Rádióhasználat", "Védelem", "Sofőri képzés",
   "Taktikai képzés", "Védett személyek", "Védett helyszínek", "Konvoj", "Vészhelyzetek",
   "Erőhasználat", "Fegyverismeret", "Egyéb oktatási anyagok",
@@ -150,6 +159,17 @@ function applyTrainingCenterSeedPatch() {
     write(KEYS.trainingQuestions, []);
   }
   if (read(KEYS.trainingCategories, []).length === 0) {
+    TRAINING_CATEGORY_SEED.forEach((name) => createTrainingCategory(name, "Rendszer"));
+  }
+}
+function applyTrainingCenterRankCategoriesPatch() {
+  const categories = read(KEYS.trainingCategories, []);
+  const names = categories.map((c) => c.name);
+  const isUntouchedOldSeed = names.length === OLD_TOPIC_TRAINING_CATEGORY_SEED.length &&
+    OLD_TOPIC_TRAINING_CATEGORY_SEED.every((n) => names.includes(n));
+  const hasAnyContent = read(KEYS.trainingDocs, []).length > 0;
+  if (isUntouchedOldSeed && !hasAnyContent) {
+    write(KEYS.trainingCategories, []);
     TRAINING_CATEGORY_SEED.forEach((name) => createTrainingCategory(name, "Rendszer"));
   }
 }
