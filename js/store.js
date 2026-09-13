@@ -2171,33 +2171,46 @@ export function deleteTrainingFile(id, actorLabel) {
 }
 
 /* ---------- Orvosi alkalmasság --------------------------------------------
-   Fokozatonként admin által beállítható időköz (hónapban) — amikor valakinél
-   rögzítesz egy elvégzett orvosi vizsgálatot, a rendszer az Ő AKKORI
-   fokozata alapján számolja ki és véglegesen eltárolja a bejegyzésen a
-   következő esedékességet (egy utólagos fokozatváltás nem írja át a már
+   Fokozatonként admin által beállítható időköz — VAGY hétben, VAGY hónapban
+   (bármelyik fokozatnál külön eldönthető, pl. az alacsonyabb fokozatoknál
+   gyakoribb, hetekben megadott ellenőrzés is értelmes lehet). Amikor
+   valakinél rögzítesz egy elvégzett orvosi vizsgálatot, a rendszer az Ő
+   AKKORI fokozata alapján számolja ki és véglegesen eltárolja a bejegyzésen
+   a következő esedékességet (egy utólagos fokozatváltás nem írja át a már
    rögzített, korábbi bejegyzések esedékességét — csak a KÖVETKEZŐ vizsgálat
    rögzítésekor számol az akkor érvényes fokozattal/időközzel). */
-const DEFAULT_MEDICAL_INTERVAL_MONTHS = 12;
+const DEFAULT_MEDICAL_INTERVAL = { amount: 12, unit: "month" };
 export function getMedicalIntervals() {
   const stored = read(KEYS.medicalIntervals, null);
-  if (stored) return stored;
-  const defaults = {};
-  LEVELS.forEach((l) => { defaults[l.id] = DEFAULT_MEDICAL_INTERVAL_MONTHS; });
-  return defaults;
+  const intervals = {};
+  LEVELS.forEach((l) => {
+    const entry = stored?.[l.id];
+    // Visszamenőleges kompatibilitás: a korábbi verzió sima számot (hónapot)
+    // tárolt objektum helyett — azt itt {amount, unit:"month"} alakra hozzuk.
+    if (typeof entry === "number") intervals[l.id] = { amount: entry, unit: "month" };
+    else if (entry && typeof entry === "object") intervals[l.id] = entry;
+    else intervals[l.id] = { ...DEFAULT_MEDICAL_INTERVAL };
+  });
+  return intervals;
 }
-export function setMedicalInterval(levelId, months, actorLabel) {
+export function setMedicalInterval(levelId, amount, unit, actorLabel) {
   const intervals = getMedicalIntervals();
-  intervals[levelId] = Math.max(1, Number(months) || DEFAULT_MEDICAL_INTERVAL_MONTHS);
+  const safeUnit = unit === "week" ? "week" : "month";
+  const safeAmount = Math.max(1, Number(amount) || DEFAULT_MEDICAL_INTERVAL.amount);
+  intervals[levelId] = { amount: safeAmount, unit: safeUnit };
   write(KEYS.medicalIntervals, intervals);
-  logAudit(actorLabel, "Orvosi időköz módosítva", `${levelId} fokozat → ${intervals[levelId]} hónap`);
+  logAudit(actorLabel, "Orvosi időköz módosítva", `${levelId} fokozat → ${safeAmount} ${safeUnit === "week" ? "hét" : "hónap"}`);
 }
 
 /* Tisztán UTC-ben számol, hogy elkerülje az "new Date(string)" (UTC-ként
-   értelmezett) és a ".setMonth()" (helyi időzóna szerint módosító) keverése
+   értelmezett) és a helyi időzóna szerint módosító setter-ek keverése
    miatti, időzóna-függő egy napos csúszást a dátumban. */
-function addMonths(dateStr, months) {
+function addInterval(dateStr, amount, unit) {
   const [y, m, d] = dateStr.split("-").map(Number);
-  return new Date(Date.UTC(y, m - 1 + months, d)).toISOString().slice(0, 10);
+  if (unit === "week") {
+    return new Date(Date.UTC(y, m - 1, d + amount * 7)).toISOString().slice(0, 10);
+  }
+  return new Date(Date.UTC(y, m - 1 + amount, d)).toISOString().slice(0, 10);
 }
 
 function getAllMedicalRecords() {
@@ -2216,12 +2229,12 @@ export function createMedicalRecord(usssId, data, actorLabel) {
   if (!person) return null;
   const examDate = data.examDate || new Date().toISOString().slice(0, 10);
   const intervals = getMedicalIntervals();
-  const months = intervals[person.level] ?? DEFAULT_MEDICAL_INTERVAL_MONTHS;
+  const interval = intervals[person.level] || DEFAULT_MEDICAL_INTERVAL;
   const record = {
     id: uid("MED"),
     usssId,
     examDate,
-    nextDueDate: addMonths(examDate, months),
+    nextDueDate: addInterval(examDate, interval.amount, interval.unit),
     levelAtExam: person.level,
     examinedBy: (data.examinedBy || "").trim(),
     notes: (data.notes || "").trim(),

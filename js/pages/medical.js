@@ -2,7 +2,7 @@ import {
   getPersonnel, getPerson, ref,
   getMedicalIntervals, setMedicalInterval,
   getMedicalRecords, getLatestMedicalRecord, createMedicalRecord, deleteMedicalRecord, medicalStatusFor,
-} from "../store.js?v=69";
+} from "../store.js?v=70";
 import { hasRole, actorLabel } from "../auth.js?v=23";
 import { esc, fmtDate, toast, openModal, closeModal } from "../utils.js?v=31";
 
@@ -98,14 +98,22 @@ function openIntervalsForm(onDone) {
   const intervals = getMedicalIntervals();
   openModal(`
     <div class="modal-head"><h3>Fokozatonkénti orvosi időközök</h3><button class="modal-close" data-close-modal>×</button></div>
-    <p class="text-low small mb-2">Ennyi hónaponta esedékes az újabb orvosi vizsgálat az adott fokozatban lévőknek — a rendszer ez alapján számolja ki a következő esedékességet, amikor rögzítesz egy vizsgálatot.</p>
+    <p class="text-low small mb-2">Ennyi hét vagy hónap múlva esedékes az újabb orvosi vizsgálat az adott fokozatban lévőknek — fokozatonként külön választható a mértékegység. A rendszer ez alapján számolja ki a következő esedékességet, amikor rögzítesz egy vizsgálatot.</p>
     <form id="interval-form">
-      ${ref.LEVELS.map((l) => `
+      ${ref.LEVELS.map((l) => {
+        const interval = intervals[l.id] || { amount: 12, unit: "month" };
+        return `
         <div class="field flex items-center gap-1" style="justify-content:space-between">
           <label style="margin:0">${esc(l.label)}</label>
-          <div class="flex items-center gap-1"><input type="number" min="1" style="width:80px" class="interval-input" data-level="${esc(l.id)}" value="${intervals[l.id] ?? 12}" /> <span class="text-low small">hónap</span></div>
-        </div>
-      `).join("")}
+          <div class="flex items-center gap-1">
+            <input type="number" min="1" style="width:70px" class="interval-amount" data-level="${esc(l.id)}" value="${interval.amount}" />
+            <select class="interval-unit" data-level="${esc(l.id)}">
+              <option value="week" ${interval.unit === "week" ? "selected" : ""}>hét</option>
+              <option value="month" ${interval.unit === "month" ? "selected" : ""}>hónap</option>
+            </select>
+          </div>
+        </div>`;
+      }).join("")}
       <div class="flex justify-between mt-2">
         <button type="button" class="btn" data-close-modal>Mégse</button>
         <button type="submit" class="btn btn-gold">Mentés</button>
@@ -114,8 +122,10 @@ function openIntervalsForm(onDone) {
   `);
   document.getElementById("interval-form").addEventListener("submit", (e) => {
     e.preventDefault();
-    document.querySelectorAll(".interval-input").forEach((input) => {
-      setMedicalInterval(input.getAttribute("data-level"), input.value, actorLabel());
+    document.querySelectorAll(".interval-amount").forEach((input) => {
+      const level = input.getAttribute("data-level");
+      const unit = document.querySelector(`.interval-unit[data-level="${level}"]`).value;
+      setMedicalInterval(level, input.value, unit, actorLabel());
     });
     toast("Időközök mentve");
     closeModal();
