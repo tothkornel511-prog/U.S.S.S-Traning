@@ -15,14 +15,14 @@ export function renderLogin(root, onSuccess) {
         <div class="login-title">U.S.S.S.</div>
         <div class="login-sub">Elit Kiképzési és Személyzeti Rendszer</div>
         <div id="login-error"></div>
-        <form id="login-form">
+        <form id="login-form" autocomplete="off">
           <div class="field">
             <label>Azonosító</label>
-            <input type="text" id="usssId" placeholder="USSS-004" autocomplete="off" required />
+            <input type="text" id="usssId" name="usss-login-id" placeholder="USSS-004" autocomplete="new-password" autocapitalize="characters" autocorrect="off" spellcheck="false" data-lpignore="true" required />
           </div>
           <div class="field">
             <label>Hozzáférési kód</label>
-            <input type="password" id="code" placeholder="••••••••" autocomplete="off" required />
+            <input type="password" id="code" name="usss-login-code" placeholder="••••••••" autocomplete="new-password" data-lpignore="true" required />
           </div>
           <button type="submit" class="btn btn-gold btn-block">Belépés</button>
         </form>
@@ -150,12 +150,12 @@ function renderPinStep(root, session, onSuccess) {
         <div class="login-sub">${isNewPin ? "Kétlépcsős azonosítás beállítása" : "Kétlépcsős azonosítás"}</div>
         <div id="pin-error"></div>
         ${isNewPin ? `<p class="text-mid small mb-2">Ez a Super Admin fiók (${esc(session.usssId)}) még nincs kétlépcsős azonosítással védve. Állíts be egy PIN kódot — ezt mostantól minden belépéskor be kell írnod az azonosító+kód után.</p>` : ""}
-        <form id="pin-form">
+        <form id="pin-form" autocomplete="off">
           <div class="field">
             <label>${isNewPin ? "Új PIN kód (min. 4 karakter)" : "PIN kód"}</label>
-            <input type="password" id="pin" placeholder="••••••" autocomplete="off" required minlength="4" autofocus />
+            <input type="password" id="pin" name="usss-pin" placeholder="••••••" autocomplete="new-password" data-lpignore="true" required minlength="4" autofocus />
           </div>
-          ${isNewPin ? `<div class="field"><label>PIN megerősítése</label><input type="password" id="pin-confirm" placeholder="••••••" autocomplete="off" required minlength="4" /></div>` : ""}
+          ${isNewPin ? `<div class="field"><label>PIN megerősítése</label><input type="password" id="pin-confirm" name="usss-pin-confirm" placeholder="••••••" autocomplete="new-password" data-lpignore="true" required minlength="4" /></div>` : ""}
           <button type="submit" class="btn btn-gold btn-block">${isNewPin ? "PIN beállítása és belépés" : "Belépés"}</button>
         </form>
         <div class="login-demo">
