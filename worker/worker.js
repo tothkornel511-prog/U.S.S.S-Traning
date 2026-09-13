@@ -67,6 +67,76 @@ function corsHeaders() {
   };
 }
 
+/* A megosztott adatfájlok (pl. data/personnel.json) csak a data/ mappában,
+   csak .json kiterjesztéssel írhatók — ez zárja ki, hogy ez az útvonal
+   bármi mást felülírjon a repóban (pl. a Worker saját kódját). */
+function isAllowedDataPath(path) {
+  return typeof path === "string" && /^data\/[a-zA-Z0-9_-]+\.json$/.test(path);
+}
+
+async function handleUpload(githubToken, body) {
+  const { filename, contentBase64 } = body || {};
+  if (!filename || !contentBase64) {
+    return new Response("Missing filename or contentBase64", { status: 400, headers: corsHeaders() });
+  }
+  if (contentBase64.length > MAX_BASE64_LENGTH) {
+    return new Response("File too large", { status: 413, headers: corsHeaders() });
+  }
+  const safeName = filename.replace(/[^a-zA-Z0-9._-]/g, "_").slice(0, 100);
+  const path = `uploads/${Date.now()}-${crypto.randomUUID().slice(0, 8)}-${safeName}`;
+  try {
+    await commitFile(githubToken, path, contentBase64, `Upload: ${safeName}`);
+    const rawUrl = `https://raw.githubusercontent.com/${OWNER}/${REPO}/${BRANCH}/${path}`;
+    return new Response(JSON.stringify({ url: rawUrl, path }), {
+      status: 200,
+      headers: { ...corsHeaders(), "Content-Type": "application/json" },
+    });
+  } catch (err) {
+    return new Response(JSON.stringify({ error: String(err && err.message || err) }), {
+      status: 502,
+      headers: { ...corsHeaders(), "Content-Type": "application/json" },
+    });
+  }
+}
+
+/* Megosztott, szerkeszthető adatfájlok (jelenleg: Állomány, Hozzáférési
+   kódok) írása — a fájl olvasása bárki számára szabad (nyilvános repo,
+   raw.githubusercontent.com, nem megy át a Workeren), csak az ÍRÁS megy
+   ezen keresztül. "Utoljára írt nyer" logika: lekéri a fájl jelenlegi
+   sha-ját (ha létezik), és azzal írja felül — ha közben más is írt volna,
+   ez az egyszerű, kis csapatra tervezett rendszer nem észleli az
+   ütközést, csak felülírja. */
+async function handleDataPut(githubToken, body) {
+  const { path, content } = body || {};
+  if (!isAllowedDataPath(path) || content === undefined) {
+    return new Response("Missing or invalid path/content", { status: 400, headers: corsHeaders() });
+  }
+  const json = JSON.stringify(content, null, 2);
+  const base64Content = btoa(unescape(encodeURIComponent(json)));
+  try {
+    let sha;
+    try {
+      const existing = await gh(githubToken, `/repos/${OWNER}/${REPO}/contents/${path}?ref=${BRANCH}`);
+      sha = existing.sha;
+    } catch {
+      sha = undefined; // a fájl még nem létezik — ez esetben létrehozzuk
+    }
+    await gh(githubToken, `/repos/${OWNER}/${REPO}/contents/${path}`, {
+      method: "PUT",
+      body: JSON.stringify({ message: `Update ${path}`, content: base64Content, branch: BRANCH, ...(sha ? { sha } : {}) }),
+    });
+    return new Response(JSON.stringify({ ok: true }), {
+      status: 200,
+      headers: { ...corsHeaders(), "Content-Type": "application/json" },
+    });
+  } catch (err) {
+    return new Response(JSON.stringify({ error: String(err && err.message || err) }), {
+      status: 502,
+      headers: { ...corsHeaders(), "Content-Type": "application/json" },
+    });
+  }
+}
+
 export default {
   async fetch(request, env) {
     if (request.method === "OPTIONS") {
@@ -86,30 +156,11 @@ export default {
     } catch {
       return new Response("Invalid JSON", { status: 400, headers: corsHeaders() });
     }
-    const { filename, contentBase64 } = body || {};
-    if (!filename || !contentBase64) {
-      return new Response("Missing filename or contentBase64", { status: 400, headers: corsHeaders() });
-    }
-    if (contentBase64.length > MAX_BASE64_LENGTH) {
-      return new Response("File too large", { status: 413, headers: corsHeaders() });
-    }
 
-    const safeName = filename.replace(/[^a-zA-Z0-9._-]/g, "_").slice(0, 100);
-    const path = `uploads/${Date.now()}-${crypto.randomUUID().slice(0, 8)}-${safeName}`;
-
-    try {
-      const githubToken = await env.GITHUB_TOKEN.get();
-      await commitFile(githubToken, path, contentBase64, `Upload: ${safeName}`);
-      const rawUrl = `https://raw.githubusercontent.com/${OWNER}/${REPO}/${BRANCH}/${path}`;
-      return new Response(JSON.stringify({ url: rawUrl, path }), {
-        status: 200,
-        headers: { ...corsHeaders(), "Content-Type": "application/json" },
-      });
-    } catch (err) {
-      return new Response(JSON.stringify({ error: String(err && err.message || err) }), {
-        status: 502,
-        headers: { ...corsHeaders(), "Content-Type": "application/json" },
-      });
+    const githubToken = await env.GITHUB_TOKEN.get();
+    if (body && body.type === "data-put") {
+      return handleDataPut(githubToken, body);
     }
+    return handleUpload(githubToken, body);
   },
 };

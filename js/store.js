@@ -14,6 +14,62 @@ import {
 
 /* v7: Roxwood/Cayo Perico eltávolítva, csak Los Santos térkép maradt. */
 const NS = "usss_ets_v7_";
+
+/* ---------- Megosztott adat-szinkronizálás (Állomány, Hozzáférési kódok) --
+   Ezek a legkorábban helyben (localStorage-ban, csak az adott böngészőben)
+   tárolt adatok voltak, ami azt jelentette, hogy egy admin által hozzáadott
+   új ember/kód csak az Ő eszközén létezett — máshonnan senki sem tudott vele
+   bejelentkezni. Mostantól ez a két adatkör GitHub-on, egy publikus repóban
+   tárolt JSON fájlként (data/personnel.json, data/access-codes.json) él:
+   OLVASÁS bárhonnan, közvetlenül, hitelesítés nélkül (nyilvános fájl); ÍRÁS
+   a már meglévő GitHub Worker proxin keresztül (lásd utils.js
+   uploadFileToGitHub — ugyanaz a WORKER_SECRET, ugyanaz a szűk, csak
+   uploads/ és data/*.json írására korlátozott képesség).
+   ŐSZINTÉN: ez "utoljára ír nyer" szinkron, nincs ütközés-feloldás — ha két
+   admin szinte egyszerre módosít, az egyik felülírhatja a másikét. Egy kis
+   csapatnak ez elfogadható korlát, valódi többfelhasználós adatbázisnak nem
+   helyettesítője. */
+const GH_WORKER_URL = "https://u-s-s-s-traning.tothkornel511.workers.dev/";
+const GH_WORKER_SECRET = "Bhq751orJyX0wqHR8fC0Adt_J29YdF23";
+const GH_DATA_RAW_BASE = "https://raw.githubusercontent.com/tothkornel511-prog/U.S.S.S-Traning/main/data/";
+
+async function pushSharedDataToGithub(filename, content) {
+  try {
+    const res = await fetch(GH_WORKER_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "X-Worker-Secret": GH_WORKER_SECRET },
+      body: JSON.stringify({ type: "data-put", path: `data/${filename}`, content }),
+    });
+    return res.ok;
+  } catch {
+    return false;
+  }
+}
+
+async function fetchSharedData(filename) {
+  try {
+    const res = await fetch(`${GH_DATA_RAW_BASE}${filename}?_=${Date.now()}`, { cache: "no-store" });
+    if (!res.ok) return null;
+    return await res.json();
+  } catch {
+    return null;
+  }
+}
+
+/* App-indításkor hívva (lásd app.js) — még az első render ELŐTT lefut, hogy
+   a felhasználó rögtön a legfrissebb, mindenki számára közös Állományt és
+   Hozzáférési kódokat lássa, ne a saját böngészőjében esetleg elavult
+   helyi másolatot. Ha a hálózati kérés sikertelen (nincs net, GitHub le van),
+   csendben megmarad a helyi (localStorage-beli) másolat — ez a "működik
+   internet nélkül is" tartalék. */
+export async function syncSharedDataFromGithub() {
+  const [personnel, accessCodes] = await Promise.all([
+    fetchSharedData("personnel.json"),
+    fetchSharedData("access-codes.json"),
+  ]);
+  if (Array.isArray(personnel)) write(KEYS.personnel, personnel);
+  if (Array.isArray(accessCodes)) write(KEYS.accessCodes, accessCodes);
+}
 const KEYS = {
   personnel: NS + "personnel",
   accessCodes: NS + "access_codes",
@@ -565,7 +621,9 @@ export function getPerson(usssId) {
   return getPersonnel().find((p) => p.usssId === usssId);
 }
 export function savePersonnel(list) {
-  return write(KEYS.personnel, list);
+  const ok = write(KEYS.personnel, list);
+  if (ok) pushSharedDataToGithub("personnel.json", list); // háttérben, nem várjuk meg
+  return ok;
 }
 /* Fényképek is base64-ként kerülnek a localStorage-ba, ezért itt is
    szigorú méretkorlát kell (lásd MAX_ATTACHMENT_BYTES fentebb a tervek
@@ -806,6 +864,7 @@ export function getAccessCodes() {
 }
 export function saveAccessCodes(list) {
   write(KEYS.accessCodes, list);
+  pushSharedDataToGithub("access-codes.json", list); // háttérben, nem várjuk meg
 }
 export function findAccessCode(usssId, code) {
   return getAccessCodes().find(

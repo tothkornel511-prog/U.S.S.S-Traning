@@ -2,7 +2,7 @@
    U.S.S.S. ELITE TRAINING SYSTEM — APP ENTRY
    ========================================================================== */
 
-import { seedIfNeeded, globalSearch, getCustomCss, getOperationRecords, SECTIONS } from "./store.js?v=70";
+import { seedIfNeeded, globalSearch, getCustomCss, getOperationRecords, SECTIONS, syncSharedDataFromGithub } from "./store.js?v=71";
 import { isAuthenticated, currentSession, logout, hasSection, isSuperAdmin, ROLES } from "./auth.js?v=23";
 import { registerRoute, resolve, startRouter, navigate, currentPath } from "./router.js?v=20";
 import { esc, sealMark, closeModal, applyBranding } from "./utils.js?v=31";
@@ -270,7 +270,16 @@ function boot() {
   startRouter(onRouteChange);
 }
 
-boot();
+/* Az Állomány és a Hozzáférési kódok mostantól GitHub-on, megosztva élnek
+   (lásd store.js syncSharedDataFromGithub) — ezt itt, még az első render
+   ELŐTT lefuttatjuk, hogy mindenki a legfrissebb, közös adatokat lássa,
+   ne egy esetleg elavult helyi másolatot. Ha nincs net / GitHub nem
+   elérhető, a függvény csendben meghagyja a helyi másolatot, és az app
+   ugyanúgy elindul azzal. */
+(async () => {
+  await syncSharedDataFromGithub();
+  boot();
+})();
 window.addEventListener("storage", () => {
   if (isAuthenticated()) onRouteChange();
 });
