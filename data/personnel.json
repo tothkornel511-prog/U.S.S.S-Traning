@@ -9,9 +9,24 @@
     "probationStart": "2026-08-17",
     "probationLifted": false,
     "notes": "",
-    "modules": {},
+    "modules": {
+      "0": {
+        "theory": 92,
+        "history": [
+          {
+            "date": "2026-08-17T10:00:00.000Z",
+            "type": "theory",
+            "theory": 92,
+            "result": "pass",
+            "examiner": "A rendszer"
+          }
+        ],
+        "theoryDate": "2026-08-17",
+        "examiner": "A rendszer"
+      }
+    },
     "levelUpEligible": false,
-    "createdAt": "2026-09-13T17:22:08.966Z"
+    "createdAt": "2026-09-14T11:12:11.763Z"
   },
   {
     "usssId": "USSS-80",
@@ -23,9 +38,24 @@
     "probationStart": "2026-08-17",
     "probationLifted": false,
     "notes": "",
-    "modules": {},
+    "modules": {
+      "0": {
+        "theory": 88,
+        "history": [
+          {
+            "date": "2026-08-17T10:00:00.000Z",
+            "type": "theory",
+            "theory": 88,
+            "result": "pass",
+            "examiner": "A rendszer"
+          }
+        ],
+        "theoryDate": "2026-08-17",
+        "examiner": "A rendszer"
+      }
+    },
     "levelUpEligible": false,
-    "createdAt": "2026-09-13T17:22:08.966Z"
+    "createdAt": "2026-09-14T11:12:11.764Z"
   },
   {
     "usssId": "USSS-91",
@@ -37,9 +67,24 @@
     "probationStart": "2026-08-17",
     "probationLifted": false,
     "notes": "",
-    "modules": {},
+    "modules": {
+      "0": {
+        "theory": 76,
+        "history": [
+          {
+            "date": "2026-08-17T10:00:00.000Z",
+            "type": "theory",
+            "theory": 76,
+            "result": "fail",
+            "examiner": "A rendszer"
+          }
+        ],
+        "theoryDate": "2026-08-17",
+        "examiner": "A rendszer"
+      }
+    },
     "levelUpEligible": false,
-    "createdAt": "2026-09-13T17:22:08.966Z"
+    "createdAt": "2026-09-14T11:12:11.764Z"
   },
   {
     "usssId": "USSS-121",
@@ -51,9 +96,24 @@
     "probationStart": "2026-08-17",
     "probationLifted": false,
     "notes": "",
-    "modules": {},
+    "modules": {
+      "0": {
+        "theory": 95,
+        "history": [
+          {
+            "date": "2026-08-17T10:00:00.000Z",
+            "type": "theory",
+            "theory": 95,
+            "result": "pass",
+            "examiner": "A rendszer"
+          }
+        ],
+        "theoryDate": "2026-08-17",
+        "examiner": "A rendszer"
+      }
+    },
     "levelUpEligible": false,
-    "createdAt": "2026-09-13T17:22:08.966Z"
+    "createdAt": "2026-09-14T11:12:11.764Z"
   },
   {
     "usssId": "USSS-112",
@@ -65,9 +125,24 @@
     "probationStart": "2026-08-17",
     "probationLifted": false,
     "notes": "",
-    "modules": {},
+    "modules": {
+      "0": {
+        "theory": 65,
+        "history": [
+          {
+            "date": "2026-08-17T10:00:00.000Z",
+            "type": "theory",
+            "theory": 65,
+            "result": "fail",
+            "examiner": "A rendszer"
+          }
+        ],
+        "theoryDate": "2026-08-17",
+        "examiner": "A rendszer"
+      }
+    },
     "levelUpEligible": false,
-    "createdAt": "2026-09-13T17:22:08.966Z"
+    "createdAt": "2026-09-14T11:12:11.764Z"
   },
   {
     "usssId": "USSS-119",
@@ -79,9 +154,24 @@
     "probationStart": "2026-08-17",
     "probationLifted": false,
     "notes": "",
-    "modules": {},
+    "modules": {
+      "0": {
+        "theory": 84,
+        "history": [
+          {
+            "date": "2026-08-17T10:00:00.000Z",
+            "type": "theory",
+            "theory": 84,
+            "result": "pass",
+            "examiner": "A rendszer"
+          }
+        ],
+        "theoryDate": "2026-08-17",
+        "examiner": "A rendszer"
+      }
+    },
     "levelUpEligible": false,
-    "createdAt": "2026-09-13T17:22:08.966Z"
+    "createdAt": "2026-09-14T11:12:11.764Z"
   },
   {
     "usssId": "USSS-8",
@@ -93,9 +183,24 @@
     "probationStart": "2026-08-17",
     "probationLifted": false,
     "notes": "",
-    "modules": {},
+    "modules": {
+      "0": {
+        "theory": 91,
+        "history": [
+          {
+            "date": "2026-08-17T10:00:00.000Z",
+            "type": "theory",
+            "theory": 91,
+            "result": "pass",
+            "examiner": "A rendszer"
+          }
+        ],
+        "theoryDate": "2026-08-17",
+        "examiner": "A rendszer"
+      }
+    },
     "levelUpEligible": false,
-    "createdAt": "2026-09-13T17:22:08.966Z"
+    "createdAt": "2026-09-14T11:12:11.764Z"
   },
   {
     "usssId": "USSS-120",
@@ -107,9 +212,24 @@
     "probationStart": "2026-08-17",
     "probationLifted": false,
     "notes": "",
-    "modules": {},
+    "modules": {
+      "0": {
+        "theory": 98,
+        "history": [
+          {
+            "date": "2026-08-17T10:00:00.000Z",
+            "type": "theory",
+            "theory": 98,
+            "result": "pass",
+            "examiner": "A rendszer"
+          }
+        ],
+        "theoryDate": "2026-08-17",
+        "examiner": "A rendszer"
+      }
+    },
     "levelUpEligible": false,
-    "createdAt": "2026-09-13T17:22:08.966Z"
+    "createdAt": "2026-09-14T11:12:11.764Z"
   },
   {
     "usssId": "USSS-111",
@@ -121,9 +241,24 @@
     "probationStart": "2026-08-17",
     "probationLifted": false,
     "notes": "",
-    "modules": {},
+    "modules": {
+      "0": {
+        "theory": 72,
+        "history": [
+          {
+            "date": "2026-08-17T10:00:00.000Z",
+            "type": "theory",
+            "theory": 72,
+            "result": "fail",
+            "examiner": "A rendszer"
+          }
+        ],
+        "theoryDate": "2026-08-17",
+        "examiner": "A rendszer"
+      }
+    },
     "levelUpEligible": false,
-    "createdAt": "2026-09-13T17:22:08.966Z"
+    "createdAt": "2026-09-14T11:12:11.764Z"
   },
   {
     "usssId": "USSS-124",
@@ -135,9 +270,24 @@
     "probationStart": "2026-08-17",
     "probationLifted": false,
     "notes": "",
-    "modules": {},
+    "modules": {
+      "0": {
+        "theory": 87,
+        "history": [
+          {
+            "date": "2026-08-17T10:00:00.000Z",
+            "type": "theory",
+            "theory": 87,
+            "result": "pass",
+            "examiner": "A rendszer"
+          }
+        ],
+        "theoryDate": "2026-08-17",
+        "examiner": "A rendszer"
+      }
+    },
     "levelUpEligible": false,
-    "createdAt": "2026-09-13T17:22:08.966Z"
+    "createdAt": "2026-09-14T11:12:11.764Z"
   },
   {
     "usssId": "USSS-92",
@@ -149,9 +299,24 @@
     "probationStart": "2026-08-17",
     "probationLifted": false,
     "notes": "",
-    "modules": {},
+    "modules": {
+      "0": {
+        "theory": 60,
+        "history": [
+          {
+            "date": "2026-08-17T10:00:00.000Z",
+            "type": "theory",
+            "theory": 60,
+            "result": "fail",
+            "examiner": "A rendszer"
+          }
+        ],
+        "theoryDate": "2026-08-17",
+        "examiner": "A rendszer"
+      }
+    },
     "levelUpEligible": false,
-    "createdAt": "2026-09-13T17:22:08.966Z"
+    "createdAt": "2026-09-14T11:12:11.764Z"
   },
   {
     "usssId": "USSS-107",
@@ -163,9 +328,24 @@
     "probationStart": "2026-08-17",
     "probationLifted": false,
     "notes": "",
-    "modules": {},
+    "modules": {
+      "0": {
+        "theory": 90,
+        "history": [
+          {
+            "date": "2026-08-17T10:00:00.000Z",
+            "type": "theory",
+            "theory": 90,
+            "result": "pass",
+            "examiner": "A rendszer"
+          }
+        ],
+        "theoryDate": "2026-08-17",
+        "examiner": "A rendszer"
+      }
+    },
     "levelUpEligible": false,
-    "createdAt": "2026-09-13T17:22:08.966Z"
+    "createdAt": "2026-09-14T11:12:11.764Z"
   },
   {
     "usssId": "USSS-106",
@@ -177,9 +357,24 @@
     "probationStart": "2026-08-17",
     "probationLifted": false,
     "notes": "",
-    "modules": {},
+    "modules": {
+      "0": {
+        "theory": 55,
+        "history": [
+          {
+            "date": "2026-08-17T10:00:00.000Z",
+            "type": "theory",
+            "theory": 55,
+            "result": "fail",
+            "examiner": "A rendszer"
+          }
+        ],
+        "theoryDate": "2026-08-17",
+        "examiner": "A rendszer"
+      }
+    },
     "levelUpEligible": false,
-    "createdAt": "2026-09-13T17:22:08.966Z"
+    "createdAt": "2026-09-14T11:12:11.764Z"
   },
   {
     "usssId": "USSS-123",
@@ -191,9 +386,24 @@
     "probationStart": "2026-08-17",
     "probationLifted": false,
     "notes": "",
-    "modules": {},
+    "modules": {
+      "0": {
+        "theory": 93,
+        "history": [
+          {
+            "date": "2026-08-17T10:00:00.000Z",
+            "type": "theory",
+            "theory": 93,
+            "result": "pass",
+            "examiner": "A rendszer"
+          }
+        ],
+        "theoryDate": "2026-08-17",
+        "examiner": "A rendszer"
+      }
+    },
     "levelUpEligible": false,
-    "createdAt": "2026-09-13T17:22:08.966Z"
+    "createdAt": "2026-09-14T11:12:11.764Z"
   },
   {
     "usssId": "USSS-50",
@@ -205,9 +415,24 @@
     "probationStart": "2026-08-17",
     "probationLifted": false,
     "notes": "",
-    "modules": {},
+    "modules": {
+      "0": {
+        "theory": 89,
+        "history": [
+          {
+            "date": "2026-08-17T10:00:00.000Z",
+            "type": "theory",
+            "theory": 89,
+            "result": "pass",
+            "examiner": "A rendszer"
+          }
+        ],
+        "theoryDate": "2026-08-17",
+        "examiner": "A rendszer"
+      }
+    },
     "levelUpEligible": false,
-    "createdAt": "2026-09-13T17:22:08.966Z"
+    "createdAt": "2026-09-14T11:12:11.764Z"
   },
   {
     "usssId": "USSS-98",
@@ -219,9 +444,24 @@
     "probationStart": "2026-08-17",
     "probationLifted": false,
     "notes": "",
-    "modules": {},
+    "modules": {
+      "0": {
+        "theory": 96,
+        "history": [
+          {
+            "date": "2026-08-17T10:00:00.000Z",
+            "type": "theory",
+            "theory": 96,
+            "result": "pass",
+            "examiner": "A rendszer"
+          }
+        ],
+        "theoryDate": "2026-08-17",
+        "examiner": "A rendszer"
+      }
+    },
     "levelUpEligible": false,
-    "createdAt": "2026-09-13T17:22:08.966Z"
+    "createdAt": "2026-09-14T11:12:11.764Z"
   },
   {
     "usssId": "USSS-118",
@@ -233,9 +473,24 @@
     "probationStart": "2026-08-17",
     "probationLifted": false,
     "notes": "",
-    "modules": {},
+    "modules": {
+      "0": {
+        "theory": 90,
+        "history": [
+          {
+            "date": "2026-08-17T10:00:00.000Z",
+            "type": "theory",
+            "theory": 90,
+            "result": "pass",
+            "examiner": "A rendszer"
+          }
+        ],
+        "theoryDate": "2026-08-17",
+        "examiner": "A rendszer"
+      }
+    },
     "levelUpEligible": false,
-    "createdAt": "2026-09-13T17:22:08.966Z"
+    "createdAt": "2026-09-14T11:12:11.764Z"
   },
   {
     "usssId": "USSS-96",
@@ -247,9 +502,24 @@
     "probationStart": "2026-08-17",
     "probationLifted": false,
     "notes": "",
-    "modules": {},
+    "modules": {
+      "0": {
+        "theory": 82,
+        "history": [
+          {
+            "date": "2026-08-17T10:00:00.000Z",
+            "type": "theory",
+            "theory": 82,
+            "result": "pass",
+            "examiner": "A rendszer"
+          }
+        ],
+        "theoryDate": "2026-08-17",
+        "examiner": "A rendszer"
+      }
+    },
     "levelUpEligible": false,
-    "createdAt": "2026-09-13T17:22:08.966Z"
+    "createdAt": "2026-09-14T11:12:11.764Z"
   },
   {
     "usssId": "USSS-109",
@@ -261,8 +531,23 @@
     "probationStart": "2026-08-17",
     "probationLifted": false,
     "notes": "",
-    "modules": {},
+    "modules": {
+      "0": {
+        "theory": 79,
+        "history": [
+          {
+            "date": "2026-08-17T10:00:00.000Z",
+            "type": "theory",
+            "theory": 79,
+            "result": "fail",
+            "examiner": "A rendszer"
+          }
+        ],
+        "theoryDate": "2026-08-17",
+        "examiner": "A rendszer"
+      }
+    },
     "levelUpEligible": false,
-    "createdAt": "2026-09-13T17:22:08.966Z"
+    "createdAt": "2026-09-14T11:12:11.764Z"
   }
 ]
