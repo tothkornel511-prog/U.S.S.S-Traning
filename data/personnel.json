@@ -3,10 +3,10 @@
     "usssId": "USSS-004",
     "name": "Tyron Wolf",
     "position": "President",
-    "level": "V",
-    "status": "Aktív",
+    "level": "0",
+    "status": "Újonc",
     "photo": "",
-    "probationStart": "",
+    "probationStart": "2026-08-17",
     "probationLifted": false,
     "notes": "",
     "modules": {
@@ -26,7 +26,7 @@
       }
     },
     "levelUpEligible": false,
-    "createdAt": "2026-08-17T14:52:21.276Z"
+    "createdAt": "2026-09-18T10:41:26.497Z"
   },
   {
     "usssId": "USSS-80",
@@ -55,7 +55,7 @@
       }
     },
     "levelUpEligible": false,
-    "createdAt": "2026-08-17T14:52:21.278Z"
+    "createdAt": "2026-09-18T10:41:26.498Z"
   },
   {
     "usssId": "USSS-91",
@@ -84,7 +84,7 @@
       }
     },
     "levelUpEligible": false,
-    "createdAt": "2026-08-17T14:52:21.278Z"
+    "createdAt": "2026-09-18T10:41:26.498Z"
   },
   {
     "usssId": "USSS-121",
@@ -113,7 +113,7 @@
       }
     },
     "levelUpEligible": false,
-    "createdAt": "2026-08-17T14:52:21.278Z"
+    "createdAt": "2026-09-18T10:41:26.498Z"
   },
   {
     "usssId": "USSS-112",
@@ -142,7 +142,7 @@
       }
     },
     "levelUpEligible": false,
-    "createdAt": "2026-08-17T14:52:21.278Z"
+    "createdAt": "2026-09-18T10:41:26.498Z"
   },
   {
     "usssId": "USSS-119",
@@ -171,7 +171,7 @@
       }
     },
     "levelUpEligible": false,
-    "createdAt": "2026-08-17T14:52:21.278Z"
+    "createdAt": "2026-09-18T10:41:26.498Z"
   },
   {
     "usssId": "USSS-8",
@@ -200,7 +200,7 @@
       }
     },
     "levelUpEligible": false,
-    "createdAt": "2026-08-17T14:52:21.278Z"
+    "createdAt": "2026-09-18T10:41:26.498Z"
   },
   {
     "usssId": "USSS-120",
@@ -229,7 +229,7 @@
       }
     },
     "levelUpEligible": false,
-    "createdAt": "2026-08-17T14:52:21.278Z"
+    "createdAt": "2026-09-18T10:41:26.498Z"
   },
   {
     "usssId": "USSS-111",
@@ -258,7 +258,7 @@
       }
     },
     "levelUpEligible": false,
-    "createdAt": "2026-08-17T14:52:21.278Z"
+    "createdAt": "2026-09-18T10:41:26.498Z"
   },
   {
     "usssId": "USSS-124",
@@ -287,7 +287,7 @@
       }
     },
     "levelUpEligible": false,
-    "createdAt": "2026-08-17T14:52:21.278Z"
+    "createdAt": "2026-09-18T10:41:26.498Z"
   },
   {
     "usssId": "USSS-92",
@@ -316,7 +316,7 @@
       }
     },
     "levelUpEligible": false,
-    "createdAt": "2026-08-17T14:52:21.278Z"
+    "createdAt": "2026-09-18T10:41:26.498Z"
   },
   {
     "usssId": "USSS-107",
@@ -345,7 +345,7 @@
       }
     },
     "levelUpEligible": false,
-    "createdAt": "2026-08-17T14:52:21.278Z"
+    "createdAt": "2026-09-18T10:41:26.498Z"
   },
   {
     "usssId": "USSS-106",
@@ -374,7 +374,7 @@
       }
     },
     "levelUpEligible": false,
-    "createdAt": "2026-08-17T14:52:21.278Z"
+    "createdAt": "2026-09-18T10:41:26.498Z"
   },
   {
     "usssId": "USSS-123",
@@ -403,7 +403,7 @@
       }
     },
     "levelUpEligible": false,
-    "createdAt": "2026-08-17T14:52:21.278Z"
+    "createdAt": "2026-09-18T10:41:26.498Z"
   },
   {
     "usssId": "USSS-50",
@@ -432,7 +432,7 @@
       }
     },
     "levelUpEligible": false,
-    "createdAt": "2026-08-17T14:52:21.278Z"
+    "createdAt": "2026-09-18T10:41:26.498Z"
   },
   {
     "usssId": "USSS-98",
@@ -461,7 +461,7 @@
       }
     },
     "levelUpEligible": false,
-    "createdAt": "2026-08-17T14:52:21.278Z"
+    "createdAt": "2026-09-18T10:41:26.498Z"
   },
   {
     "usssId": "USSS-118",
@@ -490,7 +490,7 @@
       }
     },
     "levelUpEligible": false,
-    "createdAt": "2026-08-17T14:52:21.278Z"
+    "createdAt": "2026-09-18T10:41:26.498Z"
   },
   {
     "usssId": "USSS-96",
@@ -519,7 +519,7 @@
       }
     },
     "levelUpEligible": false,
-    "createdAt": "2026-08-17T14:52:21.278Z"
+    "createdAt": "2026-09-18T10:41:26.498Z"
   },
   {
     "usssId": "USSS-109",
@@ -548,6 +548,6 @@
       }
     },
     "levelUpEligible": false,
-    "createdAt": "2026-08-17T14:52:21.278Z"
+    "createdAt": "2026-09-18T10:41:26.498Z"
   }
 ]
