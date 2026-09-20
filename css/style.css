@@ -1031,20 +1031,20 @@ body.printing-cert #cert-print-root { display: block; }
 .ins-groups { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 14px; margin-bottom: 24px; }
 .ins-group-card { padding: 14px 16px; }
 .ins-module-row {
-  display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
   padding: 8px 0; border-top: 1px solid var(--line-soft);
 }
 .ins-module-row:first-of-type { border-top: none; }
-.ins-module-info { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; flex: 1 1 auto; min-width: 0; }
+.ins-module-info { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; min-width: 0; }
 .ins-module-name { font-size: 12.5px; color: var(--text-mid); }
 .ins-module-note {
   font-size: 11px; font-style: italic; color: var(--text-low);
   border-left: 2px solid rgba(198,166,100,.35); padding-left: 8px;
 }
-.ins-module-teacher { display: flex; align-items: center; gap: 8px; margin-left: auto; flex: 0 0 auto; }
+.ins-module-teacher { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 4px; min-width: 0; }
+.ins-module-teacher span { min-width: 0; overflow-wrap: anywhere; }
 .ins-module-label {
   font-size: 10.5px; letter-spacing: 0.08em; text-transform: uppercase;
-  color: var(--gold); white-space: nowrap;
+  color: var(--gold); white-space: nowrap; flex: none;
 }
 .ins-module-input {
   width: 220px; max-width: 100%;
@@ -1057,10 +1057,6 @@ body.printing-cert #cert-print-root { display: block; }
 .ins-module-input:focus { outline: none; border-color: rgba(198,166,100,.55); box-shadow: 0 0 0 3px rgba(198,166,100,.14); }
 .ins-module-input:disabled { opacity: .6; cursor: default; }
 .ins-chip-row { display: flex; flex-wrap: wrap; gap: 4px; }
-@media (max-width: 560px) {
-  .ins-module-teacher { margin-left: 0; width: 100%; }
-  .ins-module-input { width: 100%; }
-}
 .doc-editor-toolbar { display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 6px; }
 .doc-editor-toolbar button { padding: 4px 9px; font-size: 11px; }
 .save-indicator { font-size: 11px; color: var(--text-low); transition: color .2s ease; }
