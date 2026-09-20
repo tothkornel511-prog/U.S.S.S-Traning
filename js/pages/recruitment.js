@@ -2,11 +2,11 @@ import {
   getApplicants, getApplicant, createApplicant, setApplicantStatus, setApplicantNotes,
   deleteApplicant, promoteApplicant, getRecruitmentQuestions, addRecruitmentQuestion,
   removeRecruitmentQuestion, getPositions, getExamQuestions,
-} from "../store.js?v=79";
+} from "../store.js?v=80";
 import { hasRole, actorLabel } from "../auth.js?v=20";
 import { esc, fmtDateTime, toast, openModal, closeModal, applyBranding } from "../utils.js?v=31";
 import { navigate } from "../router.js?v=20";
-import { renderExamList } from "./exam.js?v=23";
+import { renderExamList } from "./exam.js?v=24";
 
 const STATUS_META = {
   review: { c: "badge-yellow", t: "Elbírálás alatt" },

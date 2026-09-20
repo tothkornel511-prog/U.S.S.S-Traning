@@ -1,8 +1,8 @@
 import {
   getExams, getExam, createExam, setExamAnswer, setExamFinalComment, setExamCategoryScore, setExamRecommendation, interruptExam, finishExam, deleteExam,
-  getExamQuestions, getExamCategories, getExamCategoryCriteria, examScoreSummary, EXAM_MAX_SCORE, EXAM_PASS_PCT,
+  getExamQuestions, getExamCategories, getExamCategoryCriteria, examScoreSummary, examElapsedMinutes, EXAM_MAX_SCORE, EXAM_PASS_PCT, EXAM_TARGET_MINUTES,
   promoteExamCandidate, getPositions, getInstructors, ref,
-} from "../store.js?v=79";
+} from "../store.js?v=80";
 import { hasRole, actorLabel, currentSession } from "../auth.js?v=20";
 import { esc, fmtDate, fmtDateTime, toast, openModal, closeModal, sealMark } from "../utils.js?v=31";
 import { navigate } from "../router.js?v=20";
@@ -87,7 +87,7 @@ function openExamStartForm() {
         <div class="field"><label>Vizsgáztató rangja</label><input id="ef-rank-manual" placeholder="pl. Oktatásvezető" /></div>
       </div>
       ${!instructors.length ? `<p class="text-low small">Nincs még felvéve oktató az <a href="#/instructors">Oktatók</a> nyilvántartásban — egyelőre csak kézzel adható meg a vizsgáztató.</p>` : ""}
-      <p class="text-low small">A vizsga ${getExamQuestions().length} kérdésből áll, kérdésenként 0–5 pont, összesen ${EXAM_MAX_SCORE} pont. A felvételi minimum ${EXAM_PASS_PCT}%.</p>
+      <p class="text-low small">A vizsga ${getExamQuestions().length} kérdésből áll, kérdésenként 0–5 pont, összesen ${EXAM_MAX_SCORE} pont. A felvételi minimum ${EXAM_PASS_PCT}%. Cél időtartam: max. ${EXAM_TARGET_MINUTES} perc. Kihagyott kérdés nem számít bele sem a pontszámba, sem a maximumba.</p>
       <div class="flex justify-between mt-2">
         <button type="button" class="btn" data-close-modal>Mégse</button>
         <button type="submit" class="btn btn-gold">Vizsga indítása</button>
@@ -157,6 +157,7 @@ export function renderExamDetail(container, id) {
         <div><div class="card-title">Dátum</div><div class="text-hi">${fmtDate(exam.date)}</div></div>
         <div><div class="card-title">Kezdés / Befejezés</div><div class="text-hi">${fmtDateTime(exam.startedAt)}${exam.endedAt ? ` → ${fmtDateTime(exam.endedAt)}` : " → folyamatban"}</div></div>
       </div>
+      <div class="mb-2"><div class="card-title">Eltelt idő <span class="text-low">(cél: max. ${EXAM_TARGET_MINUTES} perc)</span></div><div id="exam-timer" class="text-hi"></div></div>
       <div id="exam-summary"></div>
       <details class="card mt-1">
         <summary class="card-title" style="cursor:pointer">Vizsgáztatói pontozási standard</summary>
@@ -191,6 +192,7 @@ export function renderExamDetail(container, id) {
   `;
 
   renderSummaryBar(exam);
+  renderTimer(exam);
   document.getElementById("print-exam")?.addEventListener("click", () => window.print());
 
   container.querySelectorAll("[data-score-q]").forEach((btn) =>
@@ -221,6 +223,10 @@ export function renderExamDetail(container, id) {
   container.querySelectorAll("[data-critical-q]").forEach((box) => box.addEventListener("change", () => {
     setExamAnswer(exam.id, box.getAttribute("data-critical-q"), { critical: box.checked }, actorLabel());
     renderSummaryBar(getExam(exam.id));
+  }));
+  container.querySelectorAll("[data-skip-q]").forEach((box) => box.addEventListener("change", () => {
+    setExamAnswer(exam.id, box.getAttribute("data-skip-q"), { skipped: box.checked }, actorLabel());
+    renderExamDetail(container, exam.id);
   }));
   container.querySelectorAll("[data-cat-score]").forEach((select) => select.addEventListener("change", () => {
     const [category, criterion] = select.getAttribute("data-cat-score").split("::");
@@ -297,12 +303,13 @@ function openPromoteForm(exam, container) {
 }
 
 function renderQuestionCard(exam, q, canEdit) {
-  const a = (exam.answers || []).find((x) => x.questionId === q.id) || { score: null, note: "", critical: false };
+  const a = (exam.answers || []).find((x) => x.questionId === q.id) || { score: null, note: "", critical: false, skipped: false };
   return `
-    <div class="exam-q-card">
+    <div class="exam-q-card ${a.skipped ? "exam-q-skipped" : ""}">
       <div class="exam-q-head">
         <span class="module-code">Q${String(q.num).padStart(2, "0")}</span>
         <span class="text-hi">${esc(q.text)}</span>
+        ${a.skipped ? `<span class="badge badge-gray">Kihagyva — nem számít bele</span>` : ""}
       </div>
       <div class="exam-q-tips">
         <div class="small text-low mb-1">Elfogadhatósági támpont:</div>
@@ -310,14 +317,15 @@ function renderQuestionCard(exam, q, canEdit) {
         ${q.watch ? `<div class="exam-q-watch">Mit figyeljek? ${esc(q.watch)}</div>` : ""}
       </div>
       ${canEdit ? `
-        <div class="exam-score-row">
+        <label class="small text-low"><input type="checkbox" data-skip-q="${esc(q.id)}" ${a.skipped ? "checked" : ""} /> Kihagyva (a jelöltnek nem tettük fel / nem értelmezhető nála — a rendszer nem számítja bele)</label>
+        <div class="exam-score-row" ${a.skipped ? 'style="opacity:.4; pointer-events:none;"' : ""}>
           ${[0, 1, 2, 3, 4, 5].map((n) => `<button type="button" class="exam-score-btn ${a.score === n ? "active" : ""}" data-score-q="${esc(q.id)}" data-score-val="${n}">${n}</button>`).join("")}
         </div>
         <textarea class="exam-note" rows="2" placeholder="Vizsgáztatói megjegyzés (opcionális)" data-note-q="${esc(q.id)}">${esc(a.note || "")}</textarea>
         <div class="exam-note-templates">${NOTE_TEMPLATES.map((template) => `<button type="button" class="note-template" data-note-template="${esc(template)}" data-note-target="${esc(q.id)}">${esc(template)}</button>`).join("")}</div>
         <label class="small text-low"><input type="checkbox" data-critical-q="${esc(q.id)}" ${a.critical ? "checked" : ""} /> Kritikus hiba</label>
       ` : `
-        <div class="exam-score-row"><span class="badge badge-gold">${a.score === null ? "—" : a.score + " / 5"}</span></div>
+        <div class="exam-score-row"><span class="badge badge-gold">${a.skipped ? "kihagyva" : a.score === null ? "—" : a.score + " / 5"}</span></div>
         ${a.note ? `<div class="text-low small">${esc(a.note)}</div>` : ""}
       `}
     </div>
@@ -351,6 +359,25 @@ function renderCategoryScoreCard(exam, category, canEdit) {
   `;
 }
 
+/* Élőben frissülő eltelt idő, amíg a vizsga folyamatban van — a cél
+   EXAM_TARGET_MINUTES (30 perc), afölött figyelmeztető színnel jelezzük.
+   Lezárt vizsgánál egyszer kiszámolt, végleges időt mutat, nincs időzítő. */
+function renderTimer(exam) {
+  const el = document.getElementById("exam-timer");
+  if (!el) return;
+  const draw = () => {
+    const target = document.getElementById("exam-timer");
+    if (!target) { clearInterval(timerId); return; }
+    const minutes = examElapsedMinutes(exam);
+    const mm = Math.floor(minutes);
+    const ss = Math.round((minutes - mm) * 60);
+    const over = minutes > EXAM_TARGET_MINUTES;
+    target.innerHTML = `<span class="${over ? "text-red" : ""}">${mm}:${String(ss).padStart(2, "0")} perc</span>${over ? ' <span class="badge badge-red">TÚLLÉPTE A CÉLIDŐT</span>' : ""}`;
+  };
+  draw();
+  const timerId = exam.endedAt ? null : setInterval(draw, 1000);
+}
+
 function renderSummaryBar(exam) {
   const el = document.getElementById("exam-summary");
   if (!el) return;
@@ -359,7 +386,7 @@ function renderSummaryBar(exam) {
     <div class="exam-summary-bar">
       <div><span class="card-title">Pontszám</span><div class="card-value" style="font-size:22px">${s.total} / ${s.max}</div></div>
       <div><span class="card-title">Teljesítmény</span><div class="card-value" style="font-size:22px">${s.pct.toFixed(1)}%</div></div>
-      <div><span class="card-title">Megválaszolva</span><div class="card-value" style="font-size:22px">${s.answered} / ${s.totalQuestions}</div></div>
+      <div><span class="card-title">Megválaszolva</span><div class="card-value" style="font-size:22px">${s.answered} / ${s.totalQuestions}</div>${s.skippedCount ? `<span class="text-low small">${s.skippedCount} kihagyva</span>` : ""}</div>
       <div><span class="card-title">Eredmény</span><div class="mt-1"><span class="badge ${s.passed ? "badge-green" : "badge-red"}" style="font-size:13px">${s.passed ? "SIKERES" : "SIKERTELEN"}</span> <span class="text-low small">${esc(s.tier)}</span></div></div>
       <div><span class="card-title">Kritikus hibák</span><div class="card-value" style="font-size:22px">${s.criticalErrors}</div></div>
     </div>

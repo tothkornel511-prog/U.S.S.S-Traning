@@ -237,12 +237,16 @@ export const RECRUITMENT_QUESTIONS = [
 ];
 
 /* ==========================================================================
-   FELVÉTELI VIZSGA — 30 kérdéses, IC-alapú, oktatásvezető által pontozott
+   FELVÉTELI VIZSGA — 40 kérdéses, IC-alapú, oktatásvezető által pontozott
    szóbeli vizsga kérdésbankja. Kizárólag a vizsgáztató látja (a jelölt nem
-   fér hozzá a weboldalhoz). Kérdésenként 0–5 pont, összesen 150 pont,
-   80% (120 pont) a felvételi minimum. Az "tips" az elfogadhatósági
-   támpont, a "watch" (ha van) a "Mit figyeljek?" kiegészítő útmutató.
-   ========================================================================== */
+   fér hozzá a weboldalhoz). Kérdésenként 0–5 pont, összesen 200 pont,
+   80% (160 pont) a felvételi minimum — lásd store.js EXAM_MAX_SCORE/
+   EXAM_PASS_PCT. Az "tips" az elfogadhatósági támpont (ugyanaz, amire a
+   kategória-értékelés is pontoz, lásd EXAM_CATEGORY_CRITERIA), a "watch"
+   (ha van) a "Mit figyeljek?" kiegészítő útmutató. Minden kérdés konkrét,
+   végigjátszható szituációra épül — szándékosan nincs elvont, "levegőben
+   lógó" véleménykérdés, még a "Személyes/Motiváció" kategóriában sem: ott
+   is egy konkrét helyzetet vagy emléket kell felidézni/elképzelni. */
 export const EXAM_CATEGORIES = [
   "I. SZEMÉLYES / MOTIVÁCIÓ",
   "II. VÉDETT SZEMÉLY MELLETT",
@@ -252,136 +256,18 @@ export const EXAM_CATEGORIES = [
   "VI. CSAPATMUNKA / DÖNTÉSHOZATAL",
 ];
 
-const LEGACY_EXAM_QUESTIONS = [
-  { id: "Q01", num: 1, category: EXAM_CATEGORIES[0],
-    text: "Miért szeretne az United States Secret Service állományába jelentkezni?",
-    tips: ["komoly motiváció", "szolgálat", "felelősségvállalás", "emberek védelme", "hosszú távú elköteleződés"],
-    watch: "Ne a konkrét megfogalmazást figyeld. A gondolkodás legyen komoly. A „fegyvert akarok”, „jó a rang” vagy „menő a frakció” önmagában gyenge válasz." },
-  { id: "Q02", num: 2, category: EXAM_CATEGORIES[0],
-    text: "Ön szerint mi egy Secret Service Agent legfontosabb feladata?",
-    tips: ["védett személy biztonsága", "megelőzés", "veszélyek felismerése", "professzionális szolgálat", "csapatmunka"],
-    watch: "Érti-e, hogy a szolgálat elsődlegesen nem az elfogásról vagy a fegyverhasználatról szól." },
-  { id: "Q03", num: 3, category: EXAM_CATEGORIES[0],
-    text: "Milyen tulajdonságokkal kell rendelkeznie egy jó Agentnek?",
-    tips: ["fegyelem", "megbízhatóság", "türelem", "kommunikáció", "helyzetfelismerés", "önkontroll", "felelősségtudat"] },
-
-  { id: "Q04", num: 4, category: EXAM_CATEGORIES[1],
-    text: "Ön egy védett személyt kísér egy zsúfolt rendezvényen. Mire figyel elsősorban?",
-    tips: ["környezet folyamatos figyelése", "védett személy helyzetének kontrollja", "potenciális veszélyek felismerése", "kommunikáció a csapattal", "menekítési lehetőség ismerete"],
-    watch: "A jelölt ne csak azt mondja, hogy „nézem a tömeget”. Tudja megindokolni, mit keres és miért." },
-  { id: "Q05", num: 5, category: EXAM_CATEGORIES[1],
-    text: "Egy civil folyamatosan közeledik a védett személyhez, de nem agresszív. Mit tesz?",
-    tips: ["nyugodt fellépés", "távolság fenntartása", "kommunikáció", "helyzet felmérése", "szükség esetén további intézkedés"],
-    watch: "Ne legyen indokolatlanul agresszív." },
-  { id: "Q06", num: 6, category: EXAM_CATEGORIES[1],
-    text: "A védett személy egy olyan épületbe akar bemenni, amelyet Ön nem tart biztonságosnak. Mit tesz?",
-    tips: ["veszély jelzése", "védett személy biztonságának előtérbe helyezése", "vezető / biztosításvezető értesítése", "alternatív lehetőség keresése", "nem hagyja figyelmen kívül a kockázatot"] },
-  { id: "Q07", num: 7, category: EXAM_CATEGORIES[1],
-    text: "A védett személy nem akarja követni a biztonsági utasítást, mert siet. Mit tesz?",
-    tips: ["nyugodt kommunikáció", "a kockázat ismertetése", "nem hagyja figyelmen kívül a veszélyt", "szükség esetén vezető bevonása", "biztonsági protokoll fenntartása"] },
-
-  { id: "Q08", num: 8, category: EXAM_CATEGORIES[2],
-    text: "Lövéshez hasonló hangot hall a védett személy közelében. Mi az első reakciója?",
-    tips: ["védett személy azonnali biztosítása", "veszélyből való kivonás", "kommunikáció", "helyzetfelmérés", "megfelelő segítség kérése"],
-    watch: "A jelölt ne az elkövető üldözésével kezdjen." },
-  { id: "Q09", num: 9, category: EXAM_CATEGORIES[2],
-    text: "Egy rendezvényen hirtelen pánik tör ki. A védett személyt tömeg veszi körül. Mit tesz?",
-    tips: ["védett személy kontrollálása", "biztonságos útvonal keresése", "csapattársak koordinálása", "nyugodt kommunikáció", "veszélyes terület elhagyása"] },
-  { id: "Q10", num: 10, category: EXAM_CATEGORIES[2],
-    text: "A védett személy megsérül egy támadás során. Mi a prioritása?",
-    tips: ["védett személy biztonsága", "veszélyből kivonás", "orvosi segítség", "további veszély elhárítása", "kommunikáció"] },
-  { id: "Q11", num: 11, category: EXAM_CATEGORIES[2],
-    text: "Egy kollégája megsérül, miközben a védett személy még veszélyben van. Hogyan dönt?",
-    tips: ["védett személy biztonságának elsődlegessége", "segítség kérése", "sérült kolléga támogatásának megszervezése", "nem hagyja figyelmen kívül a kollégát"] },
-  { id: "Q12", num: 12, category: EXAM_CATEGORIES[2],
-    text: "Egy támadó elmenekül, miközben a védett személy már biztonságban van. Mit tesz?",
-    tips: ["helyzet újraértékelése", "jelentés", "helyszín biztosítása", "szükség esetén üldözés / elfogás megszervezése", "nem hagyja felügyelet nélkül a védett személyt"] },
-
-  { id: "Q13", num: 13, category: EXAM_CATEGORIES[3],
-    text: "Ön konvojban dolgozik. Miért fontos a megfelelő rádiókommunikáció?",
-    tips: ["koordináció", "információ gyors átadása", "veszélyek jelzése", "útvonalváltoztatás", "egységek összehangolása"] },
-  { id: "Q14", num: 14, category: EXAM_CATEGORIES[3],
-    text: "A konvoj előtt egy gyanús jármű halad, amely folyamatosan változtatja a sebességét. Mit tesz?",
-    tips: ["megfigyelés", "információ továbbítása", "nem pánikol", "távolság kezelése", "szükség esetén útvonal módosítása"] },
-  { id: "Q15", num: 15, category: EXAM_CATEGORIES[3],
-    text: "A konvoj egyik járműve meghibásodik. Mi a teendő?",
-    tips: ["rádiókommunikáció", "konvoj biztonságának fenntartása", "védett személy prioritása", "helyzethez megfelelő döntés", "nem hagyják kontroll nélkül a konvojt"] },
-  { id: "Q16", num: 16, category: EXAM_CATEGORIES[3],
-    text: "A konvojt támadás éri. Mi az elsődleges cél?",
-    tips: ["védett személy biztonságba helyezése", "koordináció", "megfelelő menekítési döntés", "kommunikáció", "csak ezután az elkövetők kezelése"] },
-
-  { id: "Q17", num: 17, category: EXAM_CATEGORIES[4],
-    text: "Mit jelent Önnek a rádiófegyelem?",
-    tips: ["rövid", "érthető", "lényegre törő", "szolgálati célú", "felesleges beszéd kerülése"] },
-  { id: "Q18", num: 18, category: EXAM_CATEGORIES[4],
-    text: "Egy veszélyhelyzet közben mindenki egyszerre akar rádiózni. Mit tesz?",
-    tips: ["nyugodt kommunikáció", "fontos információ elsőbbsége", "rövid rádióadás", "csatorna felszabadítása", "parancsnoki utasítás követése"] },
-  { id: "Q19", num: 19, category: EXAM_CATEGORIES[4],
-    text: "Hogyan jelentene rádión egy védett személyt érintő azonnali veszélyt?",
-    tips: ["hol", "mi történt", "milyen veszély", "védett személy állapota", "milyen segítség szükséges"],
-    watch: "Nem szükséges szó szerint ugyanazt a mondatot használni." },
-
-  { id: "Q20", num: 20, category: EXAM_CATEGORIES[5],
-    text: "Egy barátja megkérdezi, hol tartózkodik egy védett személy. Ön tudja a választ. Mit mond?",
-    tips: ["nem adja ki", "szolgálati információ", "titoktartás", "illetéktelennek nem ad információt"] },
-  { id: "Q21", num: 21, category: EXAM_CATEGORIES[5],
-    text: "Egy kollégája egy szolgálati eseményről civilek előtt beszél. Mit tesz?",
-    tips: ["jelzi a problémát", "nem kapcsolódik be", "szükség esetén jelenti a vezetőnek", "szolgálati információt nem oszt meg"] },
-
-  { id: "Q22", num: 22, category: EXAM_CATEGORIES[2],
-    text: "Mikor indokolt az erő alkalmazása?",
-    tips: ["szükségesség", "arányosság", "aktuális veszély", "helyzethez igazodó intézkedés", "nem büntetésként alkalmaz erőt"] },
-  { id: "Q23", num: 23, category: EXAM_CATEGORIES[2],
-    text: "Egy személy elfut Ön elől, de nem jelent közvetlen veszélyt. Automatikusan fegyvert használ?",
-    tips: ["nem automatikusan", "helyzetfelmérés", "veszélyesség vizsgálata", "megfelelő intézkedési mód", "arányosság"] },
-
-  { id: "Q24", num: 24, category: EXAM_CATEGORIES[5],
-    text: "Mit tesz, ha egy magasabb rangú Agent olyan döntést hoz, amellyel Ön nem ért egyet?",
-    tips: ["szolgálati fegyelem", "megfelelő kommunikáció", "nem kezd konfliktust", "megfelelő csatornán jelzi aggályát"] },
-  { id: "Q25", num: 25, category: EXAM_CATEGORIES[5],
-    text: "Mit tesz, ha egy felettese olyan utasítást ad, amelyről Ön úgy gondolja, hogy súlyosan szabályellenes?",
-    tips: ["nem hajt végre vakon szabályellenes utasítást", "jelzi az aggályt", "megfelelő vezetői csatornát használ", "nem önbíráskodik"] },
-  { id: "Q26", num: 26, category: EXAM_CATEGORIES[5],
-    text: "Miért fontos a parancsnoki lánc?",
-    tips: ["egyértelmű felelősség", "gyors döntéshozatal", "koordináció", "szervezeti fegyelem", "káosz elkerülése"] },
-
-  { id: "Q27", num: 27, category: EXAM_CATEGORIES[2],
-    text: "Egy kormányzati épület előtt egy személy hosszú ideje ugyanazt a bejáratot figyeli. Mit tesz?",
-    tips: ["megfigyelés", "információgyűjtés", "megfelelő jelentés", "helyzet ellenőrzése", "nem intézkedik indokolatlanul pusztán gyanú alapján"] },
-  { id: "Q28", num: 28, category: EXAM_CATEGORIES[2],
-    text: "Egy védett helyszínen őrizetlen csomagot talál. Mi a teendő?",
-    tips: ["nem nyúl hozzá", "terület biztosítása", "megfelelő személyek értesítése", "védett személy távol tartása", "további utasítások követése"] },
-
-  { id: "Q29", num: 29, category: EXAM_CATEGORIES[4],
-    text: "Ön egy védett személyt kísér egy épületből egy gépjárműhöz. Egy személy kiabálni kezd, miközben egy másik gyorsan közeledik Önök felé. Mit tesz?",
-    tips: ["két különböző helyzet felismerése", "védett személy biztosítása", "közeledő személy megfigyelése", "megfelelő kommunikáció", "szükség esetén azonnali kivonás", "nem pánikol"] },
-  { id: "Q30", num: 30, category: EXAM_CATEGORIES[4],
-    text: "A parancsnok FULL ALERT-et rendel el. Ön mit változtatna meg a szolgálatában?",
-    tips: ["fokozott figyelem", "biztosítás megerősítése", "rádiófegyelem", "utasítások szigorúbb követése", "veszélyek fokozott figyelése", "egységek koordinációja", "védett személy biztonságának fokozott kezelése"] },
-  { id: "Q31", num: 31, category: EXAM_CATEGORIES[3], text: "Indulás előtt mit ellenőrizne a védett személy biztonságos elindulásához?", tips: ["jármű és környezet", "útvonal", "kommunikáció"] },
-  { id: "Q32", num: 32, category: EXAM_CATEGORIES[3], text: "Az autó mellett egy ismeretlen ember áll. Mit tesz?", tips: ["helyzet felmérése", "védett személy távol tartása", "biztonságos beszállás"] },
-  { id: "Q33", num: 33, category: EXAM_CATEGORIES[3], text: "Az eredeti útvonalon nem lehet továbbhaladni. Hogyan oldja meg?", tips: ["jelentés", "alternatív útvonal", "nyugodt döntés"] },
-  { id: "Q34", num: 34, category: EXAM_CATEGORIES[3], text: "A védett személy menet közben megváltoztatja az úti célját. Mit tenne?", tips: ["kockázatfelmérés", "egyeztetés", "terv módosítása"] },
-  { id: "Q35", num: 35, category: EXAM_CATEGORIES[3], text: "A védett személy autója lerobban egy forgalmas helyen. Mihez kezd?", tips: ["védelem", "biztonságos hely", "segítség kérése"] },
-  { id: "Q36", num: 36, category: EXAM_CATEGORIES[3], text: "Kísérés során elveszíti a kapcsolatot az egyik kísérőautóval. Hogyan jár el?", tips: ["kapcsolat helyreállítása", "konvoj kontrollja", "jelentés"] },
-  { id: "Q37", num: 37, category: EXAM_CATEGORIES[4], text: "Nagy rendezvényre érkeznek, ahol tömeg várja a védett személyt. Hogyan oldja meg az érkezést?", tips: ["útvonal", "csapat", "tömeg kontrollja"] },
-  { id: "Q38", num: 38, category: EXAM_CATEGORIES[4], text: "A tömeg hirtelen megindul a védett személy felé. Mihez kezd?", tips: ["azonnali védelem", "kivonás", "koordináció"] },
-  { id: "Q39", num: 39, category: EXAM_CATEGORIES[5], text: "Észreveszi, hogy egyik kollégája nem figyel megfelelően. Mit tesz?", tips: ["azonnali jelzés", "korrekció", "jelentés"] },
-  { id: "Q40", num: 40, category: EXAM_CATEGORIES[5], text: "Szolgálat közben hibázik, és komolyabb helyzet alakul ki. Mit tesz közvetlenül utána?", tips: ["felelősségvállalás", "kárelhárítás", "jelentés"] },
-];
-
 const EXAM_QUESTION_TEXTS = [
   ["I. SZEMÉLYES / MOTIVÁCIÓ", [
-    "Miért szeretne az önkormányzat testőrségéhez csatlakozni?",
-    "Mi fogta meg Önt ebben a munkában?",
-    "Miért gondolja úgy, hogy alkalmas lenne erre a feladatra?",
-    "Ön szerint milyen egy jó testőr?",
-    "Melyik tulajdonságát tartja a legerősebbnek, ami ebben a munkában előnyt jelenthet?",
-    "Van olyan tulajdonsága, amin Ön szerint még javítania kellene?",
-    "Hogyan viseli, ha egy felettese kijavítja vagy kritizálja a munkáját?",
-    "Mit jelent Önnek a fegyelem egy ilyen szolgálatban?",
-    "Mit jelent Önnek az, hogy egy másik ember biztonságáért Ön is felelős?",
-    "Ha hibázik szolgálat közben, hogyan kezeli a helyzetet?",
+    "Egy barátja megkérdezi, miért vállal egy ilyen kockázatos, megterhelő szolgálatot, amikor kényelmesebb munkát is találhatna. Mit válaszolna neki, konkrétan?",
+    "Mesélje el egy konkrét élményét vagy pillanatát, ami miatt úgy döntött, hogy pont ezt a szolgálatot választja.",
+    "Az oktatásvezető megkérdezi, milyen konkrét tapasztalata vagy tulajdonsága bizonyítja, hogy alkalmas erre a feladatra. Mondjon egy példát.",
+    "Egy újonc megkérdezi, mi különbözteti meg a jó testőrt egy átlagos szolgálattevőtől. Milyen konkrét példával magyarázná el neki?",
+    "Idézzen fel egy konkrét helyzetet, amikor az egyik erőssége ténylegesen hasznosnak bizonyult egy nehéz pillanatban.",
+    "Mondjon egy konkrét esetet, amikor szembesült egy saját hiányosságával vagy hibájával, és hogyan kezdett el rajta dolgozni.",
+    "Egy felettese szolgálat közben, mások előtt kritizálja a döntését, amit Ön szerint nem is volt rossz. Hogyan reagálna abban a pillanatban?",
+    "Egy hosszú, eseménytelen szolgálat végén elfárad, és éppen senki sem ellenőrzi a munkáját. Mit jelent Önnek ilyenkor a fegyelem — mit tenne?",
+    "Az első önálló szolgálata során rájön, hogy egyetlen figyelmetlen pillanat is végzetes lehetne a védett személy számára. Hogyan élné meg ezt a felelősséget, és mit tenne emiatt másképp?",
+    "Szolgálat közben egy apró, de észrevehető hibát vét, amit Önön kívül senki más nem vett észre. Mit tesz?",
   ]],
   ["II. VÉDETT SZEMÉLY MELLETT", [
     "Megérkeznek a védett személlyel egy hivatalos eseményre. Többen várják Önöket a bejáratnál, és első ránézésre nem látja át teljesen a környéket. Mit csinál, mielőtt a védett személy kiszállna?",

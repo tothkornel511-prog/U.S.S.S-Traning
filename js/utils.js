@@ -2,7 +2,7 @@
    U.S.S.S. ELITE TRAINING SYSTEM — UI SEGÉDFÜGGVÉNYEK
    ========================================================================== */
 
-import { getBrandingOverride } from "./store.js?v=79";
+import { getBrandingOverride } from "./store.js?v=80";
 
 /* Fájlfeltöltés a GitHub repóba egy Cloudflare Worker proxin keresztül,
    ahelyett hogy a fájl base64-ként a localStorage-ban végezné (ami az 5 MB-os

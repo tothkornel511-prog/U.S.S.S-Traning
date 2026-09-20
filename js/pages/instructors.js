@@ -18,7 +18,7 @@
    képzési dokumentum ezeket EGY modulként kezeli, két követelményszinttel.
    Itt ezért egy közös, virtuális kulccsal (H/I/J) jelenik meg egyetlen
    sorként — a két szint csak jegyzetként szerepel alatta. */
-import { getModuleInstructor, setModuleInstructor, getInstructors, getInstructor, getInstructorsForModule, createInstructor, updateInstructor, deleteInstructor, moduleByCode, levelLabel } from "../store.js?v=79";
+import { getModuleInstructor, setModuleInstructor, getInstructors, getInstructor, getInstructorsForModule, createInstructor, updateInstructor, deleteInstructor, moduleByCode, levelLabel } from "../store.js?v=80";
 import { hasRole, actorLabel } from "../auth.js?v=23";
 import { esc, toast, openModal, closeModal, applyBranding } from "../utils.js?v=31";
 

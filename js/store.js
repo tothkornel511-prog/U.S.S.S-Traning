@@ -1251,6 +1251,7 @@ export function promoteApplicant(id, usssId, position, actorLabel) {
 /* ---------- Felvételi vizsga (IC szóbeli, oktatásvezető pontozza) --------*/
 export const EXAM_MAX_SCORE = EXAM_QUESTIONS.length * 5; // 200
 export const EXAM_PASS_PCT = 80;
+export const EXAM_TARGET_MINUTES = 30;
 
 export function getExamQuestions() {
   return EXAM_QUESTIONS;
@@ -1533,11 +1534,12 @@ export function setExamAnswer(examId, questionId, patch, actorLabel) {
   if (!exam) return;
   exam.answers = exam.answers || [];
   let a = exam.answers.find((x) => x.questionId === questionId);
-  if (!a) { a = { questionId, score: null, note: "", critical: false }; exam.answers.push(a); }
+  if (!a) { a = { questionId, score: null, note: "", critical: false, skipped: false }; exam.answers.push(a); }
   const previousScore = a.score;
   if (patch.score !== undefined) a.score = patch.score;
   if (patch.note !== undefined) a.note = patch.note;
   if (patch.critical !== undefined) a.critical = Boolean(patch.critical);
+  if (patch.skipped !== undefined) a.skipped = Boolean(patch.skipped);
   write(KEYS.exams, list);
   if (actorLabel && patch.score !== undefined && previousScore !== patch.score) {
     logAudit(actorLabel, "Vizsgapont módosítva", `${examId} · ${questionId}: ${previousScore ?? "—"} → ${patch.score}`);
@@ -1611,11 +1613,17 @@ export function promoteExamCandidate(examId, personFields, actorLabel) {
   return getPerson(personFields.usssId);
 }
 
-/* Pontszám, százalék, min. 80% eredmény és minőségi sáv kiszámítása. */
+/* Pontszám, százalék, min. 80% eredmény és minőségi sáv kiszámítása.
+   A "kihagyva" jelölésű kérdéseket a rendszer teljesen figyelmen kívül
+   hagyja — sem a pontszámba, sem a maximumba nem számítanak bele, mintha
+   fel sem tették volna őket (pl. mert a helyzet nem volt értelmezhető
+   az adott jelöltnél). */
 export function examScoreSummary(exam) {
-  const total = (exam.answers || []).reduce((sum, a) => sum + (typeof a.score === "number" ? a.score : 0), 0);
-  const answered = (exam.answers || []).filter((a) => typeof a.score === "number").length;
-  const max = EXAM_MAX_SCORE;
+  const skippedIds = new Set((exam.answers || []).filter((a) => a.skipped).map((a) => a.questionId));
+  const scorableCount = EXAM_QUESTIONS.length - skippedIds.size;
+  const total = (exam.answers || []).reduce((sum, a) => sum + (!a.skipped && typeof a.score === "number" ? a.score : 0), 0);
+  const answered = (exam.answers || []).filter((a) => !a.skipped && typeof a.score === "number").length;
+  const max = scorableCount * 5;
   const pct = max ? (total / max) * 100 : 0;
   const passed = pct >= EXAM_PASS_PCT;
   let tier;
@@ -1626,7 +1634,7 @@ export function examScoreSummary(exam) {
   else if (pct < 95) tier = "Kiemelkedő";
   else tier = "Kiváló";
   const categories = EXAM_CATEGORIES.map((category) => {
-    const categoryQuestions = EXAM_QUESTIONS.filter((q) => q.category === category);
+    const categoryQuestions = EXAM_QUESTIONS.filter((q) => q.category === category && !skippedIds.has(q.id));
     const questionIds = new Set(categoryQuestions.map((q) => q.id));
     const categoryAnswers = (exam.answers || []).filter((a) => questionIds.has(a.questionId));
     const categoryTotal = categoryAnswers.reduce((sum, a) => sum + (typeof a.score === "number" ? a.score : 0), 0);
@@ -1638,7 +1646,15 @@ export function examScoreSummary(exam) {
     };
   });
   const criticalErrors = (exam.answers || []).filter((a) => a.critical).length;
-  return { total, max, pct, passed, tier, answered, totalQuestions: EXAM_QUESTIONS.length, categories, criticalErrors };
+  return { total, max, pct, passed, tier, answered, totalQuestions: scorableCount, skippedCount: skippedIds.size, categories, criticalErrors };
+}
+
+/* Eltelt idő percben — vizsga közben "most"-ig, lezárt vizsgánál a
+   lezárás időpontjáig. A cél max. EXAM_TARGET_MINUTES (30 perc). */
+export function examElapsedMinutes(exam) {
+  const start = new Date(exam.startedAt).getTime();
+  const end = exam.endedAt ? new Date(exam.endedAt).getTime() : Date.now();
+  return Math.max(0, (end - start) / 60000);
 }
 
 /* ---------- Belső Vizsgálati Rendszer -------------------------------------

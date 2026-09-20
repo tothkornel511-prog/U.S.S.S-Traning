@@ -2,7 +2,7 @@ import {
   getTrainingCategories, getTrainingCategory, createTrainingCategory, renameTrainingCategory, deleteTrainingCategory,
   getTrainingFiles, createTrainingFile, deleteTrainingFile,
   isImageAttachment, ATTACHMENT_MAX_UPLOAD_BYTES, formatFileSize,
-} from "../store.js?v=79";
+} from "../store.js?v=80";
 import { isSuperAdmin, actorLabel } from "../auth.js?v=23";
 import { esc, fmtDateTime, toast, openModal, closeModal, previewAttachment, uploadFileToGitHub } from "../utils.js?v=31";
 import { navigate } from "../router.js?v=20";
