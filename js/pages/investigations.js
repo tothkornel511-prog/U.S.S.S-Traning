@@ -5,7 +5,7 @@ import {
   addInvestigationAttachment, removeInvestigationAttachment, formatCodename,
   isImageAttachment, formatFileSize, ATTACHMENT_MAX_UPLOAD_BYTES,
   INVESTIGATION_SEVERITIES, INVESTIGATION_STATUSES, INVESTIGATION_CLOSED_STATUSES, INVESTIGATION_OUTCOMES, INVESTIGATION_ORIGINS,
-} from "../store.js?v=80";
+} from "../store.js?v=81";
 import { hasRole, actorLabel } from "../auth.js?v=20";
 import { esc, fmtDate, fmtDateTime, toast, openModal, closeModal, applyBranding, previewAttachment, uploadFileToGitHub } from "../utils.js?v=31";
 import { navigate } from "../router.js?v=20";

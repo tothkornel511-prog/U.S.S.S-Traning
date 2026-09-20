@@ -1,8 +1,8 @@
 import {
   getExams, getExam, createExam, setExamAnswer, setExamFinalComment, setExamCategoryScore, setExamRecommendation, interruptExam, finishExam, deleteExam,
-  getExamQuestions, getExamCategories, getExamCategoryCriteria, examScoreSummary, examElapsedMinutes, EXAM_MAX_SCORE, EXAM_PASS_PCT, EXAM_TARGET_MINUTES,
+  getExamQuestions, getExamCategories, getExamCategoryCriteria, examScoreSummary, examSuggestedRecommendation, examElapsedMinutes, EXAM_MAX_SCORE, EXAM_PASS_PCT, EXAM_TARGET_MINUTES,
   promoteExamCandidate, getPositions, getInstructors, ref,
-} from "../store.js?v=80";
+} from "../store.js?v=81";
 import { hasRole, actorLabel, currentSession } from "../auth.js?v=20";
 import { esc, fmtDate, fmtDateTime, toast, openModal, closeModal, sealMark } from "../utils.js?v=31";
 import { navigate } from "../router.js?v=20";
@@ -183,7 +183,8 @@ export function renderExamDetail(container, id) {
     <div class="card">
       <div class="card-title mb-1">OKTATÁSVEZETŐI ÉRTÉKELÉS</div>
       <p class="text-low small mb-1">Általános benyomás, erősségek, gyengeségek és a felvételi ajánlás.</p>
-      <label class="field mb-1"><span>FELVÉTELI AJÁNLÁS</span><select id="exam-recommendation" ${canEdit && !exam.endedAt ? "" : "disabled"}><option value="">Nincs kiválasztva</option>${[["recommended", "Felvételre ajánlott"], ["conditional", "Feltételesen ajánlott"], ["rejected", "Nem ajánlott"], ["retest", "Újravizsga javasolt"]].map(([value, label]) => `<option value="${value}" ${exam.recommendation === value ? "selected" : ""}>${label}</option>`).join("")}</select></label>
+      <div id="exam-suggestion" class="mb-1"></div>
+      <label class="field mb-1"><span>FELVÉTELI AJÁNLÁS (vizsgáztatói döntés)</span><select id="exam-recommendation" ${canEdit && !exam.endedAt ? "" : "disabled"}><option value="">Nincs kiválasztva</option>${[["recommended", "Felvételre ajánlott"], ["conditional", "Feltételesen ajánlott"], ["rejected", "Nem ajánlott"], ["retest", "Újravizsga javasolt"]].map(([value, label]) => `<option value="${value}" ${exam.recommendation === value ? "selected" : ""}>${label}</option>`).join("")}</select></label>
       ${canEdit ? `
         <textarea id="final-comment" rows="6" style="width:100%; background:var(--bg-base); border:1px solid var(--line-soft); border-radius:var(--radius-sm); color:var(--text-hi); padding:12px;">${esc(exam.finalComment || "")}</textarea>
         <button class="btn btn-sm mt-1" id="save-final-comment">Értékelés mentése</button>
@@ -193,6 +194,7 @@ export function renderExamDetail(container, id) {
 
   renderSummaryBar(exam);
   renderTimer(exam);
+  renderRecommendationSuggestion(exam);
   document.getElementById("print-exam")?.addEventListener("click", () => window.print());
 
   container.querySelectorAll("[data-score-q]").forEach((btn) =>
@@ -204,6 +206,7 @@ export function renderExamDetail(container, id) {
         b.classList.toggle("active", b === btn)
       );
       renderSummaryBar(getExam(exam.id));
+      renderRecommendationSuggestion(getExam(exam.id));
     })
   );
 
@@ -223,17 +226,26 @@ export function renderExamDetail(container, id) {
   container.querySelectorAll("[data-critical-q]").forEach((box) => box.addEventListener("change", () => {
     setExamAnswer(exam.id, box.getAttribute("data-critical-q"), { critical: box.checked }, actorLabel());
     renderSummaryBar(getExam(exam.id));
+    renderRecommendationSuggestion(getExam(exam.id));
   }));
   container.querySelectorAll("[data-skip-q]").forEach((box) => box.addEventListener("change", () => {
     setExamAnswer(exam.id, box.getAttribute("data-skip-q"), { skipped: box.checked }, actorLabel());
     renderExamDetail(container, exam.id);
   }));
-  container.querySelectorAll("[data-cat-score]").forEach((select) => select.addEventListener("change", () => {
-    const [category, criterion] = select.getAttribute("data-cat-score").split("::");
-    setExamCategoryScore(exam.id, category, criterion, select.value);
+  container.querySelectorAll("[data-cat-score-key]").forEach((btn) => btn.addEventListener("click", () => {
+    const key = btn.getAttribute("data-cat-score-key");
+    const [category, criterion] = key.split("::");
+    const value = btn.getAttribute("data-cat-score-val");
+    const alreadyActive = btn.classList.contains("active");
+    setExamCategoryScore(exam.id, category, criterion, alreadyActive ? null : value);
+    container.querySelectorAll(`[data-cat-score-key="${key}"]`).forEach((b) => b.classList.toggle("active", !alreadyActive && b === btn));
     renderSummaryBar(getExam(exam.id));
+    renderRecommendationSuggestion(getExam(exam.id));
   }));
-  document.getElementById("exam-recommendation")?.addEventListener("change", (event) => setExamRecommendation(exam.id, event.target.value));
+  document.getElementById("exam-recommendation")?.addEventListener("change", (event) => {
+    setExamRecommendation(exam.id, event.target.value);
+    renderRecommendationSuggestion(getExam(exam.id));
+  });
 
   document.getElementById("finish-exam")?.addEventListener("click", () => {
     if (!confirm("Lezárja a vizsgát? A pontszámok utána is módosíthatók maradnak.")) return;
@@ -341,19 +353,21 @@ function renderCategoryScoreCard(exam, category, canEdit) {
   const criteria = getExamCategoryCriteria(category);
   if (!criteria.length) return "";
   const scores = exam.categoryScores?.[category] || {};
+  const locked = !canEdit || exam.endedAt;
   return `
     <div class="card exam-category-card mb-1">
       <div class="card-title mb-1">Kategória-értékelés</div>
-      <div class="grid grid-3">
-        ${criteria.map((criterion) => `
-          <label class="field">
-            <span>${esc(criterion.charAt(0).toUpperCase() + criterion.slice(1))}</span>
-            <select data-cat-score="${esc(category)}::${esc(criterion)}" ${canEdit && !exam.endedAt ? "" : "disabled"}>
-              <option value="">— / 5</option>
-              ${[1, 2, 3, 4, 5].map((n) => `<option value="${n}" ${scores[criterion] === n ? "selected" : ""}>${n} / 5</option>`).join("")}
-            </select>
-          </label>
-        `).join("")}
+      <div class="exam-crit-grid">
+        ${criteria.map((criterion) => {
+          const current = scores[criterion] || null;
+          return `
+          <div class="exam-crit-row">
+            <span class="exam-crit-label">${esc(criterion.charAt(0).toUpperCase() + criterion.slice(1))}</span>
+            <div class="exam-score-row exam-crit-btns">
+              ${[1, 2, 3, 4, 5].map((n) => `<button type="button" class="exam-score-btn ${current === n ? "active" : ""}" ${locked ? "disabled" : ""} data-cat-score-key="${esc(category)}::${esc(criterion)}" data-cat-score-val="${n}">${n}</button>`).join("")}
+            </div>
+          </div>`;
+        }).join("")}
       </div>
     </div>
   `;
@@ -376,6 +390,34 @@ function renderTimer(exam) {
   };
   draw();
   const timerId = exam.endedAt ? null : setInterval(draw, 1000);
+}
+
+/* Automatikus rendszerjavaslat — CSAK javaslat, sosem írja felül a
+   vizsgáztató saját, kézi döntését (lásd examSuggestedRecommendation).
+   A vizsgáztató egy gombbal átveheti, ha egyetért vele. */
+function renderRecommendationSuggestion(exam) {
+  const el = document.getElementById("exam-suggestion");
+  if (!el) return;
+  const suggestion = examSuggestedRecommendation(exam);
+  const badgeClass = { recommended: "badge-green", conditional: "badge-yellow", rejected: "badge-red", retest: "badge-yellow" }[suggestion.value] || "badge-gray";
+  const alreadyMatches = exam.recommendation === suggestion.value;
+  const canAccept = hasRole("TRAINING") && !exam.endedAt && !alreadyMatches;
+  el.innerHTML = `
+    <div class="exam-suggestion-box">
+      <div class="flex justify-between items-center flex-wrap gap-1">
+        <div><span class="text-low small">RENDSZER-JAVASLAT (automatikus, nem végleges)</span> <span class="badge ${badgeClass}">${esc(suggestion.label)}</span></div>
+        ${canAccept ? `<button type="button" class="btn btn-sm" id="accept-suggestion">Javaslat átvétele</button>` : alreadyMatches ? `<span class="text-low small">✓ átvéve</span>` : ""}
+      </div>
+      <div class="text-low small mt-1">${esc(suggestion.reason)}</div>
+    </div>
+  `;
+  document.getElementById("accept-suggestion")?.addEventListener("click", () => {
+    setExamRecommendation(exam.id, suggestion.value);
+    const select = document.getElementById("exam-recommendation");
+    if (select) select.value = suggestion.value;
+    renderRecommendationSuggestion(getExam(exam.id));
+    toast("Javaslat átvéve");
+  });
 }
 
 function renderSummaryBar(exam) {

@@ -797,6 +797,23 @@ input[type="checkbox"] { accent-color: var(--gold); }
 .exam-score-btn[data-score-val="5"].active { background: rgba(78,158,111,.16); border-color: rgba(78,158,111,.7); color: #9be0b2; box-shadow: 0 0 16px rgba(78,158,111,.16); }
 .exam-category-score { min-height: 62px; padding: 11px 13px; border: 1px solid var(--line-soft); border-radius: var(--radius-sm); background: rgba(18,20,27,.55); }
 .exam-category-score strong { display: block; color: var(--text-hi); font-family: var(--font-mono); font-size: 13px; margin-bottom: 4px; }
+
+/* Kategória-értékelés — a modul-vizsgapontokkal egyező gombos kinézet
+   (nem sima <select>), soronként egy szemponttal. */
+.exam-crit-grid { display: flex; flex-direction: column; gap: 10px; }
+.exam-crit-row { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+.exam-crit-label { flex: 1 1 220px; min-width: 160px; font-size: 12.5px; color: var(--text-mid); }
+.exam-crit-btns { margin-bottom: 0; }
+.exam-crit-btns::before { content: none; }
+.exam-crit-btns .exam-score-btn { width: 34px; height: 34px; font-size: 13px; }
+
+/* Rendszer-javaslat doboz — automatikus, de sosem végleges; a
+   vizsgáztató saját döntése (a lenti FELVÉTELI AJÁNLÁS mező) marad az
+   irányadó, ez csak egy gyors, indokolt kiindulópont. */
+.exam-suggestion-box {
+  border: 1px solid rgba(198,166,100,.25); border-radius: var(--radius-sm);
+  background: rgba(198,166,100,.05); padding: 12px 14px;
+}
 .exam-category-score .card-title { margin-bottom: 5px; line-height: 1.35; }
 details.card { border-color: rgba(198,166,100,.22); }
 details.card > summary { color: var(--gold-bright); list-style: none; }

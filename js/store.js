@@ -1649,6 +1649,35 @@ export function examScoreSummary(exam) {
   return { total, max, pct, passed, tier, answered, totalQuestions: scorableCount, skippedCount: skippedIds.size, categories, criticalErrors };
 }
 
+/* Rendszer által automatikusan javasolt felvételi döntés — a pontszám,
+   a kritikus hibák és a kategória-értékelés átlaga alapján. Ez CSAK
+   javaslat: sosem írja felül automatikusan a vizsgáztató saját
+   döntését (exam.recommendation), az exam.js egy külön "Javaslat
+   elfogadása" gombbal engedi átvenni, ha a vizsgáztató egyetért vele. */
+export function examSuggestedRecommendation(exam) {
+  const s = examScoreSummary(exam);
+  const criteriaScores = Object.values(exam.categoryScores || {}).flatMap((c) => Object.values(c));
+  const criteriaAvg = criteriaScores.length ? criteriaScores.reduce((sum, n) => sum + n, 0) / criteriaScores.length : null;
+
+  if (s.criticalErrors > 0) {
+    return { value: "rejected", label: "Nem ajánlott", reason: `${s.criticalErrors} kritikus hiba történt a vizsga során — ez önmagában kizáró ok.` };
+  }
+  if (!s.passed) {
+    return { value: "rejected", label: "Nem ajánlott", reason: `A teljesítmény (${s.pct.toFixed(1)}%) a ${EXAM_PASS_PCT}%-os felvételi minimum alatt van.` };
+  }
+  if (criteriaAvg !== null && criteriaAvg < 3) {
+    return { value: "conditional", label: "Feltételesen ajánlott", reason: `A kategória-értékelés átlaga alacsony (${criteriaAvg.toFixed(1)} / 5) a sikeres vizsgapontszám ellenére — érdemes külön megnézni.` };
+  }
+  if (s.pct < 85) {
+    return { value: "conditional", label: "Feltételesen ajánlott", reason: `Éppen csak sikeres teljesítmény (${s.pct.toFixed(1)}%) — megfontolandó egy visszakérdezés vagy próbaidő.` };
+  }
+  return {
+    value: "recommended",
+    label: "Felvételre ajánlott",
+    reason: `Sikeres vizsga (${s.pct.toFixed(1)}%), nincs kritikus hiba${criteriaAvg !== null ? `, jó kategória-értékelés (${criteriaAvg.toFixed(1)} / 5)` : ""}.`,
+  };
+}
+
 /* Eltelt idő percben — vizsga közben "most"-ig, lezárt vizsgánál a
    lezárás időpontjáig. A cél max. EXAM_TARGET_MINUTES (30 perc). */
 export function examElapsedMinutes(exam) {
