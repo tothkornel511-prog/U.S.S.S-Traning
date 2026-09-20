@@ -1035,18 +1035,32 @@ body.printing-cert #cert-print-root { display: block; }
   padding: 8px 0; border-top: 1px solid var(--line-soft);
 }
 .ins-module-row:first-of-type { border-top: none; }
-.ins-module-info { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.ins-module-info { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; flex: 1 1 auto; min-width: 0; }
 .ins-module-name { font-size: 12.5px; color: var(--text-mid); }
-.ins-module-teacher { display: flex; align-items: center; gap: 10px; margin-left: auto; }
+.ins-module-note {
+  font-size: 11px; font-style: italic; color: var(--text-low);
+  border-left: 2px solid rgba(198,166,100,.35); padding-left: 8px;
+}
+.ins-module-teacher { display: flex; align-items: center; gap: 8px; margin-left: auto; flex: 0 0 auto; }
+.ins-module-label {
+  font-size: 10.5px; letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--gold); white-space: nowrap;
+}
 .ins-module-input {
   width: 220px; max-width: 100%;
   background: var(--bg-base); border: 1px solid var(--line-soft); border-radius: var(--radius-sm);
-  padding: 7px 10px; color: var(--text-hi); font-size: 12.5px;
+  padding: 7px 10px; color: var(--text-hi); font-size: 12.5px; font-family: var(--font-mono); letter-spacing: 0.02em;
   transition: border-color .15s ease, box-shadow .15s ease;
 }
-.ins-module-input:focus { outline: none; border-color: rgba(198,166,100,.5); box-shadow: 0 0 0 3px rgba(198,166,100,.12); }
-.ins-module-input:disabled { opacity: .7; cursor: default; }
+.ins-module-input::placeholder { color: var(--text-low); font-family: var(--font-body); font-style: italic; }
+.ins-module-input:hover { border-color: rgba(198,166,100,.35); }
+.ins-module-input:focus { outline: none; border-color: rgba(198,166,100,.55); box-shadow: 0 0 0 3px rgba(198,166,100,.14); }
+.ins-module-input:disabled { opacity: .6; cursor: default; }
 .ins-chip-row { display: flex; flex-wrap: wrap; gap: 4px; }
+@media (max-width: 560px) {
+  .ins-module-teacher { margin-left: 0; width: 100%; }
+  .ins-module-input { width: 100%; }
+}
 .doc-editor-toolbar { display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 6px; }
 .doc-editor-toolbar button { padding: 4px 9px; font-size: 11px; }
 .save-indicator { font-size: 11px; color: var(--text-low); transition: color .2s ease; }
