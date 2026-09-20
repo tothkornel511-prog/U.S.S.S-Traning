@@ -165,6 +165,20 @@
         "examiner": "A rendszer",
         "practical": "pass",
         "practicalExaminer": "Dominic Hayes (Admin)"
+      },
+      "K": {
+        "theory": 50,
+        "history": [
+          {
+            "date": "2026-09-20T08:13:39.662Z",
+            "type": "theory",
+            "theory": 50,
+            "result": "fail",
+            "examiner": "A rendszer"
+          }
+        ],
+        "theoryDate": "2026-09-20",
+        "examiner": "A rendszer"
       }
     },
     "levelUpEligible": false,
