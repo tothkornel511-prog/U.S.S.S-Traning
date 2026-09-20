@@ -16,7 +16,7 @@ export const LEVELS = [
 export const SERVICE_STATUSES = ["Újonc", "Aktív", "Inaktív", "Felfüggesztett"];
 
 export const POSITIONS = [
-  { group: "U.S.S.S.", items: ["U.S.S.S Director", "Oktatásvezető", "U.S.S.S Agent"] },
+  { group: "U.S.S.S.", items: ["U.S.S.S Director", "Oktatásvezető", "U.S.S.S Agent", "Terepügynök"] },
   {
     group: "Önkormányzat",
     items: [
@@ -33,9 +33,11 @@ export const POSITIONS = [
       "Attorney General",
       "Judge",
       "Lawyer",
+      "Jogász",
       "Administration",
     ],
   },
+  { group: "Egyéb", items: ["Karbantartó"] },
 ];
 
 /* Az önkormányzati/U.S.S.S. ranglétra sorrendje — erre rendezi a rendszer
@@ -56,10 +58,13 @@ export const RANK_ORDER = [
   "Oktatásvezető",
   "U.S.S.S Director",
   "U.S.S.S Agent",
+  "Terepügynök",
   "Attorney General",
   "Judge",
   "Lawyer",
+  "Jogász",
   "Administration",
+  "Karbantartó",
 ];
 
 /* Minden modul EGYSZER szerepel az adatbázisban (H, I, J is), a "levels" tömb
