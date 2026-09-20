@@ -17,6 +17,7 @@ export function renderExamList(container, { includeQuestionBank = true } = {}) {
   container.innerHTML = `
     <div class="classification-strip">U.S.S.S. FELVÉTELI VIZSGA · KIZÁRÓLAG OKTATÁSVEZETŐI HASZNÁLATRA</div>
     <p class="text-low small mb-2">Ez a felület a vizsgáztatóé. A jelölt IC-ben, szóban válaszol — a rendszert csak az oktatásvezető kezeli, a jelölt nem lát belőle semmit.</p>
+    <p class="text-low small mb-2">A jelölt még nem ismeri a U.S.S.S. belső eljárásait, szabályzatát — ne azt pontozd, ismeri-e a "helyes" USSS-választ. A gondolkodásmódot, a problémamegoldást, a helyzetfelismerést, a személyiséget (higgadtság, ego kezelése) és a csapatmunkára való hajlamot értékeld.</p>
     <div class="section-head">
       <h2 style="visibility:hidden">.</h2>
       <div class="actions">${canEdit ? `<button class="btn btn-gold" id="new-exam">+ Új vizsga</button>` : ""}</div>
@@ -175,8 +176,9 @@ export function renderExamDetail(container, id) {
     ${categories.map((cat) => `
       <div class="section">
         <div class="section-head"><h2 style="font-size:15px">${esc(cat)}</h2></div>
-        ${renderCategoryScoreCard(exam, cat, canEdit)}
+        ${renderCategoryTipsBanner(cat)}
         ${questions.filter((q) => q.category === cat).map((q) => renderQuestionCard(exam, q, canEdit)).join("")}
+        ${renderCategoryScoreCard(exam, cat, canEdit)}
       </div>
     `).join("")}
 
@@ -323,11 +325,6 @@ function renderQuestionCard(exam, q, canEdit) {
         <span class="text-hi">${esc(q.text)}</span>
         ${a.skipped ? `<span class="badge badge-gray">Kihagyva — nem számít bele</span>` : ""}
       </div>
-      <div class="exam-q-tips">
-        <div class="small text-low mb-1">Elfogadhatósági támpont:</div>
-        <ul class="exam-tip-list">${q.tips.map((t) => `<li>${esc(t)}</li>`).join("")}</ul>
-        ${q.watch ? `<div class="exam-q-watch">Mit figyeljek? ${esc(q.watch)}</div>` : ""}
-      </div>
       ${canEdit ? `
         <label class="small text-low"><input type="checkbox" data-skip-q="${esc(q.id)}" ${a.skipped ? "checked" : ""} /> Kihagyva (a jelöltnek nem tettük fel / nem értelmezhető nála — a rendszer nem számítja bele)</label>
         <div class="exam-score-row" ${a.skipped ? 'style="opacity:.4; pointer-events:none;"' : ""}>
@@ -349,6 +346,20 @@ function renderQuestionCard(exam, q, canEdit) {
    (getExamCategoryCriteria), nem egy általános, kérdésenként ismételt
    listára. Így minden kategóriánál pontosan azt kell értékelni, ami oda
    tartozik, egyszer. */
+/* A kategória szempontjai EGYSZER, a kategória tetején — nem soronként,
+   minden kérdésnél megismételve (az korábban 8-10x ugyanazt a listát
+   mutatta egymás alatt). */
+function renderCategoryTipsBanner(category) {
+  const criteria = getExamCategoryCriteria(category);
+  if (!criteria.length) return "";
+  return `
+    <div class="exam-q-tips mb-2">
+      <div class="small text-low mb-1">Elfogadhatósági szempontok ebben a kategóriában:</div>
+      <ul class="exam-tip-list">${criteria.map((t) => `<li>${esc(t)}</li>`).join("")}</ul>
+    </div>
+  `;
+}
+
 function renderCategoryScoreCard(exam, category, canEdit) {
   const criteria = getExamCategoryCriteria(category);
   if (!criteria.length) return "";
@@ -356,7 +367,8 @@ function renderCategoryScoreCard(exam, category, canEdit) {
   const locked = !canEdit || exam.endedAt;
   return `
     <div class="card exam-category-card mb-1">
-      <div class="card-title mb-1">Kategória-értékelés</div>
+      <div class="card-title mb-1">Kategória-összegzés</div>
+      <p class="text-low small mb-1">A fenti kérdésekre adott válaszok alapján, összesítve pontozd az alábbi szempontokat.</p>
       <div class="exam-crit-grid">
         ${criteria.map((criterion) => {
           const current = scores[criterion] || null;

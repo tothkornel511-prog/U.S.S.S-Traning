@@ -17,7 +17,7 @@ import { renderTrainingPlansList, renderTrainingPlanDetail } from "./pages/plans
 import { renderLocationsList, renderLocationDetail } from "./pages/locations.js?v=22";
 import { renderMapPage } from "./pages/map.js?v=21";
 import { renderRecruitmentHub, renderApplicantDetail } from "./pages/recruitment.js?v=26";
-import { renderExamList, renderExamDetail } from "./pages/exam.js?v=43";
+import { renderExamList, renderExamDetail } from "./pages/exam.js?v=44";
 import { renderAdmin } from "./pages/admin.js?v=31";
 import { renderOperations } from "./pages/operations.js?v=39";
 import { renderReadiness } from "./pages/readiness.js?v=32";

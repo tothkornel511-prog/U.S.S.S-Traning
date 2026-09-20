@@ -6,7 +6,7 @@ import {
 import { hasRole, actorLabel } from "../auth.js?v=20";
 import { esc, fmtDateTime, toast, openModal, closeModal, applyBranding } from "../utils.js?v=31";
 import { navigate } from "../router.js?v=20";
-import { renderExamList } from "./exam.js?v=25";
+import { renderExamList } from "./exam.js?v=26";
 
 const STATUS_META = {
   review: { c: "badge-yellow", t: "Elbírálás alatt" },
