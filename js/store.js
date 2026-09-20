@@ -102,6 +102,7 @@ const KEYS = {
   medicalRecords: NS + "medical_records",
   medicalIntervals: NS + "medical_intervals",
   instructors: NS + "instructors",
+  moduleInstructors: NS + "module_instructors",
 };
 
 /* Elméleti vizsgánál ez alatt a százalék alatt a modul nem számít teljesítettnek. */
@@ -177,6 +178,7 @@ export function seedIfNeeded() {
     write(KEYS.trainingPlans, []);
     write(KEYS.nextTrainingPlan, 1);
     write(KEYS.instructors, []);
+    write(KEYS.moduleInstructors, {});
     write(KEYS.seeded, true);
   }
   applyPositionPatch();
@@ -205,6 +207,9 @@ export function seedIfNeeded() {
 function applyInstructorsSeedPatch() {
   if (read(KEYS.instructors, null) === null) {
     write(KEYS.instructors, []);
+  }
+  if (read(KEYS.moduleInstructors, null) === null) {
+    write(KEYS.moduleInstructors, {});
   }
 }
 
@@ -2244,11 +2249,31 @@ export function deleteTrainingFile(id, actorLabel) {
   logAudit(actorLabel, "Training Center fájl törölve", file?.label || id);
 }
 
-/* ---------- Oktatók (nyilvántartás + modulonkénti hozzárendelés) ----------
-   Egyetlen adatforrás: minden oktatóhoz egy "modules" tömb tartozik (mely
-   kódok tanítja) — az adott modulnál megjelenő oktató(k) ebből a listából
-   szűrve jelennek meg, nincs külön, duplikált hozzárendelés-tábla. Üresen
-   indul (nincs előre kitöltött oktató egyik modulnál sem). */
+/* ---------- Oktatók (modulonkénti egyetlen oktató + nyilvántartás) --------
+   Két, szándékosan különálló adatkör:
+   1) moduleInstructors: modulkódonként EGY szabad szöveg (lásd
+      getModuleInstructor/setModuleInstructor) — ez lehet egy konkrét személy
+      neve, VAGY egy szerepkör-jellegű megnevezés (pl. "Mindenkori LSNTA
+      vezető"), ezért nem korlátozzuk a nyilvántartásban szereplő nevekre;
+      a UI csak javaslatként (datalist) ajánlja fel a már felvett oktatókat.
+   2) instructors: a lenti "Oktatói nyilvántartás" — egy-egy konkrét oktató
+      neve/rangja + mely modulokat tanítja (jelölőnégyzetes lista), csak
+      áttekintésre/adminisztrációra, nincs automatikus szinkron az 1) ponttal.
+   Mindkettő üresen indul — nincs előre kitöltött oktató sehol. */
+export function getModuleInstructorMap() {
+  return read(KEYS.moduleInstructors, {});
+}
+export function getModuleInstructor(code) {
+  return getModuleInstructorMap()[code] || "";
+}
+export function setModuleInstructor(code, text, actorLabel) {
+  const map = getModuleInstructorMap();
+  const trimmed = (text || "").trim();
+  if (trimmed) map[code] = trimmed; else delete map[code];
+  write(KEYS.moduleInstructors, map);
+  logAudit(actorLabel, "Modul oktatója frissítve", `${code}: ${trimmed || "— törölve —"}`);
+}
+
 export function getInstructors() {
   return read(KEYS.instructors, []).slice().sort((a, b) => a.name.localeCompare(b.name, "hu"));
 }

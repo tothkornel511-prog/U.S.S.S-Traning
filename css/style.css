@@ -1038,6 +1038,14 @@ body.printing-cert #cert-print-root { display: block; }
 .ins-module-info { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 .ins-module-name { font-size: 12.5px; color: var(--text-mid); }
 .ins-module-teacher { display: flex; align-items: center; gap: 10px; margin-left: auto; }
+.ins-module-input {
+  width: 220px; max-width: 100%;
+  background: var(--bg-base); border: 1px solid var(--line-soft); border-radius: var(--radius-sm);
+  padding: 7px 10px; color: var(--text-hi); font-size: 12.5px;
+  transition: border-color .15s ease, box-shadow .15s ease;
+}
+.ins-module-input:focus { outline: none; border-color: rgba(198,166,100,.5); box-shadow: 0 0 0 3px rgba(198,166,100,.12); }
+.ins-module-input:disabled { opacity: .7; cursor: default; }
 .ins-chip-row { display: flex; flex-wrap: wrap; gap: 4px; }
 .doc-editor-toolbar { display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 6px; }
 .doc-editor-toolbar button { padding: 4px 9px; font-size: 11px; }

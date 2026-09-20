@@ -1,13 +1,13 @@
 /* ==========================================================================
    U.S.S.S. ELITE TRAINING SYSTEM — OKTATÓK
-   Modulcsoportonként mutatja, ki oktatja az adott modult, plusz egy
-   oktatói nyilvántartás (név, rang, oktatott modulok). Egyetlen adatforrás:
-   minden oktatóhoz tartozik egy modulkód-lista (lásd store.js) — a
-   modulsoron megjelenő oktató(k) ebből szűrve jelennek meg, úgyhogy a két
-   nézet (modulonkénti / oktatónkénti) sosem futhat szét egymástól.
-   Alapértelmezetten egyetlen modulhoz sincs oktató hozzárendelve — ezt
-   admin/oktatásvezető tölti fel innen. */
-import { getInstructors, getInstructor, createInstructor, updateInstructor, deleteInstructor, getInstructorsForModule, moduleByCode, levelLabel } from "../store.js?v=72";
+   Modulcsoportonként EGY oktató-mező modulonként (szabad szöveg — lehet
+   konkrét név, VAGY szerepkör-jellegű megnevezés, pl. "Mindenkori LSNTA
+   vezető"), plusz egy külön oktatói nyilvántartás (név, rang, oktatott
+   modulok, jelölőnégyzetekkel). A két nézet szándékosan nem szinkronizált
+   automatikusan (lásd store.js) — a modulmezőnél a nyilvántartásban lévő
+   nevek csak javaslatként (datalist) jelennek meg, de bármi más szöveg is
+   beírható. Alapértelmezetten egyik modulhoz sincs semmi beállítva. */
+import { getModuleInstructor, setModuleInstructor, getInstructors, getInstructor, createInstructor, updateInstructor, deleteInstructor, moduleByCode, levelLabel } from "../store.js?v=73";
 import { hasRole, actorLabel } from "../auth.js?v=23";
 import { esc, toast, openModal, closeModal, applyBranding } from "../utils.js?v=31";
 
@@ -37,6 +37,8 @@ const GROUP_DEFS = [
   { title: "Szinten kívüli szakirányok", codes: ["ADM", "LSNTA"] },
 ];
 
+const INSTRUCTOR_OPTIONS_ID = "ins-name-options";
+
 export function renderInstructors(container) {
   const canEdit = hasRole("TRAINING");
   draw();
@@ -48,9 +50,12 @@ export function renderInstructors(container) {
         <div class="page-banner-body">
           <div class="eyebrow">ÁLLOMÁNY & KÉPZÉS</div>
           <h2>Oktatók</h2>
-          <p>Képzési területenként csoportosított modullista — minden modulhoz itt rendelhető hozzá az oktató. Alapértelmezetten egyik modulhoz sincs oktató beállítva.</p>
+          <p>Képzési területenként csoportosított modullista — minden modulhoz egy oktató adható meg: válassz a nyilvántartásból, vagy írj be bármilyen szöveget (pl. "Mindenkori LSNTA vezető"). Alapértelmezetten egyik modulhoz sincs oktató beállítva.</p>
         </div>
       </div>
+      <datalist id="${INSTRUCTOR_OPTIONS_ID}">
+        ${instructors.map((i) => `<option value="${esc(i.name)}"></option>`).join("")}
+      </datalist>
       <div class="ins-groups">
         ${GROUP_DEFS.map((g) => renderGroup(g)).join("")}
       </div>
@@ -58,7 +63,7 @@ export function renderInstructors(container) {
         <h2 style="font-size:15px">Oktatói nyilvántartás</h2>
         ${canEdit ? `<button class="btn btn-gold btn-sm" id="new-instructor">+ Új oktató</button>` : ""}
       </div>
-      <p class="text-mid small mb-2">Minden oktatóhoz több modul is hozzárendelhető.</p>
+      <p class="text-mid small mb-2">Minden oktatóhoz több modul is hozzárendelhető — ez a lista csak áttekintésre szolgál, a fenti modulmezőket külön-külön kell kitölteni.</p>
       <div class="table-wrap"><table>
         <thead><tr><th>Oktató neve</th><th>Rang / beosztás</th><th>Oktatott modulok</th>${canEdit ? "<th></th>" : ""}</tr></thead>
         <tbody>
@@ -87,7 +92,7 @@ export function renderInstructors(container) {
         <div class="card-title mb-1">${esc(g.title)}</div>
         ${codes.map((code) => {
           const def = moduleByCode(code);
-          const names = getInstructorsForModule(code).map((i) => i.name);
+          const current = getModuleInstructor(code);
           return `
             <div class="ins-module-row">
               <div class="ins-module-info">
@@ -96,8 +101,14 @@ export function renderInstructors(container) {
                 <span class="text-low small">${esc((def.levels || []).map((l) => levelLabel(l)).join(" / "))}</span>
               </div>
               <div class="ins-module-teacher">
-                <span class="${names.length ? "text-gold" : "text-low"} small">${names.length ? esc(names.join(", ")) : "— nincs oktató —"}</span>
-                ${canEdit ? `<button class="btn btn-sm" data-assign-module="${esc(code)}">Szerkeszt</button>` : ""}
+                <input
+                  class="ins-module-input"
+                  data-code="${esc(code)}"
+                  list="${INSTRUCTOR_OPTIONS_ID}"
+                  placeholder="— nincs megadva —"
+                  value="${esc(current)}"
+                  ${canEdit ? "" : "disabled"}
+                />
               </div>
             </div>`;
         }).join("")}
@@ -105,6 +116,14 @@ export function renderInstructors(container) {
   }
 
   function wireActions() {
+    if (canEdit) {
+      container.querySelectorAll(".ins-module-input").forEach((input) => {
+        input.addEventListener("change", () => {
+          setModuleInstructor(input.getAttribute("data-code"), input.value, actorLabel());
+          toast("Mentve");
+        });
+      });
+    }
     document.getElementById("new-instructor")?.addEventListener("click", () => openInstructorForm());
     container.querySelectorAll("[data-edit-ins]").forEach((b) =>
       b.addEventListener("click", () => openInstructorForm(getInstructor(b.getAttribute("data-edit-ins"))))
@@ -117,9 +136,6 @@ export function renderInstructors(container) {
         toast("Oktató törölve");
         draw();
       })
-    );
-    container.querySelectorAll("[data-assign-module]").forEach((b) =>
-      b.addEventListener("click", () => openModuleAssignForm(b.getAttribute("data-assign-module")))
     );
   }
 
@@ -173,42 +189,6 @@ export function renderInstructors(container) {
         : updateInstructor(existing.id, { name, rank, modules }, actorLabel());
       if (!saved) return toast("Nem sikerült menteni.", "warn");
       toast(isNew ? "Oktató felvéve" : "Oktató módosítva");
-      closeModal();
-      draw();
-    });
-  }
-
-  function openModuleAssignForm(code) {
-    const def = moduleByCode(code);
-    const instructors = getInstructors();
-    const assigned = new Set(getInstructorsForModule(code).map((i) => i.id));
-    openModal(`
-      <div class="modal-head"><h3>${esc(code)} — ${esc(def.name)}</h3><button class="modal-close" data-close-modal>×</button></div>
-      <p class="text-mid small mb-2">Válaszd ki, mely oktatók tanítják ezt a modult, vagy vegyél fel egy újat.</p>
-      <div style="max-height:280px; overflow-y:auto; border:1px solid var(--line-soft); border-radius:var(--radius-sm); padding:10px; margin-bottom:14px;">
-        ${instructors.length ? instructors.map((i) => `
-          <label class="section-check-row">
-            <input type="checkbox" class="ma-instructor-check" value="${esc(i.id)}" ${assigned.has(i.id) ? "checked" : ""} /> <span>${esc(i.name)}${i.rank ? ` — ${esc(i.rank)}` : ""}</span>
-          </label>`).join("") : `<p class="text-low small">Még nincs felvéve oktató a nyilvántartásba.</p>`}
-      </div>
-      <div class="field"><label>+ Új oktató felvétele és hozzárendelése</label><input id="ma-new-name" placeholder="Oktató neve (üresen hagyva kihagyható)" /></div>
-      <div class="flex justify-between mt-2">
-        <button type="button" class="btn" data-close-modal>Mégse</button>
-        <button type="button" class="btn btn-gold" id="ma-save">Mentés</button>
-      </div>
-    `);
-
-    document.getElementById("ma-save").addEventListener("click", () => {
-      const checkedIds = new Set([...document.querySelectorAll(".ma-instructor-check:checked")].map((cb) => cb.value));
-      instructors.forEach((i) => {
-        const shouldHave = checkedIds.has(i.id);
-        const has = (i.modules || []).includes(code);
-        if (shouldHave && !has) updateInstructor(i.id, { modules: [...(i.modules || []), code] }, actorLabel());
-        if (!shouldHave && has) updateInstructor(i.id, { modules: (i.modules || []).filter((c) => c !== code) }, actorLabel());
-      });
-      const newName = document.getElementById("ma-new-name").value.trim();
-      if (newName) createInstructor({ name: newName, modules: [code] }, actorLabel());
-      toast("Modul-hozzárendelés mentve");
       closeModal();
       draw();
     });
