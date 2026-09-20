@@ -14,7 +14,7 @@
    Itt ezért egy közös, virtuális kulccsal (H/I/J) jelenik meg egyetlen
    sorként, egyetlen oktató-mezővel — a két szint csak jegyzetként szerepel
    alatta, ahogy az eredeti dokumentumban is. */
-import { getModuleInstructor, setModuleInstructor, getInstructors, getInstructor, createInstructor, updateInstructor, deleteInstructor, moduleByCode, levelLabel } from "../store.js?v=74";
+import { getModuleInstructor, setModuleInstructor, getInstructors, getInstructor, createInstructor, updateInstructor, deleteInstructor, moduleByCode, levelLabel } from "../store.js?v=75";
 import { hasRole, actorLabel } from "../auth.js?v=23";
 import { esc, toast, openModal, closeModal, applyBranding } from "../utils.js?v=31";
 

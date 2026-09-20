@@ -1,4 +1,4 @@
-import { getPersonnel, upsertPerson, deletePerson, readinessPercent, ref, probationInfo, getPositions, MAX_PHOTO_BYTES } from "../store.js?v=74";
+import { getPersonnel, upsertPerson, deletePerson, readinessPercent, ref, probationInfo, getPositions, sortByRank, MAX_PHOTO_BYTES } from "../store.js?v=75";
 import { hasRole, actorLabel } from "../auth.js?v=20";
 import { esc, avatarContent, toast, openModal, closeModal } from "../utils.js?v=31";
 import { navigate } from "../router.js?v=20";
@@ -61,13 +61,13 @@ export function renderPersonnelList(container) {
 
   function renderRows() {
     const q = state.search.trim().toLowerCase();
-    const rows = all.filter((p) => {
+    const rows = sortByRank(all.filter((p) => {
       if (q && !(p.name.toLowerCase().includes(q) || p.usssId.toLowerCase().includes(q))) return false;
       if (state.level && p.level !== state.level) return false;
       if (state.status && p.status !== state.status) return false;
       if (state.position && p.position !== state.position) return false;
       return true;
-    });
+    }));
     const tbody = document.getElementById("p-tbody");
     if (!rows.length) {
       tbody.innerHTML = `<tr><td colspan="7"><div class="empty-state"><h3>Nincs találat</h3><p>Módosítsa a szűrési feltételeket.</p></div></td></tr>`;

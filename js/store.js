@@ -9,8 +9,8 @@
 import {
   LEVELS, SERVICE_STATUSES, POSITIONS, MODULES, LEVEL_MODULE_ORDER,
   PERSONNEL, ACCESS_CODES, PROTECTED_LOCATIONS, AUDIT_LOG_SEED, MAPS, DISTRICTS,
-  RECRUITMENT_QUESTIONS, EXAM_QUESTIONS, EXAM_CATEGORIES,
-} from "./data.js?v=25";
+  RECRUITMENT_QUESTIONS, EXAM_QUESTIONS, EXAM_CATEGORIES, RANK_ORDER,
+} from "./data.js?v=26";
 
 /* v7: Roxwood/Cayo Perico eltávolítva, csak Los Santos térkép maradt. */
 const NS = "usss_ets_v7_";
@@ -197,6 +197,18 @@ export function seedIfNeeded() {
   applyTrainingCenterSeedPatch();
   applyTrainingCenterRankCategoriesPatch();
   applyInstructorsSeedPatch();
+  applyPositionCatalogPatch();
+}
+
+/* Célzott, ismételten lefuttatható kiegészítés: az önkormányzati ranglétra
+   bővült (Campaign Manager, Secretary of Transportation, Administration) —
+   ez pótolja be a korábban már seedelt böngészőknél a hiányzó pozíciókat a
+   választható listában. addPosition() eleve idempotens (névre nézve nem
+   duplikál), ezért bátran hívható minden indításkor. */
+function applyPositionCatalogPatch() {
+  POSITIONS.forEach((g) => g.items.forEach((name) => {
+    if (!getPositions().includes(name)) addPosition(name, g.group, "Rendszer");
+  }));
 }
 
 /* Célzott seedelés: az Oktatók nyilvántartás — korábban telepített
@@ -609,6 +621,20 @@ export function addPosition(name, group, actorLabel) {
 export function removePosition(name, actorLabel) {
   write(KEYS.positions, getPositionEntries().filter((p) => p.name !== name));
   logAudit(actorLabel, "Pozíció törölve", name);
+}
+
+/* Ranglétra szerinti sorrend (lásd data.js RANK_ORDER) — egyszerű, egyetlen
+   .sort() hívás, nincs külön tárolt sorrend-mező: aki nincs a listán, a
+   végére kerül, azon belül név szerint. Ugyanaz fut mindenhol (Állomány,
+   Kiképzési Áttekintés), ezért csak itt van definiálva. */
+export function positionRankIndex(position) {
+  const i = RANK_ORDER.indexOf(position);
+  return i === -1 ? RANK_ORDER.length : i;
+}
+export function sortByRank(list) {
+  return [...list].sort((a, b) =>
+    positionRankIndex(a.position) - positionRankIndex(b.position) || a.name.localeCompare(b.name, "hu")
+  );
 }
 
 export function moduleByCode(code) {

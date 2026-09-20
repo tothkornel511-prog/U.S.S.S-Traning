@@ -3,7 +3,7 @@ import {
   getChannelDocs, getChannelDoc, createChannelDoc, updateChannelDoc, deleteChannelDoc,
   getChannelQuestions, createChannelQuestion, deleteChannelQuestion,
   CHANNEL_DOC_STATUSES, ATTACHMENT_MAX_UPLOAD_BYTES, formatFileSize,
-} from "../store.js?v=74";
+} from "../store.js?v=75";
 import { isSuperAdmin, actorLabel } from "../auth.js?v=23";
 import { esc, fmtDateTime, toast, openModal, closeModal, renderRichText, uploadFileToGitHub } from "../utils.js?v=31";
 import { navigate } from "../router.js?v=20";

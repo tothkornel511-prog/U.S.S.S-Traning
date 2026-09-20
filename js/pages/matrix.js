@@ -1,4 +1,4 @@
-import { getPersonnel, ref, moduleState, moduleByCode, levelLabel } from "../store.js?v=74";
+import { getPersonnel, sortByRank, ref, moduleState, moduleByCode, levelLabel } from "../store.js?v=75";
 import { hasRole } from "../auth.js?v=20";
 import { esc, avatarContent, applyBranding } from "../utils.js?v=31";
 import { navigate } from "../router.js?v=20";
@@ -24,7 +24,7 @@ function buildGroups() {
 
 export function renderMatrix(container) {
   const canEdit = hasRole("TRAINING");
-  const personnel = getPersonnel();
+  const personnel = sortByRank(getPersonnel());
   const allGroups = buildGroups();
   const allModules = [...new Map(allGroups.flatMap((g) => g.codes).map((c) => [c, moduleByCode(c)])).keys()];
 

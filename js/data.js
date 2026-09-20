@@ -27,12 +27,39 @@ export const POSITIONS = [
       "Secretary of Homeland Security",
       "Secretary of Development",
       "Secretary of Public Relations",
+      "Campaign Manager",
       "Secretary of Health",
+      "Secretary of Transportation",
       "Attorney General",
       "Judge",
       "Lawyer",
+      "Administration",
     ],
   },
+];
+
+/* Az önkormányzati/U.S.S.S. ranglétra sorrendje — erre rendezi a rendszer
+   az Állomány listát és a Kiképzési Áttekintés mátrixot (lásd store.js
+   RANK_ORDER/positionRankIndex). Aki nincs a listán (vagy nincs pozíciója),
+   a sor végére kerül, név szerint ábécésorrendben. */
+export const RANK_ORDER = [
+  "President",
+  "Vice President",
+  "Chief Of Staff",
+  "Secretary of Defense",
+  "Secretary of Homeland Security",
+  "Secretary of Development",
+  "Secretary of Public Relations",
+  "Campaign Manager",
+  "Secretary of Health",
+  "Secretary of Transportation",
+  "Oktatásvezető",
+  "U.S.S.S Director",
+  "U.S.S.S Agent",
+  "Attorney General",
+  "Judge",
+  "Lawyer",
+  "Administration",
 ];
 
 /* Minden modul EGYSZER szerepel az adatbázisban (H, I, J is), a "levels" tömb
