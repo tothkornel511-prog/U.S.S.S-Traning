@@ -656,14 +656,14 @@ export function upsertPerson(person, actorLabel) {
   if (idx >= 0) {
     const previous = list[idx];
     list[idx] = { ...previous, ...person };
-    if (!write(KEYS.personnel, list)) return false;
+    if (!savePersonnel(list)) return false;
     logAudit(actorLabel, "Profil frissítve", `${person.name || previous.name} (${person.usssId})`);
   } else {
     list.push({
       modules: {}, notes: "", photo: "", probationLifted: false,
       levelUpEligible: false, createdAt: new Date().toISOString(), ...person,
     });
-    if (!write(KEYS.personnel, list)) return false;
+    if (!savePersonnel(list)) return false;
     logAudit(actorLabel, "Új személy felvéve", `${person.name} (${person.usssId})`);
   }
   return true;
