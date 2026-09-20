@@ -1,22 +1,30 @@
 /* ==========================================================================
    U.S.S.S. ELITE TRAINING SYSTEM — OKTATÓK
-   Modulcsoportonként EGY oktató-mező soronként (szabad szöveg — lehet
-   konkrét név, VAGY szerepkör-jellegű megnevezés, pl. "Mindenkori LSNTA
-   vezető"), plusz egy külön oktatói nyilvántartás (név, rang, oktatott
-   modulok, jelölőnégyzetekkel). A két nézet szándékosan nem szinkronizált
-   automatikusan (lásd store.js) — a modulmezőnél a nyilvántartásban lévő
-   nevek csak javaslatként (datalist) jelennek meg, de bármi más szöveg is
-   beírható. Alapértelmezetten egyik sorhoz sincs semmi beállítva.
+   Két féle modulsor van:
+   1) A legtöbb modulnál a fenti "Oktató" mező CSAK MEGJELENÍT — automatikusan
+      az Oktatói nyilvántartásból (lásd lent) olvassa ki, kik tanítják az
+      adott modult (getInstructorsForModule). Itt nincs külön beírás — az
+      oktatót a nyilvántartásban, a jelölőnégyzetekkel kell hozzárendelni,
+      így a két nézet SOSEM futhat szét egymástól (egyetlen adatforrás).
+   2) ADM, LSNTA és a GSD modulok kivételek: ott szabad szöveget lehet írni
+      (lehet konkrét név, VAGY szerepkör-jellegű megnevezés, pl. "Mindenkori
+      LSNTA vezető") — ezek NEM szerepelnek a nyilvántartás jelölőlistáján,
+      külön, saját mezőben élnek (lásd store.js getModuleInstructor/
+      setModuleInstructor).
+   Alapértelmezetten egyik sorhoz sincs semmi beállítva.
 
    A H / I / J modulokat a rendszer belül két külön vizsgaként tartja
    nyilván (alap: H1/I1/J1, emelt: H2/I2/J2 — lásd data.js), de az eredeti
    képzési dokumentum ezeket EGY modulként kezeli, két követelményszinttel.
    Itt ezért egy közös, virtuális kulccsal (H/I/J) jelenik meg egyetlen
-   sorként, egyetlen oktató-mezővel — a két szint csak jegyzetként szerepel
-   alatta, ahogy az eredeti dokumentumban is. */
-import { getModuleInstructor, setModuleInstructor, getInstructors, getInstructor, createInstructor, updateInstructor, deleteInstructor, moduleByCode, levelLabel } from "../store.js?v=77";
+   sorként — a két szint csak jegyzetként szerepel alatta. */
+import { getModuleInstructor, setModuleInstructor, getInstructors, getInstructor, getInstructorsForModule, createInstructor, updateInstructor, deleteInstructor, moduleByCode, levelLabel } from "../store.js?v=78";
 import { hasRole, actorLabel } from "../auth.js?v=23";
 import { esc, toast, openModal, closeModal, applyBranding } from "../utils.js?v=31";
+
+/* Ezek a kódok maradnak szabad szöveges mezők, kikerülve a nyilvántartás
+   jelölőnégyzetes rendszeréből. */
+const FREE_TEXT_CODES = ["ADM", "LSNTA", "GSD1", "GSD2", "GSD3"];
 
 const MERGES = {
   H: { key: "H", codes: ["H1", "H2"], name: "Helikopter pilóta képzés", note: "IV. szint – Operátor: Alap / standard követelmények · V. szint – Elit / Parancsnok: Emelt követelmények" },
@@ -68,6 +76,12 @@ function groupEntries(g) {
   });
 }
 
+/* Ugyanaz, de a szabad szöveges kódok nélkül — ez kerül a nyilvántartás
+   jelölőnégyzetes listájába (azokat külön mezőben kezeljük, lásd fent). */
+function registryEntries(g) {
+  return groupEntries(g).filter((e) => !FREE_TEXT_CODES.includes(e.key));
+}
+
 export function renderInstructors(container) {
   const canEdit = hasRole("TRAINING");
   draw();
@@ -79,7 +93,7 @@ export function renderInstructors(container) {
         <div class="page-banner-body">
           <div class="eyebrow">ÁLLOMÁNY & KÉPZÉS</div>
           <h2>Oktatók</h2>
-          <p>Képzési területenként csoportosított modullista — minden sorhoz egy oktató adható meg: válassz a nyilvántartásból, vagy írj be bármilyen szöveget (pl. "Mindenkori LSNTA vezető"). Alapértelmezetten egyik sorhoz sincs oktató beállítva.</p>
+          <p>A legtöbb modulnál az "Oktató" mező automatikusan az alábbi nyilvántartásból jelenik meg (ott, a jelölőnégyzetekkel add hozzá az oktatót). Az ADM, LSNTA és GSD moduloknál kivételesen szabad szöveg írható (pl. "Mindenkori LSNTA vezető"). Alapértelmezetten egyik sorhoz sincs oktató beállítva.</p>
         </div>
       </div>
       <datalist id="${INSTRUCTOR_OPTIONS_ID}">
@@ -92,7 +106,7 @@ export function renderInstructors(container) {
         <h2 style="font-size:15px">Oktatói nyilvántartás</h2>
         ${canEdit ? `<button class="btn btn-gold btn-sm" id="new-instructor">+ Új oktató</button>` : ""}
       </div>
-      <p class="text-mid small mb-2">Minden oktatóhoz több modul is hozzárendelhető — ez a lista csak áttekintésre szolgál, a fenti sorokat külön-külön kell kitölteni.</p>
+      <p class="text-mid small mb-2">Minden oktatóhoz több modul is hozzárendelhető — ez a lista az egyetlen hely, ahol (az ADM/LSNTA/GSD kivételével) a modulonkénti oktatót beállíthatod.</p>
       <div class="table-wrap"><table>
         <thead><tr><th>Oktató neve</th><th>Rang / beosztás</th><th>Oktatott modulok</th>${canEdit ? "<th></th>" : ""}</tr></thead>
         <tbody>
@@ -120,7 +134,22 @@ export function renderInstructors(container) {
       <div class="card ins-group-card">
         <div class="card-title mb-1">${esc(g.title)}</div>
         ${entries.map((entry) => {
-          const current = getModuleInstructor(entry.key);
+          const isFreeText = FREE_TEXT_CODES.includes(entry.key);
+          const teacherHtml = isFreeText
+            ? `<label class="ins-module-label" for="ins-input-${esc(entry.key)}">Oktató</label>
+               <input
+                 id="ins-input-${esc(entry.key)}"
+                 class="ins-module-input"
+                 data-code="${esc(entry.key)}"
+                 list="${INSTRUCTOR_OPTIONS_ID}"
+                 placeholder="— nincs megadva —"
+                 value="${esc(getModuleInstructor(entry.key))}"
+                 ${canEdit ? "" : "disabled"}
+               />`
+            : (() => {
+                const names = getInstructorsForModule(entry.key).map((i) => i.name);
+                return `<span class="${names.length ? "text-gold" : "text-low"} small">${names.length ? esc(names.join(", ")) : "— nincs oktató —"}</span>`;
+              })();
           return `
             <div class="ins-module-row">
               <div class="ins-module-info">
@@ -128,18 +157,7 @@ export function renderInstructors(container) {
                 <span class="ins-module-name">${esc(entry.name)}</span>
                 ${entry.note ? `<span class="ins-module-note">${esc(entry.note)}</span>` : `<span class="text-low small">${esc(entry.levelText)}</span>`}
               </div>
-              <div class="ins-module-teacher">
-                <label class="ins-module-label" for="ins-input-${esc(entry.key)}">Oktató</label>
-                <input
-                  id="ins-input-${esc(entry.key)}"
-                  class="ins-module-input"
-                  data-code="${esc(entry.key)}"
-                  list="${INSTRUCTOR_OPTIONS_ID}"
-                  placeholder="— nincs megadva —"
-                  value="${esc(current)}"
-                  ${canEdit ? "" : "disabled"}
-                />
-              </div>
+              <div class="ins-module-teacher">${teacherHtml}</div>
             </div>`;
         }).join("")}
       </div>`;
@@ -179,10 +197,11 @@ export function renderInstructors(container) {
         <div class="field"><label>Rang / beosztás</label><input id="ins-rank" value="${esc(existing?.rank || "")}" /></div>
         <div style="margin-bottom:18px;">
           <div class="section-check-label">Oktatott modulok</div>
+          <p class="text-low small mb-1">Az ADM, LSNTA és GSD modulok itt nem szerepelnek — azokat a fenti listán, szabad szövegként kell beállítani.</p>
           <div class="flex gap-1 mb-1"><button type="button" class="btn btn-sm" id="ins-select-all">Mind kijelöl</button><button type="button" class="btn btn-sm" id="ins-select-none">Mind töröl</button></div>
           <div style="max-height:280px; overflow-y:auto; border:1px solid var(--line-soft); border-radius:var(--radius-sm); padding:10px;">
             ${GROUP_DEFS.map((g) => {
-              const entries = groupEntries(g);
+              const entries = registryEntries(g);
               if (!entries.length) return "";
               return `
                 <div class="card-title mb-1 mt-1">${esc(g.title)}</div>

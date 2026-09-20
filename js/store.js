@@ -63,12 +63,26 @@ async function fetchSharedData(filename) {
    csendben megmarad a helyi (localStorage-beli) másolat — ez a "működik
    internet nélkül is" tartalék. */
 export async function syncSharedDataFromGithub() {
-  const [personnel, accessCodes] = await Promise.all([
+  const [personnel, accessCodes, instructorData] = await Promise.all([
     fetchSharedData("personnel.json"),
     fetchSharedData("access-codes.json"),
+    fetchSharedData("instructors.json"),
   ]);
   if (Array.isArray(personnel)) write(KEYS.personnel, personnel);
   if (Array.isArray(accessCodes)) write(KEYS.accessCodes, accessCodes);
+  if (instructorData && Array.isArray(instructorData.instructors)) write(KEYS.instructors, instructorData.instructors);
+  if (instructorData && instructorData.moduleInstructors && typeof instructorData.moduleInstructors === "object") {
+    write(KEYS.moduleInstructors, instructorData.moduleInstructors);
+  }
+}
+/* Az Oktatók adatai (nyilvántartás + modulonkénti szabad szöveg mező) egy
+   közös data/instructors.json fájlba mentődnek, ugyanúgy háttérben,
+   ugyanazzal a Worker-rel, mint az Állomány — lásd a fenti bekezdést. */
+function pushInstructorsShared() {
+  pushSharedDataToGithub("instructors.json", {
+    instructors: read(KEYS.instructors, []),
+    moduleInstructors: read(KEYS.moduleInstructors, {}),
+  });
 }
 const KEYS = {
   personnel: NS + "personnel",
@@ -2283,9 +2297,13 @@ export function deleteTrainingFile(id, actorLabel) {
       vezető"), ezért nem korlátozzuk a nyilvántartásban szereplő nevekre;
       a UI csak javaslatként (datalist) ajánlja fel a már felvett oktatókat.
    2) instructors: a lenti "Oktatói nyilvántartás" — egy-egy konkrét oktató
-      neve/rangja + mely modulokat tanítja (jelölőnégyzetes lista), csak
-      áttekintésre/adminisztrációra, nincs automatikus szinkron az 1) ponttal.
-   Mindkettő üresen indul — nincs előre kitöltött oktató sehol. */
+      neve/rangja + mely modulokat tanítja (jelölőnégyzetes lista). Ez a
+      TÉNYLEGES forrás a legtöbb modul oktatójának megjelenítéséhez (lásd
+      getInstructorsForModule) — csak az 1) pontban felsorolt kivételes
+      kódoknál (ADM/LSNTA/GSD) él párhuzamosan, külön szabad szöveg.
+   Mindkettő üresen indul — nincs előre kitöltött oktató sehol. Mindkettő
+   szinkronizálódik GitHub-ra (data/instructors.json), ugyanúgy, mint az
+   Állomány — lásd pushInstructorsShared / syncSharedDataFromGithub. */
 export function getModuleInstructorMap() {
   return read(KEYS.moduleInstructors, {});
 }
@@ -2297,6 +2315,7 @@ export function setModuleInstructor(code, text, actorLabel) {
   const trimmed = (text || "").trim();
   if (trimmed) map[code] = trimmed; else delete map[code];
   write(KEYS.moduleInstructors, map);
+  pushInstructorsShared();
   logAudit(actorLabel, "Modul oktatója frissítve", `${code}: ${trimmed || "— törölve —"}`);
 }
 
@@ -2323,6 +2342,7 @@ export function createInstructor(data, actorLabel) {
   const list = read(KEYS.instructors, []);
   list.push(instructor);
   if (!write(KEYS.instructors, list)) return null;
+  pushInstructorsShared();
   logAudit(actorLabel, "Oktató felvéve", name);
   return instructor;
 }
@@ -2334,12 +2354,14 @@ export function updateInstructor(id, data, actorLabel) {
   if (data.rank !== undefined) instructor.rank = (data.rank || "").trim();
   if (data.modules !== undefined) instructor.modules = Array.isArray(data.modules) ? [...new Set(data.modules)] : [];
   write(KEYS.instructors, list);
+  pushInstructorsShared();
   logAudit(actorLabel, "Oktató adatai módosítva", instructor.name);
   return instructor;
 }
 export function deleteInstructor(id, actorLabel) {
   const instructor = getInstructor(id);
   write(KEYS.instructors, read(KEYS.instructors, []).filter((i) => i.id !== id));
+  pushInstructorsShared();
   logAudit(actorLabel, "Oktató törölve", instructor?.name || id);
 }
 
