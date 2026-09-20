@@ -96,6 +96,20 @@
         "examiner": "A rendszer",
         "practical": "pass",
         "practicalExaminer": "Dominic Hayes (Admin)"
+      },
+      "ADM": {
+        "theory": null,
+        "practical": "pass",
+        "history": [
+          {
+            "date": "2026-09-20T08:12:58.438Z",
+            "type": "practical",
+            "theory": null,
+            "result": "pass",
+            "examiner": "Dominic Hayes (Admin)"
+          }
+        ],
+        "practicalExaminer": "Dominic Hayes (Admin)"
       }
     },
     "levelUpEligible": false,
