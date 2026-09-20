@@ -174,35 +174,6 @@
     "createdAt": "2026-09-18T10:41:26.498Z"
   },
   {
-    "usssId": "USSS-8",
-    "name": "Günther Grün",
-    "position": "U.S.S.S Agent",
-    "level": "0",
-    "status": "Újonc",
-    "photo": "",
-    "probationStart": "2026-08-17",
-    "probationLifted": false,
-    "notes": "",
-    "modules": {
-      "0": {
-        "theory": 91,
-        "history": [
-          {
-            "date": "2026-08-17T10:00:00.000Z",
-            "type": "theory",
-            "theory": 91,
-            "result": "pass",
-            "examiner": "A rendszer"
-          }
-        ],
-        "theoryDate": "2026-08-17",
-        "examiner": "A rendszer"
-      }
-    },
-    "levelUpEligible": false,
-    "createdAt": "2026-09-18T10:41:26.498Z"
-  },
-  {
     "usssId": "USSS-120",
     "name": "Harrelson Grant",
     "position": "U.S.S.S Director",
