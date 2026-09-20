@@ -598,10 +598,19 @@
             "theory": 90,
             "result": "pass",
             "examiner": "A rendszer"
+          },
+          {
+            "date": "2026-09-20T08:28:08.060Z",
+            "type": "practical",
+            "theory": 90,
+            "result": "pass",
+            "examiner": "Dominic Hayes (Admin)"
           }
         ],
         "theoryDate": "2026-09-20",
-        "examiner": "A rendszer"
+        "examiner": "A rendszer",
+        "practical": "pass",
+        "practicalExaminer": "Dominic Hayes (Admin)"
       }
     },
     "levelUpEligible": false,
