@@ -425,7 +425,7 @@ const EXAM_QUESTION_TEXTS = [
   ]],
 ];
 
-const EXAM_CATEGORY_CRITERIA = {
+export const EXAM_CATEGORY_CRITERIA = {
   "I. SZEMÉLYES / MOTIVÁCIÓ": ["felelősségtudat", "önismeret és fejlődési készség", "fegyelem", "nyugodt kommunikáció", "szolgálati motiváció"],
   "II. VÉDETT SZEMÉLY MELLETT": ["előzetes környezetfelmérés", "a védett személy elsőbbsége", "távolság és hozzáférés kontrollja", "diszkrét kommunikáció", "alternatív terv"],
   "III. KOMOLYABB SZITUÁCIÓK": ["azonnali védelem és kivonás", "veszélyforrás felismerése", "segítség és csapat koordinálása", "arányos intézkedés", "nem üldözéssel kezdi"],

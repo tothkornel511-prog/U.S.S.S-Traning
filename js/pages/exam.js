@@ -1,8 +1,8 @@
 import {
-  getExams, getExam, createExam, setExamAnswer, setExamFinalComment, setExamCompetency, setExamRecommendation, interruptExam, finishExam, deleteExam,
-  getExamQuestions, getExamCategories, examScoreSummary, EXAM_MAX_SCORE, EXAM_PASS_PCT,
-  promoteExamCandidate, getPositions, ref,
-} from "../store.js?v=78";
+  getExams, getExam, createExam, setExamAnswer, setExamFinalComment, setExamCategoryScore, setExamRecommendation, interruptExam, finishExam, deleteExam,
+  getExamQuestions, getExamCategories, getExamCategoryCriteria, examScoreSummary, EXAM_MAX_SCORE, EXAM_PASS_PCT,
+  promoteExamCandidate, getPositions, getInstructors, ref,
+} from "../store.js?v=79";
 import { hasRole, actorLabel, currentSession } from "../auth.js?v=20";
 import { esc, fmtDate, fmtDateTime, toast, openModal, closeModal, sealMark } from "../utils.js?v=31";
 import { navigate } from "../router.js?v=20";
@@ -68,15 +68,25 @@ function renderExamRow(e) {
 
 function openExamStartForm() {
   const session = currentSession();
+  const instructors = getInstructors();
+  const sessionIsInstructor = instructors.some((i) => i.name === session?.name);
   openModal(`
     <div class="modal-head"><h3>Új felvételi vizsga indítása</h3><button class="modal-close" data-close-modal>×</button></div>
     <form id="exam-start-form">
       <div class="field"><label>Jelölt neve (IC)</label><input required id="ef-name" autofocus /></div>
       <div class="field"><label>Jelölt Discord neve</label><input id="ef-discord" placeholder="pl. jelolt#0001" /></div>
-      <div class="grid grid-2">
-        <div class="field"><label>Vizsgáztató / oktatásvezető</label><input id="ef-examiner" value="${esc(session?.name || "")}" /></div>
-        <div class="field"><label>Vizsgáztató rangja</label><input id="ef-rank" placeholder="pl. Oktatásvezető" /></div>
+      <div class="field"><label>Vizsgáztató</label>
+        <select id="ef-examiner-select">
+          ${session?.name && !sessionIsInstructor ? `<option value="${esc(session.name)}">${esc(session.name)} (jelenlegi felhasználó)</option>` : ""}
+          ${instructors.map((i) => `<option value="${esc(i.name)}" data-rank="${esc(i.rank || "")}" ${session?.name === i.name ? "selected" : ""}>${esc(i.name)}${i.rank ? ` — ${esc(i.rank)}` : ""}</option>`).join("")}
+          <option value="__other__">+ Egyéb / kézi megadás…</option>
+        </select>
       </div>
+      <div class="grid grid-2" id="ef-manual-wrap" style="display:none;">
+        <div class="field"><label>Vizsgáztató neve</label><input id="ef-examiner-manual" /></div>
+        <div class="field"><label>Vizsgáztató rangja</label><input id="ef-rank-manual" placeholder="pl. Oktatásvezető" /></div>
+      </div>
+      ${!instructors.length ? `<p class="text-low small">Nincs még felvéve oktató az <a href="#/instructors">Oktatók</a> nyilvántartásban — egyelőre csak kézzel adható meg a vizsgáztató.</p>` : ""}
       <p class="text-low small">A vizsga ${getExamQuestions().length} kérdésből áll, kérdésenként 0–5 pont, összesen ${EXAM_MAX_SCORE} pont. A felvételi minimum ${EXAM_PASS_PCT}%.</p>
       <div class="flex justify-between mt-2">
         <button type="button" class="btn" data-close-modal>Mégse</button>
@@ -84,15 +94,31 @@ function openExamStartForm() {
       </div>
     </form>
   `);
+
+  const select = document.getElementById("ef-examiner-select");
+  const manualWrap = document.getElementById("ef-manual-wrap");
+  function syncManualVisibility() {
+    manualWrap.style.display = select.value === "__other__" ? "grid" : "none";
+  }
+  select.addEventListener("change", syncManualVisibility);
+  if (!select.options.length || select.value === "__other__") syncManualVisibility();
+  if (!instructors.length && !session?.name) select.value = "__other__";
+  syncManualVisibility();
+
   document.getElementById("exam-start-form").addEventListener("submit", (e) => {
     e.preventDefault();
     const candidateName = document.getElementById("ef-name").value.trim();
     if (!candidateName) return;
+    const isManual = select.value === "__other__";
+    const examinerName = isManual ? document.getElementById("ef-examiner-manual").value.trim() : select.value;
+    const examinerRank = isManual
+      ? document.getElementById("ef-rank-manual").value.trim()
+      : (select.selectedOptions[0]?.getAttribute("data-rank") || "");
     const exam = createExam({
       candidateName,
       candidateDiscord: document.getElementById("ef-discord").value.trim(),
-      examinerName: document.getElementById("ef-examiner").value.trim(),
-      examinerRank: document.getElementById("ef-rank").value.trim(),
+      examinerName,
+      examinerRank,
     }, actorLabel());
     toast(`Vizsga elindítva: ${exam.id}`);
     closeModal();
@@ -148,13 +174,15 @@ export function renderExamDetail(container, id) {
     ${categories.map((cat) => `
       <div class="section">
         <div class="section-head"><h2 style="font-size:15px">${esc(cat)}</h2></div>
+        ${renderCategoryScoreCard(exam, cat, canEdit)}
         ${questions.filter((q) => q.category === cat).map((q) => renderQuestionCard(exam, q, canEdit)).join("")}
       </div>
     `).join("")}
 
     <div class="card">
       <div class="card-title mb-1">OKTATÁSVEZETŐI ÉRTÉKELÉS</div>
-      <p class="text-low small mb-1">Általános benyomás, erősségek, gyengeségek, kommunikáció, helyzetfelismerés, ajánlás.</p>
+      <p class="text-low small mb-1">Általános benyomás, erősségek, gyengeségek és a felvételi ajánlás.</p>
+      <label class="field mb-1"><span>FELVÉTELI AJÁNLÁS</span><select id="exam-recommendation" ${canEdit && !exam.endedAt ? "" : "disabled"}><option value="">Nincs kiválasztva</option>${[["recommended", "Felvételre ajánlott"], ["conditional", "Feltételesen ajánlott"], ["rejected", "Nem ajánlott"], ["retest", "Újravizsga javasolt"]].map(([value, label]) => `<option value="${value}" ${exam.recommendation === value ? "selected" : ""}>${label}</option>`).join("")}</select></label>
       ${canEdit ? `
         <textarea id="final-comment" rows="6" style="width:100%; background:var(--bg-base); border:1px solid var(--line-soft); border-radius:var(--radius-sm); color:var(--text-hi); padding:12px;">${esc(exam.finalComment || "")}</textarea>
         <button class="btn btn-sm mt-1" id="save-final-comment">Értékelés mentése</button>
@@ -194,7 +222,11 @@ export function renderExamDetail(container, id) {
     setExamAnswer(exam.id, box.getAttribute("data-critical-q"), { critical: box.checked }, actorLabel());
     renderSummaryBar(getExam(exam.id));
   }));
-  container.querySelectorAll("[data-competency]").forEach((select) => select.addEventListener("change", () => setExamCompetency(exam.id, select.getAttribute("data-competency"), select.value)));
+  container.querySelectorAll("[data-cat-score]").forEach((select) => select.addEventListener("change", () => {
+    const [category, criterion] = select.getAttribute("data-cat-score").split("::");
+    setExamCategoryScore(exam.id, category, criterion, select.value);
+    renderSummaryBar(getExam(exam.id));
+  }));
   document.getElementById("exam-recommendation")?.addEventListener("change", (event) => setExamRecommendation(exam.id, event.target.value));
 
   document.getElementById("finish-exam")?.addEventListener("click", () => {
@@ -288,10 +320,33 @@ function renderQuestionCard(exam, q, canEdit) {
         <div class="exam-score-row"><span class="badge badge-gold">${a.score === null ? "—" : a.score + " / 5"}</span></div>
         ${a.note ? `<div class="text-low small">${esc(a.note)}</div>` : ""}
       `}
-      <div class="grid grid-3 mt-2">
-        ${["Kommunikáció", "Döntéshozatal", "Fegyelem", "Helyzetfelismerés", "Védett személy kezelése", "Stresszhelyzet kezelése", "Csapatmunka"].map((name) => `<label class="field"><span>${name}</span><select data-competency="${esc(name)}" ${canEdit && !exam.endedAt ? "" : "disabled"}><option value="">— / 5</option>${[1, 2, 3, 4, 5].map((n) => `<option value="${n}" ${exam.competencies?.[name] === n ? "selected" : ""}>${n} / 5</option>`).join("")}</select></label>`).join("")}
+    </div>
+  `;
+}
+
+/* Kategóriánként EGYSZER megjelenő értékelő blokk — a kategória kérdéseinél
+   már úgyis megjelenő "Elfogadhatósági támpont" szempontokra pontoz
+   (getExamCategoryCriteria), nem egy általános, kérdésenként ismételt
+   listára. Így minden kategóriánál pontosan azt kell értékelni, ami oda
+   tartozik, egyszer. */
+function renderCategoryScoreCard(exam, category, canEdit) {
+  const criteria = getExamCategoryCriteria(category);
+  if (!criteria.length) return "";
+  const scores = exam.categoryScores?.[category] || {};
+  return `
+    <div class="card exam-category-card mb-1">
+      <div class="card-title mb-1">Kategória-értékelés</div>
+      <div class="grid grid-3">
+        ${criteria.map((criterion) => `
+          <label class="field">
+            <span>${esc(criterion.charAt(0).toUpperCase() + criterion.slice(1))}</span>
+            <select data-cat-score="${esc(category)}::${esc(criterion)}" ${canEdit && !exam.endedAt ? "" : "disabled"}>
+              <option value="">— / 5</option>
+              ${[1, 2, 3, 4, 5].map((n) => `<option value="${n}" ${scores[criterion] === n ? "selected" : ""}>${n} / 5</option>`).join("")}
+            </select>
+          </label>
+        `).join("")}
       </div>
-      <label class="field mt-1"><span>FELVÉTELI AJÁNLÁS</span><select id="exam-recommendation" ${canEdit && !exam.endedAt ? "" : "disabled"}><option value="">Nincs kiválasztva</option>${[["recommended", "Felvételre ajánlott"], ["conditional", "Feltételesen ajánlott"], ["rejected", "Nem ajánlott"], ["retest", "Újravizsga javasolt"]].map(([value, label]) => `<option value="${value}" ${exam.recommendation === value ? "selected" : ""}>${label}</option>`).join("")}</select></label>
     </div>
   `;
 }
@@ -309,7 +364,16 @@ function renderSummaryBar(exam) {
       <div><span class="card-title">Kritikus hibák</span><div class="card-value" style="font-size:22px">${s.criticalErrors}</div></div>
     </div>
     <div class="grid grid-3 mt-1">
-      ${s.categories.map((cat) => `<div class="exam-category-score"><div class="card-title">${esc(cat.category)}</div><strong>${cat.total} / ${cat.max}</strong><span class="text-low small">${cat.max ? ((cat.total / cat.max) * 100).toFixed(0) : 0}%</span></div>`).join("")}
+      ${s.categories.map((cat) => {
+        const catScores = Object.values(exam.categoryScores?.[cat.category] || {});
+        const avg = catScores.length ? (catScores.reduce((sum, n) => sum + n, 0) / catScores.length) : null;
+        return `<div class="exam-category-score">
+          <div class="card-title">${esc(cat.category)}</div>
+          <strong>${cat.total} / ${cat.max}</strong>
+          <span class="text-low small">${cat.max ? ((cat.total / cat.max) * 100).toFixed(0) : 0}%</span>
+          ${avg !== null ? `<span class="text-gold small">Kategória-értékelés: ${avg.toFixed(1)} / 5</span>` : ""}
+        </div>`;
+      }).join("")}
     </div>
   `;
 }

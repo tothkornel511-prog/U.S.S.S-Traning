@@ -1,4 +1,4 @@
-import { getPersonnel, sortByRank, ref, moduleState, moduleByCode, levelLabel } from "../store.js?v=78";
+import { getPersonnel, sortByRank, ref, moduleState, moduleByCode, levelLabel } from "../store.js?v=79";
 import { hasRole } from "../auth.js?v=20";
 import { esc, avatarContent, applyBranding } from "../utils.js?v=31";
 import { navigate } from "../router.js?v=20";

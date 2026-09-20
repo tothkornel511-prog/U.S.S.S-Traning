@@ -9,8 +9,8 @@
 import {
   LEVELS, SERVICE_STATUSES, POSITIONS, MODULES, LEVEL_MODULE_ORDER,
   PERSONNEL, ACCESS_CODES, PROTECTED_LOCATIONS, AUDIT_LOG_SEED, MAPS, DISTRICTS,
-  RECRUITMENT_QUESTIONS, EXAM_QUESTIONS, EXAM_CATEGORIES, RANK_ORDER,
-} from "./data.js?v=28";
+  RECRUITMENT_QUESTIONS, EXAM_QUESTIONS, EXAM_CATEGORIES, EXAM_CATEGORY_CRITERIA, RANK_ORDER,
+} from "./data.js?v=29";
 
 /* v7: Roxwood/Cayo Perico eltávolítva, csak Los Santos térkép maradt. */
 const NS = "usss_ets_v7_";
@@ -1258,6 +1258,12 @@ export function getExamQuestions() {
 export function getExamCategories() {
   return EXAM_CATEGORIES;
 }
+/* Kategóriánként 4-5 konkrét, a kérdésekhez illő értékelési szempont (ezek
+   ugyanazok, amiket "Elfogadhatósági támpont"-ként a kérdéseknél is látni) —
+   ezekre pontoz az oktatásvezető KATEGÓRIÁNKÉNT EGYSZER, nem soronként. */
+export function getExamCategoryCriteria(category) {
+  return EXAM_CATEGORY_CRITERIA[category] || [];
+}
 
 function nextExamId() {
   const seq = Math.max(1, read(KEYS.nextExamSeq, 1));
@@ -1506,7 +1512,7 @@ export function createExam({ candidateName, candidateDiscord, examinerName, exam
     startedAt: new Date().toISOString(),
     endedAt: null,
     answers: [], // [{questionId, score: 0-5|null, note, critical}]
-    competencies: {},
+    categoryScores: {}, // { [category]: { [criterion]: 1-5 } }
     recommendation: "",
     interruptionReason: "",
     interruptedAt: null,
@@ -1537,12 +1543,17 @@ export function setExamAnswer(examId, questionId, patch, actorLabel) {
     logAudit(actorLabel, "Vizsgapont módosítva", `${examId} · ${questionId}: ${previousScore ?? "—"} → ${patch.score}`);
   }
 }
-export function setExamCompetency(examId, name, score) {
+export function setExamCategoryScore(examId, category, criterion, score) {
   const list = getExams();
   const exam = list.find((e) => e.id === examId);
   if (!exam) return;
-  exam.competencies = exam.competencies || {};
-  exam.competencies[name] = Math.max(1, Math.min(5, Number(score)));
+  exam.categoryScores = exam.categoryScores || {};
+  exam.categoryScores[category] = exam.categoryScores[category] || {};
+  if (score === "" || score === null || score === undefined) {
+    delete exam.categoryScores[category][criterion];
+  } else {
+    exam.categoryScores[category][criterion] = Math.max(1, Math.min(5, Number(score)));
+  }
   write(KEYS.exams, list);
 }
 export function setExamRecommendation(examId, recommendation) {
