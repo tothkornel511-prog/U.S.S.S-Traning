@@ -30,6 +30,20 @@
         ],
         "theoryDate": "2026-08-17",
         "examiner": "A rendszer"
+      },
+      "ADM": {
+        "theory": 95,
+        "history": [
+          {
+            "date": "2026-09-20T08:12:34.023Z",
+            "type": "theory",
+            "theory": 95,
+            "result": "pass",
+            "examiner": "A rendszer"
+          }
+        ],
+        "theoryDate": "2026-09-20",
+        "examiner": "A rendszer"
       }
     },
     "levelUpEligible": false,
