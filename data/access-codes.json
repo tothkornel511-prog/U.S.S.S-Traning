@@ -8,5 +8,39 @@
     "usssId": "USSS-98",
     "code": "5PLZ-8XWQ",
     "role": "TRAINING"
+  },
+  {
+    "usssId": "USSS-125",
+    "role": "VIEWER",
+    "code": "VPRB-4THJ",
+    "sections": [
+      "personnel",
+      "matrix",
+      "instructors",
+      "plans",
+      "protocols",
+      "recruitment",
+      "medical",
+      "locations",
+      "map",
+      "readiness",
+      "operations/reports",
+      "operations/threats",
+      "operations/events",
+      "operations/assignments",
+      "operations/protectees",
+      "operations/escorts",
+      "operations/advance",
+      "operations/protection-levels",
+      "operations/protective-plans",
+      "operations/intelligence",
+      "investigations",
+      "covert-ops",
+      "operations/government",
+      "operations/succession",
+      "operations/calendar",
+      "operations/notifications",
+      "admin"
+    ]
   }
 ]
