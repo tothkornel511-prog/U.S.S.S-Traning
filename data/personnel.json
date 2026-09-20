@@ -196,18 +196,46 @@
     "notes": "",
     "modules": {
       "0": {
-        "theory": 76,
+        "theory": 90,
+        "theoryDate": "2026-08-19",
+        "examiner": "A rendszer",
         "history": [
           {
             "date": "2026-08-17T10:00:00.000Z",
             "type": "theory",
-            "theory": 76,
-            "result": "fail",
+            "theory": 90,
+            "result": "pass",
+            "examiner": "A rendszer"
+          },
+          {
+            "date": "2026-08-18T10:00:00.000Z",
+            "type": "theory",
+            "theory": 90,
+            "result": "pass",
+            "examiner": "A rendszer"
+          },
+          {
+            "date": "2026-08-19T10:00:00.000Z",
+            "type": "theory",
+            "theory": 90,
+            "result": "pass",
             "examiner": "A rendszer"
           }
-        ],
+        ]
+      },
+      "ADM": {
+        "theory": 80,
         "theoryDate": "2026-08-17",
-        "examiner": "A rendszer"
+        "examiner": "A rendszer",
+        "history": [
+          {
+            "date": "2026-08-17T10:00:00.000Z",
+            "type": "theory",
+            "theory": 80,
+            "result": "pass",
+            "examiner": "A rendszer"
+          }
+        ]
       }
     },
     "levelUpEligible": false,
@@ -226,6 +254,8 @@
     "modules": {
       "0": {
         "theory": 95,
+        "theoryDate": "2026-08-17",
+        "examiner": "A rendszer",
         "history": [
           {
             "date": "2026-08-17T10:00:00.000Z",
@@ -234,9 +264,49 @@
             "result": "pass",
             "examiner": "A rendszer"
           }
-        ],
+        ]
+      },
+      "ADM": {
+        "theory": 100,
         "theoryDate": "2026-08-17",
-        "examiner": "A rendszer"
+        "examiner": "A rendszer",
+        "history": [
+          {
+            "date": "2026-08-17T10:00:00.000Z",
+            "type": "theory",
+            "theory": 100,
+            "result": "pass",
+            "examiner": "A rendszer"
+          }
+        ]
+      },
+      "LSNTA": {
+        "theory": 100,
+        "theoryDate": "2026-08-17",
+        "examiner": "A rendszer",
+        "history": [
+          {
+            "date": "2026-08-17T10:00:00.000Z",
+            "type": "theory",
+            "theory": 100,
+            "result": "pass",
+            "examiner": "A rendszer"
+          }
+        ]
+      },
+      "L": {
+        "theory": 90,
+        "theoryDate": "2026-08-17",
+        "examiner": "A rendszer",
+        "history": [
+          {
+            "date": "2026-08-17T10:00:00.000Z",
+            "type": "theory",
+            "theory": 90,
+            "result": "pass",
+            "examiner": "A rendszer"
+          }
+        ]
       }
     },
     "levelUpEligible": false,
@@ -283,18 +353,158 @@
     "notes": "",
     "modules": {
       "0": {
-        "theory": 84,
+        "theory": 95,
+        "theoryDate": "2026-08-17",
+        "examiner": "A rendszer",
         "history": [
           {
             "date": "2026-08-17T10:00:00.000Z",
             "type": "theory",
-            "theory": 84,
+            "theory": 95,
             "result": "pass",
             "examiner": "A rendszer"
           }
-        ],
+        ]
+      },
+      "ADM": {
+        "theory": 100,
         "theoryDate": "2026-08-17",
-        "examiner": "A rendszer"
+        "examiner": "A rendszer",
+        "history": [
+          {
+            "date": "2026-08-17T10:00:00.000Z",
+            "type": "theory",
+            "theory": 100,
+            "result": "pass",
+            "examiner": "A rendszer"
+          }
+        ]
+      },
+      "LSNTA": {
+        "theory": 95,
+        "theoryDate": "2026-08-17",
+        "examiner": "A rendszer",
+        "history": [
+          {
+            "date": "2026-08-17T10:00:00.000Z",
+            "type": "theory",
+            "theory": 95,
+            "result": "pass",
+            "examiner": "A rendszer"
+          }
+        ]
+      },
+      "A": {
+        "theory": 95,
+        "theoryDate": "2026-08-17",
+        "examiner": "A rendszer",
+        "history": [
+          {
+            "date": "2026-08-17T10:00:00.000Z",
+            "type": "theory",
+            "theory": 95,
+            "result": "pass",
+            "examiner": "A rendszer"
+          }
+        ]
+      },
+      "G1": {
+        "theory": 95,
+        "theoryDate": "2026-08-17",
+        "examiner": "A rendszer",
+        "history": [
+          {
+            "date": "2026-08-17T10:00:00.000Z",
+            "type": "theory",
+            "theory": 95,
+            "result": "pass",
+            "examiner": "A rendszer"
+          }
+        ]
+      },
+      "K": {
+        "theory": 95,
+        "theoryDate": "2026-08-17",
+        "examiner": "A rendszer",
+        "history": [
+          {
+            "date": "2026-08-17T10:00:00.000Z",
+            "type": "theory",
+            "theory": 95,
+            "result": "pass",
+            "examiner": "A rendszer"
+          }
+        ]
+      },
+      "L": {
+        "theory": 95,
+        "theoryDate": "2026-08-17",
+        "examiner": "A rendszer",
+        "history": [
+          {
+            "date": "2026-08-17T10:00:00.000Z",
+            "type": "theory",
+            "theory": 95,
+            "result": "pass",
+            "examiner": "A rendszer"
+          }
+        ]
+      },
+      "R": {
+        "theory": 95,
+        "theoryDate": "2026-08-17",
+        "examiner": "A rendszer",
+        "history": [
+          {
+            "date": "2026-08-17T10:00:00.000Z",
+            "type": "theory",
+            "theory": 95,
+            "result": "pass",
+            "examiner": "A rendszer"
+          }
+        ]
+      },
+      "GSD1": {
+        "theory": 95,
+        "theoryDate": "2026-08-17",
+        "examiner": "A rendszer",
+        "history": [
+          {
+            "date": "2026-08-17T10:00:00.000Z",
+            "type": "theory",
+            "theory": 95,
+            "result": "pass",
+            "examiner": "A rendszer"
+          }
+        ]
+      },
+      "GSD2": {
+        "theory": 100,
+        "theoryDate": "2026-08-17",
+        "examiner": "A rendszer",
+        "history": [
+          {
+            "date": "2026-08-17T10:00:00.000Z",
+            "type": "theory",
+            "theory": 100,
+            "result": "pass",
+            "examiner": "A rendszer"
+          }
+        ]
+      },
+      "GSD3": {
+        "theory": 95,
+        "theoryDate": "2026-08-17",
+        "examiner": "A rendszer",
+        "history": [
+          {
+            "date": "2026-08-17T10:00:00.000Z",
+            "type": "theory",
+            "theory": 95,
+            "result": "pass",
+            "examiner": "A rendszer"
+          }
+        ]
       }
     },
     "levelUpEligible": false,
@@ -312,18 +522,116 @@
     "notes": "",
     "modules": {
       "0": {
-        "theory": 98,
+        "theory": 90,
+        "theoryDate": "2026-08-17",
+        "examiner": "A rendszer",
         "history": [
           {
             "date": "2026-08-17T10:00:00.000Z",
             "type": "theory",
-            "theory": 98,
+            "theory": 90,
             "result": "pass",
             "examiner": "A rendszer"
           }
-        ],
+        ]
+      },
+      "ADM": {
+        "theory": 100,
         "theoryDate": "2026-08-17",
-        "examiner": "A rendszer"
+        "examiner": "A rendszer",
+        "history": [
+          {
+            "date": "2026-08-17T10:00:00.000Z",
+            "type": "theory",
+            "theory": 100,
+            "result": "pass",
+            "examiner": "A rendszer"
+          }
+        ]
+      },
+      "LSNTA": {
+        "theory": 100,
+        "theoryDate": "2026-08-17",
+        "examiner": "A rendszer",
+        "history": [
+          {
+            "date": "2026-08-17T10:00:00.000Z",
+            "type": "theory",
+            "theory": 100,
+            "result": "pass",
+            "examiner": "A rendszer"
+          }
+        ]
+      },
+      "A": {
+        "theory": 95,
+        "theoryDate": "2026-08-17",
+        "examiner": "A rendszer",
+        "history": [
+          {
+            "date": "2026-08-17T10:00:00.000Z",
+            "type": "theory",
+            "theory": 95,
+            "result": "pass",
+            "examiner": "A rendszer"
+          }
+        ]
+      },
+      "G1": {
+        "theory": 90,
+        "theoryDate": "2026-08-17",
+        "examiner": "A rendszer",
+        "history": [
+          {
+            "date": "2026-08-17T10:00:00.000Z",
+            "type": "theory",
+            "theory": 90,
+            "result": "pass",
+            "examiner": "A rendszer"
+          }
+        ]
+      },
+      "K": {
+        "theory": 95,
+        "theoryDate": "2026-08-17",
+        "examiner": "A rendszer",
+        "history": [
+          {
+            "date": "2026-08-17T10:00:00.000Z",
+            "type": "theory",
+            "theory": 95,
+            "result": "pass",
+            "examiner": "A rendszer"
+          }
+        ]
+      },
+      "L": {
+        "theory": 90,
+        "theoryDate": "2026-08-17",
+        "examiner": "A rendszer",
+        "history": [
+          {
+            "date": "2026-08-17T10:00:00.000Z",
+            "type": "theory",
+            "theory": 90,
+            "result": "pass",
+            "examiner": "A rendszer"
+          }
+        ]
+      },
+      "R": {
+        "theory": 85,
+        "theoryDate": "2026-08-17",
+        "examiner": "A rendszer",
+        "history": [
+          {
+            "date": "2026-08-17T10:00:00.000Z",
+            "type": "theory",
+            "theory": 85,
+            "result": "pass",
+            "examiner": "A rendszer"
+          }
+        ]
       }
     },
     "levelUpEligible": false,
@@ -370,18 +678,123 @@
     "notes": "",
     "modules": {
       "0": {
-        "theory": 87,
+        "theory": 90,
+        "theoryDate": "2026-08-17",
+        "examiner": "A rendszer",
         "history": [
           {
             "date": "2026-08-17T10:00:00.000Z",
             "type": "theory",
-            "theory": 87,
+            "theory": 90,
             "result": "pass",
             "examiner": "A rendszer"
           }
-        ],
+        ]
+      },
+      "ADM": {
+        "theory": 85,
         "theoryDate": "2026-08-17",
-        "examiner": "A rendszer"
+        "examiner": "A rendszer",
+        "history": [
+          {
+            "date": "2026-08-17T10:00:00.000Z",
+            "type": "theory",
+            "theory": 85,
+            "result": "pass",
+            "examiner": "A rendszer"
+          }
+        ]
+      },
+      "LSNTA": {
+        "theory": 85,
+        "theoryDate": "2026-08-18",
+        "examiner": "A rendszer",
+        "history": [
+          {
+            "date": "2026-08-17T10:00:00.000Z",
+            "type": "theory",
+            "theory": 85,
+            "result": "pass",
+            "examiner": "A rendszer"
+          },
+          {
+            "date": "2026-08-18T10:00:00.000Z",
+            "type": "theory",
+            "theory": 85,
+            "result": "pass",
+            "examiner": "A rendszer"
+          }
+        ]
+      },
+      "A": {
+        "theory": 80,
+        "theoryDate": "2026-08-17",
+        "examiner": "A rendszer",
+        "history": [
+          {
+            "date": "2026-08-17T10:00:00.000Z",
+            "type": "theory",
+            "theory": 80,
+            "result": "pass",
+            "examiner": "A rendszer"
+          }
+        ]
+      },
+      "G1": {
+        "theory": 80,
+        "theoryDate": "2026-08-17",
+        "examiner": "A rendszer",
+        "history": [
+          {
+            "date": "2026-08-17T10:00:00.000Z",
+            "type": "theory",
+            "theory": 80,
+            "result": "pass",
+            "examiner": "A rendszer"
+          }
+        ]
+      },
+      "K": {
+        "theory": 90,
+        "theoryDate": "2026-08-17",
+        "examiner": "A rendszer",
+        "history": [
+          {
+            "date": "2026-08-17T10:00:00.000Z",
+            "type": "theory",
+            "theory": 90,
+            "result": "pass",
+            "examiner": "A rendszer"
+          }
+        ]
+      },
+      "L": {
+        "theory": 90,
+        "theoryDate": "2026-08-17",
+        "examiner": "A rendszer",
+        "history": [
+          {
+            "date": "2026-08-17T10:00:00.000Z",
+            "type": "theory",
+            "theory": 90,
+            "result": "pass",
+            "examiner": "A rendszer"
+          }
+        ]
+      },
+      "R": {
+        "theory": 90,
+        "theoryDate": "2026-08-17",
+        "examiner": "A rendszer",
+        "history": [
+          {
+            "date": "2026-08-17T10:00:00.000Z",
+            "type": "theory",
+            "theory": 90,
+            "result": "pass",
+            "examiner": "A rendszer"
+          }
+        ]
       }
     },
     "levelUpEligible": false,
@@ -428,18 +841,67 @@
     "notes": "",
     "modules": {
       "0": {
-        "theory": 90,
+        "theory": 55,
+        "theoryDate": "2026-08-20",
+        "examiner": "A rendszer",
         "history": [
           {
             "date": "2026-08-17T10:00:00.000Z",
             "type": "theory",
-            "theory": 90,
-            "result": "pass",
+            "theory": 55,
+            "result": "fail",
+            "examiner": "A rendszer"
+          },
+          {
+            "date": "2026-08-18T10:00:00.000Z",
+            "type": "theory",
+            "theory": 55,
+            "result": "fail",
+            "examiner": "A rendszer"
+          },
+          {
+            "date": "2026-08-19T10:00:00.000Z",
+            "type": "theory",
+            "theory": 55,
+            "result": "fail",
+            "examiner": "A rendszer"
+          },
+          {
+            "date": "2026-08-20T10:00:00.000Z",
+            "type": "theory",
+            "theory": 55,
+            "result": "fail",
             "examiner": "A rendszer"
           }
-        ],
+        ]
+      },
+      "ADM": {
+        "theory": 65,
         "theoryDate": "2026-08-17",
-        "examiner": "A rendszer"
+        "examiner": "A rendszer",
+        "history": [
+          {
+            "date": "2026-08-17T10:00:00.000Z",
+            "type": "theory",
+            "theory": 65,
+            "result": "fail",
+            "examiner": "A rendszer"
+          }
+        ]
+      },
+      "LSNTA": {
+        "theory": 75,
+        "theoryDate": "2026-08-17",
+        "examiner": "A rendszer",
+        "history": [
+          {
+            "date": "2026-08-17T10:00:00.000Z",
+            "type": "theory",
+            "theory": 75,
+            "result": "fail",
+            "examiner": "A rendszer"
+          }
+        ]
       }
     },
     "levelUpEligible": false,
@@ -457,18 +919,172 @@
     "notes": "",
     "modules": {
       "0": {
-        "theory": 55,
+        "theory": 80,
+        "theoryDate": "2026-08-19",
+        "examiner": "A rendszer",
         "history": [
           {
             "date": "2026-08-17T10:00:00.000Z",
             "type": "theory",
-            "theory": 55,
-            "result": "fail",
+            "theory": 80,
+            "result": "pass",
+            "examiner": "A rendszer"
+          },
+          {
+            "date": "2026-08-18T10:00:00.000Z",
+            "type": "theory",
+            "theory": 80,
+            "result": "pass",
+            "examiner": "A rendszer"
+          },
+          {
+            "date": "2026-08-19T10:00:00.000Z",
+            "type": "theory",
+            "theory": 80,
+            "result": "pass",
             "examiner": "A rendszer"
           }
-        ],
+        ]
+      },
+      "ADM": {
+        "theory": 85,
+        "theoryDate": "2026-08-18",
+        "examiner": "A rendszer",
+        "history": [
+          {
+            "date": "2026-08-17T10:00:00.000Z",
+            "type": "theory",
+            "theory": 85,
+            "result": "pass",
+            "examiner": "A rendszer"
+          },
+          {
+            "date": "2026-08-18T10:00:00.000Z",
+            "type": "theory",
+            "theory": 85,
+            "result": "pass",
+            "examiner": "A rendszer"
+          }
+        ]
+      },
+      "LSNTA": {
+        "theory": 85,
+        "theoryDate": "2026-08-18",
+        "examiner": "A rendszer",
+        "history": [
+          {
+            "date": "2026-08-17T10:00:00.000Z",
+            "type": "theory",
+            "theory": 85,
+            "result": "pass",
+            "examiner": "A rendszer"
+          },
+          {
+            "date": "2026-08-18T10:00:00.000Z",
+            "type": "theory",
+            "theory": 85,
+            "result": "pass",
+            "examiner": "A rendszer"
+          }
+        ]
+      },
+      "A": {
+        "theory": 80,
+        "theoryDate": "2026-08-18",
+        "examiner": "A rendszer",
+        "history": [
+          {
+            "date": "2026-08-17T10:00:00.000Z",
+            "type": "theory",
+            "theory": 80,
+            "result": "pass",
+            "examiner": "A rendszer"
+          },
+          {
+            "date": "2026-08-18T10:00:00.000Z",
+            "type": "theory",
+            "theory": 80,
+            "result": "pass",
+            "examiner": "A rendszer"
+          }
+        ]
+      },
+      "G1": {
+        "theory": 80,
+        "theoryDate": "2026-08-20",
+        "examiner": "A rendszer",
+        "history": [
+          {
+            "date": "2026-08-17T10:00:00.000Z",
+            "type": "theory",
+            "theory": 80,
+            "result": "pass",
+            "examiner": "A rendszer"
+          },
+          {
+            "date": "2026-08-18T10:00:00.000Z",
+            "type": "theory",
+            "theory": 80,
+            "result": "pass",
+            "examiner": "A rendszer"
+          },
+          {
+            "date": "2026-08-19T10:00:00.000Z",
+            "type": "theory",
+            "theory": 80,
+            "result": "pass",
+            "examiner": "A rendszer"
+          },
+          {
+            "date": "2026-08-20T10:00:00.000Z",
+            "type": "theory",
+            "theory": 80,
+            "result": "pass",
+            "examiner": "A rendszer"
+          }
+        ]
+      },
+      "K": {
+        "theory": 95,
         "theoryDate": "2026-08-17",
-        "examiner": "A rendszer"
+        "examiner": "A rendszer",
+        "history": [
+          {
+            "date": "2026-08-17T10:00:00.000Z",
+            "type": "theory",
+            "theory": 95,
+            "result": "pass",
+            "examiner": "A rendszer"
+          }
+        ]
+      },
+      "L": {
+        "theory": 80,
+        "theoryDate": "2026-08-17",
+        "examiner": "A rendszer",
+        "history": [
+          {
+            "date": "2026-08-17T10:00:00.000Z",
+            "type": "theory",
+            "theory": 80,
+            "result": "pass",
+            "examiner": "A rendszer"
+          }
+        ]
+      },
+      "R": {
+        "theory": 80,
+        "theoryDate": "2026-08-17",
+        "examiner": "A rendszer",
+        "history": [
+          {
+            "date": "2026-08-17T10:00:00.000Z",
+            "type": "theory",
+            "theory": 80,
+            "result": "pass",
+            "examiner": "A rendszer"
+          }
+        ]
       }
     },
     "levelUpEligible": false,
@@ -486,18 +1102,116 @@
     "notes": "",
     "modules": {
       "0": {
-        "theory": 93,
+        "theory": 85,
+        "theoryDate": "2026-08-17",
+        "examiner": "A rendszer",
         "history": [
           {
             "date": "2026-08-17T10:00:00.000Z",
             "type": "theory",
-            "theory": 93,
+            "theory": 85,
             "result": "pass",
             "examiner": "A rendszer"
           }
-        ],
+        ]
+      },
+      "ADM": {
+        "theory": 95,
         "theoryDate": "2026-08-17",
-        "examiner": "A rendszer"
+        "examiner": "A rendszer",
+        "history": [
+          {
+            "date": "2026-08-17T10:00:00.000Z",
+            "type": "theory",
+            "theory": 95,
+            "result": "pass",
+            "examiner": "A rendszer"
+          }
+        ]
+      },
+      "LSNTA": {
+        "theory": 90,
+        "theoryDate": "2026-08-17",
+        "examiner": "A rendszer",
+        "history": [
+          {
+            "date": "2026-08-17T10:00:00.000Z",
+            "type": "theory",
+            "theory": 90,
+            "result": "pass",
+            "examiner": "A rendszer"
+          }
+        ]
+      },
+      "A": {
+        "theory": 90,
+        "theoryDate": "2026-08-17",
+        "examiner": "A rendszer",
+        "history": [
+          {
+            "date": "2026-08-17T10:00:00.000Z",
+            "type": "theory",
+            "theory": 90,
+            "result": "pass",
+            "examiner": "A rendszer"
+          }
+        ]
+      },
+      "G1": {
+        "theory": 80,
+        "theoryDate": "2026-08-17",
+        "examiner": "A rendszer",
+        "history": [
+          {
+            "date": "2026-08-17T10:00:00.000Z",
+            "type": "theory",
+            "theory": 80,
+            "result": "pass",
+            "examiner": "A rendszer"
+          }
+        ]
+      },
+      "K": {
+        "theory": 85,
+        "theoryDate": "2026-08-17",
+        "examiner": "A rendszer",
+        "history": [
+          {
+            "date": "2026-08-17T10:00:00.000Z",
+            "type": "theory",
+            "theory": 85,
+            "result": "pass",
+            "examiner": "A rendszer"
+          }
+        ]
+      },
+      "L": {
+        "theory": 95,
+        "theoryDate": "2026-08-17",
+        "examiner": "A rendszer",
+        "history": [
+          {
+            "date": "2026-08-17T10:00:00.000Z",
+            "type": "theory",
+            "theory": 95,
+            "result": "pass",
+            "examiner": "A rendszer"
+          }
+        ]
+      },
+      "R": {
+        "theory": 85,
+        "theoryDate": "2026-08-17",
+        "examiner": "A rendszer",
+        "history": [
+          {
+            "date": "2026-08-17T10:00:00.000Z",
+            "type": "theory",
+            "theory": 85,
+            "result": "pass",
+            "examiner": "A rendszer"
+          }
+        ]
       }
     },
     "levelUpEligible": false,
@@ -629,6 +1343,8 @@
     "modules": {
       "0": {
         "theory": 90,
+        "theoryDate": "2026-08-18",
+        "examiner": "A rendszer",
         "history": [
           {
             "date": "2026-08-17T10:00:00.000Z",
@@ -636,10 +1352,169 @@
             "theory": 90,
             "result": "pass",
             "examiner": "A rendszer"
+          },
+          {
+            "date": "2026-08-18T10:00:00.000Z",
+            "type": "theory",
+            "theory": 90,
+            "result": "pass",
+            "examiner": "A rendszer"
           }
-        ],
+        ]
+      },
+      "ADM": {
+        "theory": 85,
+        "theoryDate": "2026-08-18",
+        "examiner": "A rendszer",
+        "history": [
+          {
+            "date": "2026-08-17T10:00:00.000Z",
+            "type": "theory",
+            "theory": 85,
+            "result": "pass",
+            "examiner": "A rendszer"
+          },
+          {
+            "date": "2026-08-18T10:00:00.000Z",
+            "type": "theory",
+            "theory": 85,
+            "result": "pass",
+            "examiner": "A rendszer"
+          }
+        ]
+      },
+      "LSNTA": {
+        "theory": 80,
         "theoryDate": "2026-08-17",
-        "examiner": "A rendszer"
+        "examiner": "A rendszer",
+        "history": [
+          {
+            "date": "2026-08-17T10:00:00.000Z",
+            "type": "theory",
+            "theory": 80,
+            "result": "pass",
+            "examiner": "A rendszer"
+          }
+        ]
+      },
+      "A": {
+        "theory": 90,
+        "theoryDate": "2026-08-18",
+        "examiner": "A rendszer",
+        "history": [
+          {
+            "date": "2026-08-17T10:00:00.000Z",
+            "type": "theory",
+            "theory": 90,
+            "result": "pass",
+            "examiner": "A rendszer"
+          },
+          {
+            "date": "2026-08-18T10:00:00.000Z",
+            "type": "theory",
+            "theory": 90,
+            "result": "pass",
+            "examiner": "A rendszer"
+          }
+        ]
+      },
+      "G1": {
+        "theory": 85,
+        "theoryDate": "2026-08-17",
+        "examiner": "A rendszer",
+        "history": [
+          {
+            "date": "2026-08-17T10:00:00.000Z",
+            "type": "theory",
+            "theory": 85,
+            "result": "pass",
+            "examiner": "A rendszer"
+          }
+        ]
+      },
+      "K": {
+        "theory": 95,
+        "theoryDate": "2026-08-18",
+        "examiner": "A rendszer",
+        "history": [
+          {
+            "date": "2026-08-17T10:00:00.000Z",
+            "type": "theory",
+            "theory": 95,
+            "result": "pass",
+            "examiner": "A rendszer"
+          },
+          {
+            "date": "2026-08-18T10:00:00.000Z",
+            "type": "theory",
+            "theory": 95,
+            "result": "pass",
+            "examiner": "A rendszer"
+          }
+        ]
+      },
+      "L": {
+        "theory": 95,
+        "theoryDate": "2026-08-18",
+        "examiner": "A rendszer",
+        "history": [
+          {
+            "date": "2026-08-17T10:00:00.000Z",
+            "type": "theory",
+            "theory": 95,
+            "result": "pass",
+            "examiner": "A rendszer"
+          },
+          {
+            "date": "2026-08-18T10:00:00.000Z",
+            "type": "theory",
+            "theory": 95,
+            "result": "pass",
+            "examiner": "A rendszer"
+          }
+        ]
+      },
+      "R": {
+        "theory": 95,
+        "theoryDate": "2026-08-17",
+        "examiner": "A rendszer",
+        "history": [
+          {
+            "date": "2026-08-17T10:00:00.000Z",
+            "type": "theory",
+            "theory": 95,
+            "result": "pass",
+            "examiner": "A rendszer"
+          }
+        ]
+      },
+      "GSD1": {
+        "theory": 100,
+        "theoryDate": "2026-08-17",
+        "examiner": "A rendszer",
+        "history": [
+          {
+            "date": "2026-08-17T10:00:00.000Z",
+            "type": "theory",
+            "theory": 100,
+            "result": "pass",
+            "examiner": "A rendszer"
+          }
+        ]
+      },
+      "GSD2": {
+        "theory": 95,
+        "theoryDate": "2026-08-17",
+        "examiner": "A rendszer",
+        "history": [
+          {
+            "date": "2026-08-17T10:00:00.000Z",
+            "type": "theory",
+            "theory": 95,
+            "result": "pass",
+            "examiner": "A rendszer"
+          }
+        ]
       }
     },
     "levelUpEligible": false,
@@ -669,6 +1544,48 @@
         ],
         "theoryDate": "2026-08-17",
         "examiner": "A rendszer"
+      },
+      "LSNTA": {
+        "theory": 95,
+        "theoryDate": "2026-08-19",
+        "examiner": "A rendszer",
+        "history": [
+          {
+            "date": "2026-08-17T10:00:00.000Z",
+            "type": "theory",
+            "theory": 95,
+            "result": "pass",
+            "examiner": "A rendszer"
+          },
+          {
+            "date": "2026-08-18T10:00:00.000Z",
+            "type": "theory",
+            "theory": 95,
+            "result": "pass",
+            "examiner": "A rendszer"
+          },
+          {
+            "date": "2026-08-19T10:00:00.000Z",
+            "type": "theory",
+            "theory": 95,
+            "result": "pass",
+            "examiner": "A rendszer"
+          }
+        ]
+      },
+      "A": {
+        "theory": 65,
+        "theoryDate": "2026-08-17",
+        "examiner": "A rendszer",
+        "history": [
+          {
+            "date": "2026-08-17T10:00:00.000Z",
+            "type": "theory",
+            "theory": 65,
+            "result": "fail",
+            "examiner": "A rendszer"
+          }
+        ]
       }
     },
     "levelUpEligible": false,
@@ -686,18 +1603,102 @@
     "notes": "",
     "modules": {
       "0": {
-        "theory": 79,
+        "theory": 90,
+        "theoryDate": "2026-08-17",
+        "examiner": "A rendszer",
         "history": [
           {
             "date": "2026-08-17T10:00:00.000Z",
             "type": "theory",
-            "theory": 79,
+            "theory": 90,
+            "result": "pass",
+            "examiner": "A rendszer"
+          }
+        ]
+      },
+      "LSNTA": {
+        "theory": 75,
+        "theoryDate": "2026-08-18",
+        "examiner": "A rendszer",
+        "history": [
+          {
+            "date": "2026-08-17T10:00:00.000Z",
+            "type": "theory",
+            "theory": 75,
+            "result": "fail",
+            "examiner": "A rendszer"
+          },
+          {
+            "date": "2026-08-18T10:00:00.000Z",
+            "type": "theory",
+            "theory": 75,
             "result": "fail",
             "examiner": "A rendszer"
           }
-        ],
+        ]
+      },
+      "GSD1": {
+        "theory": 95,
         "theoryDate": "2026-08-17",
-        "examiner": "A rendszer"
+        "examiner": "A rendszer",
+        "history": [
+          {
+            "date": "2026-08-17T10:00:00.000Z",
+            "type": "theory",
+            "theory": 95,
+            "result": "pass",
+            "examiner": "A rendszer"
+          }
+        ]
+      },
+      "GSD2": {
+        "theory": 80,
+        "theoryDate": "2026-08-18",
+        "examiner": "A rendszer",
+        "history": [
+          {
+            "date": "2026-08-17T10:00:00.000Z",
+            "type": "theory",
+            "theory": 80,
+            "result": "pass",
+            "examiner": "A rendszer"
+          },
+          {
+            "date": "2026-08-18T10:00:00.000Z",
+            "type": "theory",
+            "theory": 80,
+            "result": "pass",
+            "examiner": "A rendszer"
+          }
+        ]
+      },
+      "GSD3": {
+        "theory": 85,
+        "theoryDate": "2026-08-19",
+        "examiner": "A rendszer",
+        "history": [
+          {
+            "date": "2026-08-17T10:00:00.000Z",
+            "type": "theory",
+            "theory": 85,
+            "result": "pass",
+            "examiner": "A rendszer"
+          },
+          {
+            "date": "2026-08-18T10:00:00.000Z",
+            "type": "theory",
+            "theory": 85,
+            "result": "pass",
+            "examiner": "A rendszer"
+          },
+          {
+            "date": "2026-08-19T10:00:00.000Z",
+            "type": "theory",
+            "theory": 85,
+            "result": "pass",
+            "examiner": "A rendszer"
+          }
+        ]
       }
     },
     "levelUpEligible": false,
@@ -727,7 +1728,253 @@
     "probationStart": "2026-08-17",
     "probationLifted": false,
     "notes": "",
-    "modules": {},
+    "modules": {
+      "0": {
+        "theory": 85,
+        "theoryDate": "2026-08-19",
+        "examiner": "A rendszer",
+        "history": [
+          {
+            "date": "2026-08-17T10:00:00.000Z",
+            "type": "theory",
+            "theory": 85,
+            "result": "pass",
+            "examiner": "A rendszer"
+          },
+          {
+            "date": "2026-08-18T10:00:00.000Z",
+            "type": "theory",
+            "theory": 85,
+            "result": "pass",
+            "examiner": "A rendszer"
+          },
+          {
+            "date": "2026-08-19T10:00:00.000Z",
+            "type": "theory",
+            "theory": 85,
+            "result": "pass",
+            "examiner": "A rendszer"
+          }
+        ]
+      },
+      "ADM": {
+        "theory": 80,
+        "theoryDate": "2026-08-19",
+        "examiner": "A rendszer",
+        "history": [
+          {
+            "date": "2026-08-17T10:00:00.000Z",
+            "type": "theory",
+            "theory": 80,
+            "result": "pass",
+            "examiner": "A rendszer"
+          },
+          {
+            "date": "2026-08-18T10:00:00.000Z",
+            "type": "theory",
+            "theory": 80,
+            "result": "pass",
+            "examiner": "A rendszer"
+          },
+          {
+            "date": "2026-08-19T10:00:00.000Z",
+            "type": "theory",
+            "theory": 80,
+            "result": "pass",
+            "examiner": "A rendszer"
+          }
+        ]
+      },
+      "LSNTA": {
+        "theory": 80,
+        "theoryDate": "2026-08-18",
+        "examiner": "A rendszer",
+        "history": [
+          {
+            "date": "2026-08-17T10:00:00.000Z",
+            "type": "theory",
+            "theory": 80,
+            "result": "pass",
+            "examiner": "A rendszer"
+          },
+          {
+            "date": "2026-08-18T10:00:00.000Z",
+            "type": "theory",
+            "theory": 80,
+            "result": "pass",
+            "examiner": "A rendszer"
+          }
+        ]
+      },
+      "A": {
+        "theory": 80,
+        "theoryDate": "2026-08-21",
+        "examiner": "A rendszer",
+        "history": [
+          {
+            "date": "2026-08-17T10:00:00.000Z",
+            "type": "theory",
+            "theory": 80,
+            "result": "pass",
+            "examiner": "A rendszer"
+          },
+          {
+            "date": "2026-08-18T10:00:00.000Z",
+            "type": "theory",
+            "theory": 80,
+            "result": "pass",
+            "examiner": "A rendszer"
+          },
+          {
+            "date": "2026-08-19T10:00:00.000Z",
+            "type": "theory",
+            "theory": 80,
+            "result": "pass",
+            "examiner": "A rendszer"
+          },
+          {
+            "date": "2026-08-20T10:00:00.000Z",
+            "type": "theory",
+            "theory": 80,
+            "result": "pass",
+            "examiner": "A rendszer"
+          },
+          {
+            "date": "2026-08-21T10:00:00.000Z",
+            "type": "theory",
+            "theory": 80,
+            "result": "pass",
+            "examiner": "A rendszer"
+          }
+        ]
+      },
+      "G1": {
+        "theory": 85,
+        "theoryDate": "2026-08-23",
+        "examiner": "A rendszer",
+        "history": [
+          {
+            "date": "2026-08-17T10:00:00.000Z",
+            "type": "theory",
+            "theory": 85,
+            "result": "pass",
+            "examiner": "A rendszer"
+          },
+          {
+            "date": "2026-08-18T10:00:00.000Z",
+            "type": "theory",
+            "theory": 85,
+            "result": "pass",
+            "examiner": "A rendszer"
+          },
+          {
+            "date": "2026-08-19T10:00:00.000Z",
+            "type": "theory",
+            "theory": 85,
+            "result": "pass",
+            "examiner": "A rendszer"
+          },
+          {
+            "date": "2026-08-20T10:00:00.000Z",
+            "type": "theory",
+            "theory": 85,
+            "result": "pass",
+            "examiner": "A rendszer"
+          },
+          {
+            "date": "2026-08-21T10:00:00.000Z",
+            "type": "theory",
+            "theory": 85,
+            "result": "pass",
+            "examiner": "A rendszer"
+          },
+          {
+            "date": "2026-08-22T10:00:00.000Z",
+            "type": "theory",
+            "theory": 85,
+            "result": "pass",
+            "examiner": "A rendszer"
+          },
+          {
+            "date": "2026-08-23T10:00:00.000Z",
+            "type": "theory",
+            "theory": 85,
+            "result": "pass",
+            "examiner": "A rendszer"
+          }
+        ]
+      },
+      "K": {
+        "theory": 85,
+        "theoryDate": "2026-08-19",
+        "examiner": "A rendszer",
+        "history": [
+          {
+            "date": "2026-08-17T10:00:00.000Z",
+            "type": "theory",
+            "theory": 85,
+            "result": "pass",
+            "examiner": "A rendszer"
+          },
+          {
+            "date": "2026-08-18T10:00:00.000Z",
+            "type": "theory",
+            "theory": 85,
+            "result": "pass",
+            "examiner": "A rendszer"
+          },
+          {
+            "date": "2026-08-19T10:00:00.000Z",
+            "type": "theory",
+            "theory": 85,
+            "result": "pass",
+            "examiner": "A rendszer"
+          }
+        ]
+      },
+      "L": {
+        "theory": 100,
+        "theoryDate": "2026-08-18",
+        "examiner": "A rendszer",
+        "history": [
+          {
+            "date": "2026-08-17T10:00:00.000Z",
+            "type": "theory",
+            "theory": 100,
+            "result": "pass",
+            "examiner": "A rendszer"
+          },
+          {
+            "date": "2026-08-18T10:00:00.000Z",
+            "type": "theory",
+            "theory": 100,
+            "result": "pass",
+            "examiner": "A rendszer"
+          }
+        ]
+      },
+      "R": {
+        "theory": 85,
+        "theoryDate": "2026-08-18",
+        "examiner": "A rendszer",
+        "history": [
+          {
+            "date": "2026-08-17T10:00:00.000Z",
+            "type": "theory",
+            "theory": 85,
+            "result": "pass",
+            "examiner": "A rendszer"
+          },
+          {
+            "date": "2026-08-18T10:00:00.000Z",
+            "type": "theory",
+            "theory": 85,
+            "result": "pass",
+            "examiner": "A rendszer"
+          }
+        ]
+      }
+    },
     "levelUpEligible": false,
     "createdAt": "2026-09-20T08:03:59.264Z"
   },
@@ -755,7 +2002,43 @@
     "probationStart": "2026-08-17",
     "probationLifted": false,
     "notes": "",
-    "modules": {},
+    "modules": {
+      "0": {
+        "theory": 95,
+        "theoryDate": "2026-08-17",
+        "examiner": "A rendszer",
+        "history": [
+          {
+            "date": "2026-08-17T10:00:00.000Z",
+            "type": "theory",
+            "theory": 95,
+            "result": "pass",
+            "examiner": "A rendszer"
+          }
+        ]
+      },
+      "ADM": {
+        "theory": 85,
+        "theoryDate": "2026-08-18",
+        "examiner": "A rendszer",
+        "history": [
+          {
+            "date": "2026-08-17T10:00:00.000Z",
+            "type": "theory",
+            "theory": 85,
+            "result": "pass",
+            "examiner": "A rendszer"
+          },
+          {
+            "date": "2026-08-18T10:00:00.000Z",
+            "type": "theory",
+            "theory": 85,
+            "result": "pass",
+            "examiner": "A rendszer"
+          }
+        ]
+      }
+    },
     "levelUpEligible": false,
     "createdAt": "2026-09-20T08:03:59.264Z"
   },
@@ -853,7 +2136,22 @@
     "probationStart": "2026-08-17",
     "probationLifted": false,
     "notes": "",
-    "modules": {},
+    "modules": {
+      "0": {
+        "theory": 85,
+        "theoryDate": "2026-08-17",
+        "examiner": "A rendszer",
+        "history": [
+          {
+            "date": "2026-08-17T10:00:00.000Z",
+            "type": "theory",
+            "theory": 85,
+            "result": "pass",
+            "examiner": "A rendszer"
+          }
+        ]
+      }
+    },
     "levelUpEligible": false,
     "createdAt": "2026-09-20T08:03:59.264Z"
   }
