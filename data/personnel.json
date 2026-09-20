@@ -588,6 +588,20 @@
         "practicalExaminer": "Dominic Hayes (Admin)",
         "theoryDate": "2026-09-20",
         "examiner": "A rendszer"
+      },
+      "LSNTA": {
+        "theory": 90,
+        "history": [
+          {
+            "date": "2026-09-20T08:28:06.685Z",
+            "type": "theory",
+            "theory": 90,
+            "result": "pass",
+            "examiner": "A rendszer"
+          }
+        ],
+        "theoryDate": "2026-09-20",
+        "examiner": "A rendszer"
       }
     },
     "levelUpEligible": false,
