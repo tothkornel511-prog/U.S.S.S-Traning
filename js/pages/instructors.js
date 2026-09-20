@@ -14,7 +14,7 @@
    Itt ezért egy közös, virtuális kulccsal (H/I/J) jelenik meg egyetlen
    sorként, egyetlen oktató-mezővel — a két szint csak jegyzetként szerepel
    alatta, ahogy az eredeti dokumentumban is. */
-import { getModuleInstructor, setModuleInstructor, getInstructors, getInstructor, createInstructor, updateInstructor, deleteInstructor, moduleByCode, levelLabel } from "../store.js?v=76";
+import { getModuleInstructor, setModuleInstructor, getInstructors, getInstructor, createInstructor, updateInstructor, deleteInstructor, moduleByCode, levelLabel } from "../store.js?v=77";
 import { hasRole, actorLabel } from "../auth.js?v=23";
 import { esc, toast, openModal, closeModal, applyBranding } from "../utils.js?v=31";
 
@@ -48,6 +48,7 @@ const GROUP_DEFS = [
   { title: "S – Vízi műveletek", codes: ["S1", "S2"] },
   { title: "T – Tűzszerész képzés", codes: ["T1", "T2"] },
   { title: "Szinten kívüli szakirányok", codes: ["ADM", "LSNTA"] },
+  { title: "GSD – Government Support Division", codes: ["GSD1", "GSD2", "GSD3"] },
 ];
 
 const INSTRUCTOR_OPTIONS_ID = "ins-name-options";

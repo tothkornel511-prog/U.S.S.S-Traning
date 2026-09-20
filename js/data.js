@@ -112,6 +112,10 @@ export const MODULES = [
 
   { code: "ADM",  name: "Önkormányzati adminisztráció",                  levels: ["SPEC"],      theory: true, practical: true },
   { code: "LSNTA",name: "Adóhatósági szolgálat",                         levels: ["SPEC"],      theory: true, practical: true },
+
+  { code: "GSD1", name: "Government Support Division – alapfokú egészségügyi kiképzés",  levels: ["SPEC"], theory: true, practical: true },
+  { code: "GSD2", name: "Government Support Division – harctéri sebesültellátás",         levels: ["SPEC"], theory: true, practical: true },
+  { code: "GSD3", name: "Government Support Division – speciális mentőorvosi kiképzés",   levels: ["SPEC"], theory: true, practical: true },
 ];
 
 /* Sorrend, ahogy egy adott szinten a modulokat mutatjuk. A H/I/J modulok
@@ -125,7 +129,7 @@ export const LEVEL_MODULE_ORDER = {
   "III": ["B2", "C", "F1", "G1H", "G3", "I1", "M"],
   "IV":  ["D", "F2", "G2H", "H1", "J1", "O", "S1", "T1"],
   "V":   ["F3", "H2", "I2", "J2", "S2", "T2"],
-  "SPEC":["ADM", "LSNTA"],
+  "SPEC":["ADM", "LSNTA", "GSD1", "GSD2", "GSD3"],
 };
 
 /* Kezdeti állomány. Teljes visszaállítás: mindenki 0. szint (Próbaidős) /
