@@ -11,12 +11,19 @@
     "notes": "",
     "modules": {
       "0": {
-        "theory": 92,
+        "theory": 80,
         "history": [
           {
             "date": "2026-08-17T10:00:00.000Z",
             "type": "theory",
             "theory": 92,
+            "result": "pass",
+            "examiner": "A rendszer"
+          },
+          {
+            "date": "2026-08-17T00:00:00.000Z",
+            "type": "theory",
+            "theory": 80,
             "result": "pass",
             "examiner": "A rendszer"
           }
