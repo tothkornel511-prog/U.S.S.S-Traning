@@ -101,6 +101,7 @@ const KEYS = {
   trainingFiles: NS + "tc_files",
   medicalRecords: NS + "medical_records",
   medicalIntervals: NS + "medical_intervals",
+  instructors: NS + "instructors",
 };
 
 /* Elméleti vizsgánál ez alatt a százalék alatt a modul nem számít teljesítettnek. */
@@ -175,6 +176,7 @@ export function seedIfNeeded() {
     write(KEYS.applicants, []);
     write(KEYS.trainingPlans, []);
     write(KEYS.nextTrainingPlan, 1);
+    write(KEYS.instructors, []);
     write(KEYS.seeded, true);
   }
   applyPositionPatch();
@@ -192,6 +194,18 @@ export function seedIfNeeded() {
   applyChannelsToDocEngineMigration();
   applyTrainingCenterSeedPatch();
   applyTrainingCenterRankCategoriesPatch();
+  applyInstructorsSeedPatch();
+}
+
+/* Célzott seedelés: az Oktatók nyilvántartás — korábban telepített
+   böngészőknél a fenti "seeded" blokk már lefutott, így ez pótolja be a
+   hiányzó kulcsot. Szándékosan ÜRES listával indul (lásd data.js-hez
+   hasonlóan: nincs előre kitöltött oktató egyik modulnál sem — ezt az
+   admin/oktatásvezető tölti fel manuálisan). */
+function applyInstructorsSeedPatch() {
+  if (read(KEYS.instructors, null) === null) {
+    write(KEYS.instructors, []);
+  }
 }
 
 /* Célzott seedelés: a Training Center (kategorizált fájlkönyvtár) modul —
@@ -500,6 +514,7 @@ export const SECTIONS = [
   { id: "dashboard", label: "Vezérlőpult", icon: "◈", group: "Áttekintés" },
   { id: "personnel", label: "Állomány", icon: "☰", group: "Állomány & Képzés" },
   { id: "matrix", label: "Kiképzési Áttekintés", icon: "▦", group: "Állomány & Képzés" },
+  { id: "instructors", label: "Oktatók", icon: "🎖", group: "Állomány & Képzés" },
   { id: "plans", label: "Kiképzési tervek", icon: "✎", group: "Állomány & Képzés" },
   { id: "protocols", label: "Jegyzőkönyvek", icon: "▤", group: "Állomány & Képzés" },
   { id: "recruitment", label: "Felvételi", icon: "✎", group: "Állomány & Képzés" },
@@ -2227,6 +2242,54 @@ export function deleteTrainingFile(id, actorLabel) {
   const file = getAllTrainingFiles().find((f) => f.id === id);
   write(KEYS.trainingFiles, getAllTrainingFiles().filter((f) => f.id !== id));
   logAudit(actorLabel, "Training Center fájl törölve", file?.label || id);
+}
+
+/* ---------- Oktatók (nyilvántartás + modulonkénti hozzárendelés) ----------
+   Egyetlen adatforrás: minden oktatóhoz egy "modules" tömb tartozik (mely
+   kódok tanítja) — az adott modulnál megjelenő oktató(k) ebből a listából
+   szűrve jelennek meg, nincs külön, duplikált hozzárendelés-tábla. Üresen
+   indul (nincs előre kitöltött oktató egyik modulnál sem). */
+export function getInstructors() {
+  return read(KEYS.instructors, []).slice().sort((a, b) => a.name.localeCompare(b.name, "hu"));
+}
+export function getInstructor(id) {
+  return read(KEYS.instructors, []).find((i) => i.id === id);
+}
+export function getInstructorsForModule(code) {
+  return getInstructors().filter((i) => (i.modules || []).includes(code));
+}
+export function createInstructor(data, actorLabel) {
+  const name = (data.name || "").trim();
+  if (!name) return null;
+  const instructor = {
+    id: uid("INS"),
+    name,
+    rank: (data.rank || "").trim(),
+    modules: Array.isArray(data.modules) ? [...new Set(data.modules)] : [],
+    createdBy: actorLabel || "Rendszer",
+    createdAt: new Date().toISOString(),
+  };
+  const list = read(KEYS.instructors, []);
+  list.push(instructor);
+  if (!write(KEYS.instructors, list)) return null;
+  logAudit(actorLabel, "Oktató felvéve", name);
+  return instructor;
+}
+export function updateInstructor(id, data, actorLabel) {
+  const list = read(KEYS.instructors, []);
+  const instructor = list.find((i) => i.id === id);
+  if (!instructor) return null;
+  if (data.name !== undefined) instructor.name = (data.name || "").trim() || instructor.name;
+  if (data.rank !== undefined) instructor.rank = (data.rank || "").trim();
+  if (data.modules !== undefined) instructor.modules = Array.isArray(data.modules) ? [...new Set(data.modules)] : [];
+  write(KEYS.instructors, list);
+  logAudit(actorLabel, "Oktató adatai módosítva", instructor.name);
+  return instructor;
+}
+export function deleteInstructor(id, actorLabel) {
+  const instructor = getInstructor(id);
+  write(KEYS.instructors, read(KEYS.instructors, []).filter((i) => i.id !== id));
+  logAudit(actorLabel, "Oktató törölve", instructor?.name || id);
 }
 
 /* ---------- Orvosi alkalmasság --------------------------------------------

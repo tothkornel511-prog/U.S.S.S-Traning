@@ -2,7 +2,7 @@
    U.S.S.S. ELITE TRAINING SYSTEM — APP ENTRY
    ========================================================================== */
 
-import { seedIfNeeded, globalSearch, getCustomCss, getOperationRecords, SECTIONS, syncSharedDataFromGithub } from "./store.js?v=71";
+import { seedIfNeeded, globalSearch, getCustomCss, getOperationRecords, SECTIONS, syncSharedDataFromGithub } from "./store.js?v=72";
 import { isAuthenticated, currentSession, logout, hasSection, isSuperAdmin, ROLES } from "./auth.js?v=23";
 import { registerRoute, resolve, startRouter, navigate, currentPath } from "./router.js?v=20";
 import { esc, sealMark, closeModal, applyBranding } from "./utils.js?v=31";
@@ -11,6 +11,7 @@ import { renderDashboard } from "./pages/dashboard.js?v=46";
 import { renderPersonnelList } from "./pages/personnel.js?v=22";
 import { renderProfile } from "./pages/profile.js?v=22";
 import { renderMatrix } from "./pages/matrix.js?v=23";
+import { renderInstructors } from "./pages/instructors.js?v=1";
 import { renderProtocolsList, renderProtocolDetail } from "./pages/protocols.js?v=22";
 import { renderTrainingPlansList, renderTrainingPlanDetail } from "./pages/plans.js?v=8";
 import { renderLocationsList, renderLocationDetail } from "./pages/locations.js?v=22";
@@ -203,6 +204,7 @@ registerRoute("/dashboard", () => renderDashboard(document.getElementById("conte
 registerRoute("/personnel", () => renderPersonnelList(document.getElementById("content")));
 registerRoute("/personnel/:id", (p) => renderProfile(document.getElementById("content"), p.id));
 registerRoute("/matrix", () => renderMatrix(document.getElementById("content")));
+registerRoute("/instructors", () => renderInstructors(document.getElementById("content")));
 registerRoute("/protocols", () => renderProtocolsList(document.getElementById("content")));
 registerRoute("/protocols/:id", (p) => renderProtocolDetail(document.getElementById("content"), p.id));
 registerRoute("/plans", () => renderTrainingPlansList(document.getElementById("content")));

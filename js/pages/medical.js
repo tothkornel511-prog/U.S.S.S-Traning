@@ -2,7 +2,7 @@ import {
   getPersonnel, getPerson, ref,
   getMedicalIntervals, setMedicalInterval,
   getMedicalRecords, getLatestMedicalRecord, createMedicalRecord, deleteMedicalRecord, medicalStatusFor,
-} from "../store.js?v=71";
+} from "../store.js?v=72";
 import { hasRole, actorLabel } from "../auth.js?v=23";
 import { esc, fmtDate, toast, openModal, closeModal } from "../utils.js?v=31";
 

@@ -1026,6 +1026,19 @@ body.printing-cert #cert-print-root { display: block; }
 .doc-content blockquote p { margin: 0; color: var(--text-hi); }
 .doc-content strong { color: var(--text-hi); }
 .doc-cover { width: 100%; max-height: 280px; object-fit: cover; border-radius: var(--radius-lg); border: 1px solid rgba(198,166,100,.3); margin-bottom: 16px; }
+
+/* Oktatók (Instructors) — modulcsoportonkénti oktató-hozzárendelés */
+.ins-groups { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 14px; margin-bottom: 24px; }
+.ins-group-card { padding: 14px 16px; }
+.ins-module-row {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+  padding: 8px 0; border-top: 1px solid var(--line-soft);
+}
+.ins-module-row:first-of-type { border-top: none; }
+.ins-module-info { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.ins-module-name { font-size: 12.5px; color: var(--text-mid); }
+.ins-module-teacher { display: flex; align-items: center; gap: 10px; margin-left: auto; }
+.ins-chip-row { display: flex; flex-wrap: wrap; gap: 4px; }
 .doc-editor-toolbar { display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 6px; }
 .doc-editor-toolbar button { padding: 4px 9px; font-size: 11px; }
 .save-indicator { font-size: 11px; color: var(--text-low); transition: color .2s ease; }

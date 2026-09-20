@@ -2,7 +2,7 @@ import {
   getPerson, ref, moduleState, readinessPercent, levelProgress, probationInfo,
   setModuleTheory, setModulePractical, approveLevelUp, nextLevelId, liftProbation,
   levelLabel, moduleByCode, examStats, THEORY_PASS_THRESHOLD, deleteHistoryEntry,
-} from "../store.js?v=71";
+} from "../store.js?v=72";
 import { hasRole, actorLabel } from "../auth.js?v=20";
 import { esc, avatarContent, fmtDate, fmtDateTime, toast, openModal, closeModal } from "../utils.js?v=31";
 import { navigate } from "../router.js?v=20";
