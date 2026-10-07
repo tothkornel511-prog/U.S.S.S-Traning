@@ -1,4 +1,4 @@
-import { ref, mapById, locationsForMap, districtsForMap, upsertDistrict, deleteDistrict } from "../store.js?v=84";
+import { ref, mapById, locationsForMap, districtsForMap, upsertDistrict, deleteDistrict } from "../store.js?v=85";
 import { hasRole, actorLabel } from "../auth.js?v=20";
 import { esc, toast, openModal, closeModal } from "../utils.js?v=31";
 import { navigate } from "../router.js?v=20";

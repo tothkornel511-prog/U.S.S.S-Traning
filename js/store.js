@@ -213,6 +213,7 @@ export function seedIfNeeded() {
   applyInstructorsSeedPatch();
   applyPositionCatalogPatch();
   applyProtectionLevelRecordsCleanupPatch();
+  applyOperationNightfallSeedPatch();
 }
 
 /* Célzott, ismételten lefuttatható kiegészítés: az önkormányzati ranglétra
@@ -1461,6 +1462,23 @@ function applyProtectionLevelRecordsCleanupPatch() {
   const filtered = records.filter((record) => record.type !== "protection-levels");
   if (filtered.length !== records.length) write(KEYS.operations, filtered);
   write(PROTECTION_LEVEL_RECORDS_CLEANUP_KEY, true);
+}
+
+/* Egyszeri, kérésre létrehozott minta-ügy a Fedett Műveletek modulban —
+   üres vázként, hogy legyen egy konkrét, valós rekord a "Operation
+   Nightfall" névre, amit innentől a oktatásvezető/admin tölt fel a
+   tényleges részletekkel (cél, engedélyező, végrehajtók, gyanúsítottak). */
+const OPERATION_NIGHTFALL_SEED_KEY = NS + "operation_nightfall_seed_2026_10_07";
+function applyOperationNightfallSeedPatch() {
+  if (read(OPERATION_NIGHTFALL_SEED_KEY, false)) return;
+  const exists = getCovertOps().some((op) => op.codename.toLowerCase().includes("nightfall"));
+  if (!exists) {
+    createCovertOp({
+      codename: "Operation Nightfall",
+      objective: "Cél és háttér rögzítése folyamatban — töltse ki a tényleges részletekkel.",
+    }, "Rendszer");
+  }
+  write(OPERATION_NIGHTFALL_SEED_KEY, true);
 }
 
 function applyCommandCenterSeedPatch() {
