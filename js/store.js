@@ -559,7 +559,6 @@ export const SECTIONS = [
   { id: "operations/advance", label: "Előzetes helyszínfelmérés", icon: "⌖", group: "Parancsnoki Központ" },
   { id: "operations/protection-levels", label: "Védelmi fokozatok", icon: "◉", group: "Parancsnoki Központ" },
   { id: "investigations", label: "Belső Vizsgálatok", icon: "⚖", group: "Parancsnoki Központ" },
-  { id: "covert-ops", label: "Fedett Műveletek", icon: "◐", group: "Parancsnoki Központ" },
   { id: "operations/succession", label: "Elnöki öröklési sorrend", icon: "Ⅰ", group: "Parancsnoki Központ" },
   { id: "operations/calendar", label: "Naptár", icon: "▦", group: "Parancsnoki Központ" },
   { id: "admin", label: "Adminisztráció", icon: "⚙", group: "Rendszer" },
@@ -1847,13 +1846,16 @@ export function deleteInvestigation(id, actorLabel) {
   write(KEYS.investigations, getInvestigations().filter((i) => i.id !== id));
   logAudit(actorLabel, "Belső vizsgálat törölve", inv ? `${id} — ${inv.subjectName || inv.subjectUsssId}` : id);
 }
-/* Csatolmányok — a rendszernek nincs szervere, ezért kétféle csatolmány létezik:
-   1) "upload": a fájl ténylegesen feltöltve, Base64-ként a böngésző localStorage-ában tárolva
-      (FileReader.readAsDataURL) — méretkorlátozott, mert a localStorage kvóta böngészőnként ~5-10MB.
+/* Csatolmányok — kétféle csatolmány létezik:
+   1) "upload": a fájl ténylegesen feltöltve — a GitHub Worker proxin
+      keresztül (lásd utils.js uploadFileToGitHub) valódi fájlként
+      commitolódik az uploads/ mappába, bármilyen típus (PDF, DOCX, kép
+      stb.), nem localStorage-base64. A korlát a Workeren beállított
+      ~6 MB-os nyers fájlméret (lásd worker/worker.js MAX_BASE64_LENGTH).
    2) "link": külső helyen (Discord, Drive, Dropbox stb.) elérhető hivatkozás,
       pont úgy, ahogy a személyi profilkép is URL-ként van tárolva.
    Kép típusú csatolmányok (mindkét fajta) előnézeti miniatűrként jelennek meg. */
-export const ATTACHMENT_MAX_UPLOAD_BYTES = 3 * 1024 * 1024;
+export const ATTACHMENT_MAX_UPLOAD_BYTES = 5 * 1024 * 1024;
 const IMAGE_EXT_RE = /\.(png|jpe?g|gif|webp|avif|svg|bmp)(\?.*)?$/i;
 export function isImageAttachment(a) {
   if (!a || !a.url) return false;

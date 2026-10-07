@@ -2,7 +2,7 @@
    U.S.S.S. ELITE TRAINING SYSTEM — APP ENTRY
    ========================================================================== */
 
-import { seedIfNeeded, globalSearch, getCustomCss, SECTIONS, syncSharedDataFromGithub } from "./store.js?v=86";
+import { seedIfNeeded, globalSearch, getCustomCss, SECTIONS, syncSharedDataFromGithub } from "./store.js?v=87";
 import { isAuthenticated, currentSession, logout, hasSection, isSuperAdmin, ROLES } from "./auth.js?v=23";
 import { registerRoute, resolve, startRouter, navigate, currentPath } from "./router.js?v=20";
 import { esc, sealMark, closeModal, applyBranding } from "./utils.js?v=31";
@@ -21,8 +21,8 @@ import { renderExamList, renderExamDetail } from "./pages/exam.js?v=44";
 import { renderAdmin } from "./pages/admin.js?v=31";
 import { renderOperations } from "./pages/operations.js?v=40";
 import { renderReadiness } from "./pages/readiness.js?v=32";
-import { renderInvestigationList, renderInvestigationDetail } from "./pages/investigations.js?v=10";
-import { renderCovertOpList, renderCovertOpDetail } from "./pages/covert-ops.js?v=12";
+import { renderInvestigationList, renderInvestigationDetail } from "./pages/investigations.js?v=11";
+import { renderCovertOpList, renderCovertOpDetail } from "./pages/covert-ops.js?v=13";
 import { renderChannelsCategories, renderChannelsCategory, renderChannelsDoc } from "./pages/channels.js?v=5";
 import { renderTrainingCenterCategories, renderTrainingCenterCategory } from "./pages/training-center.js?v=3";
 
@@ -194,6 +194,9 @@ function renderNav() {
         <a href="#/training-center" class="nav-link ${path === "/training-center" || path.startsWith("/training-center/") ? "active" : ""}">
           <span class="ic">🎓</span>Training Center
         </a>
+        <a href="#/covert-ops" class="nav-link ${path === "/covert-ops" || path.startsWith("/covert-ops/") ? "active" : ""}">
+          <span class="ic">◐</span>Fedett Műveletek
+        </a>
       </div>` : "");
 }
 
@@ -250,7 +253,7 @@ function onRouteChange() {
   renderNav();
   if (!match) { navigate("/dashboard"); return; }
   const section = sectionForPath(currentPath());
-  const superAdminOnly = section === "training-center" || section === "channels";
+  const superAdminOnly = section === "training-center" || section === "channels" || section === "covert-ops";
   const allowed = superAdminOnly ? isSuperAdmin() : hasSection(section);
   if (!allowed) {
     content.innerHTML = `<div class="denied"><div class="ic">⚠</div><h3>Hozzáférés megtagadva</h3><p class="text-low">Ehhez a részhez nincs jogosultságod. Kérj hozzáférést egy adminisztrátortól.</p></div>`;

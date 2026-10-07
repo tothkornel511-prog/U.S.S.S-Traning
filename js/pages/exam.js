@@ -2,7 +2,7 @@ import {
   getExams, getExam, createExam, setExamAnswer, setExamFinalComment, setExamCategoryScore, setExamRecommendation, interruptExam, finishExam, deleteExam,
   getExamQuestions, getExamCategories, getExamCategoryCriteria, examScoreSummary, examSuggestedRecommendation, examElapsedMinutes, EXAM_MAX_SCORE, EXAM_PASS_PCT, EXAM_TARGET_MINUTES,
   promoteExamCandidate, getPositions, getInstructors, ref,
-} from "../store.js?v=86";
+} from "../store.js?v=87";
 import { hasRole, actorLabel, currentSession } from "../auth.js?v=20";
 import { esc, fmtDate, fmtDateTime, toast, openModal, closeModal, sealMark } from "../utils.js?v=31";
 import { navigate } from "../router.js?v=20";

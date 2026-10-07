@@ -5,7 +5,7 @@ import {
   isImageAttachment, formatFileSize, ATTACHMENT_MAX_UPLOAD_BYTES,
   addSubject, removeSubject,
   CO_STATUSES, CO_CLOSED_STATUSES,
-} from "../store.js?v=86";
+} from "../store.js?v=87";
 import { hasRole, actorLabel } from "../auth.js?v=20";
 import { esc, fmtDate, fmtDateTime, toast, openModal, closeModal, applyBranding, previewAttachment, uploadFileToGitHub } from "../utils.js?v=31";
 import { navigate } from "../router.js?v=20";
@@ -251,7 +251,7 @@ export function renderCovertOpDetail(container, id) {
 
     <div class="card mb-2">
       <div class="card-title mb-1">CSATOLMÁNYOK</div>
-      <p class="text-low small mb-1">Bizonyítékok, dokumentumok — közvetlenül feltöltve (böngésző helyi tárolójában) vagy külső helyen (Discord, Drive, Dropbox) tárolt hivatkozásként. Kép típusú csatolmányok előnézettel jelennek meg.</p>
+      <p class="text-low small mb-1">Bizonyítékok, dokumentumok — közvetlenül feltöltve (PDF, DOCX, kép, bármi) vagy külső helyen (Discord, Drive, Dropbox) tárolt hivatkozásként. Kép típusú csatolmányok előnézettel jelennek meg.</p>
       ${(op.attachments || []).length ? `<div class="attachment-grid">${op.attachments.map((a, i) => `
         <div class="attachment-card">
           ${isImageAttachment(a) ? `<a href="${esc(a.url)}" target="_blank" rel="noopener noreferrer"><img src="${esc(a.url)}" alt="${esc(a.label)}" class="attachment-thumb" /></a>` : `<a href="#" data-preview-attach="${i}" class="attachment-file-icon">📄</a>`}
@@ -270,7 +270,7 @@ export function renderCovertOpDetail(container, id) {
           <label class="btn btn-sm" style="cursor:pointer">Fájl kiválasztása<input type="file" id="op-attachment-file" style="display:none" /></label>
           <span class="text-low small" id="op-attachment-file-name">Nincs fájl kiválasztva.</span>
         </div>
-        <p class="text-low small mt-1">Feltöltés esetén a fájl a böngésző helyi tárolójában (localStorage) kerül mentésre, max. ${formatFileSize(ATTACHMENT_MAX_UPLOAD_BYTES)} méretig. Nagyobb dokumentumokhoz külső linket használj.</p>
+        <p class="text-low small mt-1">A fájl ténylegesen feltöltődik (PDF, DOCX, bármilyen típus), max. ${formatFileSize(ATTACHMENT_MAX_UPLOAD_BYTES)} méretig.</p>
       ` : ""}
     </div>
 
