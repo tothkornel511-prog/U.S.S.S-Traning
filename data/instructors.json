@@ -1,0 +1,116 @@
+{
+  "instructors": [
+    {
+      "id": "INS-LNJ72R",
+      "name": "Dominic Hayes",
+      "rank": "Oktatásvezető",
+      "modules": [
+        "0",
+        "A",
+        "B1",
+        "B2",
+        "C",
+        "D",
+        "E",
+        "F",
+        "F1",
+        "F2",
+        "F3",
+        "G1",
+        "G1H",
+        "G2",
+        "G2H",
+        "G3",
+        "H",
+        "I",
+        "J",
+        "K",
+        "L",
+        "M",
+        "N",
+        "O",
+        "P",
+        "R",
+        "S1",
+        "S2",
+        "T1",
+        "T2"
+      ],
+      "createdBy": "Dominic Hayes (Admin)",
+      "createdAt": "2026-09-20T08:45:48.914Z"
+    },
+    {
+      "id": "INS-76Q7VQ",
+      "name": "Christoph Norbert Kleinemann",
+      "rank": "Secretary of Homeland Security",
+      "modules": [
+        "0",
+        "A",
+        "B1",
+        "B2",
+        "C",
+        "D",
+        "E",
+        "F",
+        "F1",
+        "F2",
+        "F3",
+        "G1",
+        "G1H",
+        "G2",
+        "G2H",
+        "G3",
+        "H",
+        "I",
+        "J",
+        "K",
+        "L",
+        "M",
+        "N",
+        "O",
+        "P",
+        "R",
+        "S1",
+        "S2",
+        "T1",
+        "T2"
+      ],
+      "createdBy": "Dominic Hayes (Admin)",
+      "createdAt": "2026-09-20T08:48:20.139Z"
+    },
+    {
+      "id": "INS-1DI67W",
+      "name": "Dr. Hajas Ricsi",
+      "rank": "U.S.S.S Director / Oktató",
+      "modules": [
+        "E",
+        "GSD1",
+        "GSD2",
+        "GSD3"
+      ],
+      "createdBy": "Dominic Hayes (Admin)",
+      "createdAt": "2026-09-20T08:49:09.970Z"
+    },
+    {
+      "id": "INS-P4ZNSR",
+      "name": "Dr. Rick Deckard",
+      "rank": "Secretary of Health / Oktató",
+      "modules": [
+        "E",
+        "GSD1",
+        "GSD2",
+        "GSD3"
+      ],
+      "createdBy": "Dominic Hayes (Admin)",
+      "createdAt": "2026-09-20T08:49:52.057Z"
+    }
+  ],
+  "moduleInstructors": {
+    "E": "Dr. Hajas Ricsi , Dr. Rick Deckard",
+    "ADM": "Mindenkori Secretary of Development illetve a kijelöltek",
+    "LSNTA": "Mindenkori LSNTA Vezetősége illetve a kijelöltek",
+    "GSD1": "Mindenkori GSD vezetző illetve a kijelöltek",
+    "GSD2": "Mindenkori GSD vezetző illetve a kijelöltek",
+    "GSD3": "Mindenkori GSD vezetző illetve a kijelöltek"
+  }
+}
