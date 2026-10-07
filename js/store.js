@@ -116,7 +116,6 @@ const KEYS = {
   instructors: NS + "instructors",
   moduleInstructors: NS + "module_instructors",
   protectionLevelNotes: NS + "protection_level_notes",
-  awards: NS + "awards",
 };
 
 /* Elméleti vizsgánál ez alatt a százalék alatt a modul nem számít teljesítettnek. */
@@ -708,58 +707,6 @@ export function deletePerson(usssId, actorLabel) {
   logAudit(actorLabel, "Személy törölve", usssId);
 }
 
-/* ---- Kitüntetések (szolgálati érmek/jelvények) --------------------------
-   Katalógus: admin bármikor bővítheti (lásd Belső Vizsgálat kategóriák /
-   Fedett Művelet minősítések ugyanilyen mintáját) — a katalógusból törölt
-   tétel a már kiosztott, meglévő kitüntetéseket NEM veszi el senkitől,
-   csak az új hozzárendelési listából tűnik el. Személyenként egyszerű
-   név-string tömb (person.awards), nem ID-referencia — ugyanúgy, ahogy a
-   fedett műveletek minősítése is sima szöveg. */
-const DEFAULT_AWARDS = [
-  "Alapítói Érdemérem", "Sebesülési Érem", "Fél Éves Jubileumi Érdemérem", "Egyéves Jubileumi Érdemérem",
-  "Másfél Éves Jubileumi Érdemérem", "Technikai Kiválóságért", "Kibervédelmi Érdemjel", "Terrorelhárító Érdemjel",
-  "Hírszerzői Érdemérem", "Nemzetbiztonsági Érdemjel", "Titkos Műveleti Szalag", "Taktikai Kiválóságért",
-  "Nyomozói Kiválóságért", "Veterán Szolgálati Jel", "Hűség Érdemrend", "Tengeri Műveleti Érem",
-  "Légi Műveleti Jelvény", "Hadjárat Érdemérem", "Különleges Műveleti Érem", "Oktatási Kiválóság Érdemjel",
-  "KADÉT Szint Teljesítési Érdemérem", "Egészségügyi Szolgálatért", "Kiemelkedő Orvoslási Szolgálati Érdemérem",
-  "LSNTA Együttműködési Érem", "Rendvédelmi Szolgálati Érdemérem", "Weazel News Média Érdem",
-];
-export function getAwards() {
-  return read(KEYS.awards, DEFAULT_AWARDS);
-}
-export function addAward(name, actorLabel) {
-  const trimmed = (name || "").trim();
-  if (!trimmed) return false;
-  const list = getAwards();
-  if (list.includes(trimmed)) return true;
-  write(KEYS.awards, [...list, trimmed]);
-  logAudit(actorLabel, "Kitüntetés felvéve a katalógusba", trimmed);
-  return true;
-}
-export function removeAward(name, actorLabel) {
-  write(KEYS.awards, getAwards().filter((a) => a !== name));
-  logAudit(actorLabel, "Kitüntetés törölve a katalógusból", name);
-}
-export function addPersonAward(usssId, awardName, actorLabel) {
-  const name = (awardName || "").trim();
-  if (!name) return;
-  const list = getPersonnel();
-  const person = list.find((p) => p.usssId === usssId);
-  if (!person) return;
-  person.awards = person.awards || [];
-  if (person.awards.includes(name)) return;
-  person.awards.push(name);
-  savePersonnel(list);
-  logAudit(actorLabel, "Kitüntetés hozzárendelve", `${person.name} (${usssId}) — ${name}`);
-}
-export function removePersonAward(usssId, awardName, actorLabel) {
-  const list = getPersonnel();
-  const person = list.find((p) => p.usssId === usssId);
-  if (!person) return;
-  person.awards = (person.awards || []).filter((a) => a !== awardName);
-  savePersonnel(list);
-  logAudit(actorLabel, "Kitüntetés eltávolítva", `${person.name} (${usssId}) — ${awardName}`);
-}
 
 /* ---- Modul állapot számítás -------------------------------------------*/
 export function moduleState(person, code) {

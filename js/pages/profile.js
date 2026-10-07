@@ -2,8 +2,7 @@ import {
   getPerson, ref, moduleState, readinessPercent, levelProgress, probationInfo,
   setModuleTheory, setModulePractical, approveLevelUp, nextLevelId, liftProbation,
   levelLabel, moduleByCode, examStats, THEORY_PASS_THRESHOLD, deleteHistoryEntry,
-  getAwards, addAward, addPersonAward, removePersonAward,
-} from "../store.js?v=85";
+} from "../store.js?v=86";
 import { hasRole, actorLabel } from "../auth.js?v=20";
 import { esc, avatarContent, fmtDate, fmtDateTime, toast, openModal, closeModal } from "../utils.js?v=31";
 import { navigate } from "../router.js?v=20";
@@ -55,22 +54,6 @@ export function renderProfile(container, usssId) {
       <div class="card"><div class="card-title">Szakirányok</div><div class="card-value" style="font-size:20px">${specialtyBadges(person)}</div></div>
     </div>
 
-    <div class="card section">
-      <div class="card-title mb-1">KITÜNTETÉSEK</div>
-      ${(person.awards || []).length
-        ? `<div class="flex gap-1 flex-wrap">${person.awards.map((a) => `
-            <span class="badge badge-gold">${esc(a)}${canAdmin ? ` <button type="button" class="award-remove" data-remove-award="${esc(a)}" title="Eltávolítás">×</button>` : ""}</span>
-          `).join("")}</div>`
-        : `<div class="text-low small">Nincs rögzített kitüntetés.</div>`}
-      ${canAdmin ? `
-        <div class="flex gap-1 mt-2">
-          <select id="award-select" style="flex:1"><option value="">Válasszon kitüntetést…</option>${getAwards().filter((a) => !(person.awards || []).includes(a)).map((a) => `<option>${esc(a)}</option>`).join("")}<option value="__new__">+ Új kitüntetés…</option></select>
-          <button type="button" class="btn btn-sm" id="add-award-btn">+ Hozzárendelés</button>
-        </div>
-        <div class="field mt-1" id="award-new-wrap" style="display:none;"><input id="award-new-name" placeholder="Új kitüntetés neve" /></div>
-      ` : ""}
-    </div>
-
     <div class="tabs">
       <button class="tab-btn ${activeTab === "modules" ? "active" : ""}" data-tab="modules">Képzési modulok</button>
       <button class="tab-btn ${activeTab === "history" ? "active" : ""}" data-tab="history">Vizsgatörténet</button>
@@ -85,30 +68,6 @@ export function renderProfile(container, usssId) {
       renderProfile(container, usssId);
     })
   );
-
-  container.querySelectorAll("[data-remove-award]").forEach((b) =>
-    b.addEventListener("click", () => {
-      removePersonAward(usssId, b.getAttribute("data-remove-award"), actorLabel());
-      toast("Kitüntetés eltávolítva");
-      renderProfile(container, usssId);
-    })
-  );
-  document.getElementById("award-select")?.addEventListener("change", (e) => {
-    document.getElementById("award-new-wrap").style.display = e.target.value === "__new__" ? "block" : "none";
-  });
-  document.getElementById("add-award-btn")?.addEventListener("click", () => {
-    const select = document.getElementById("award-select");
-    let name = select.value;
-    if (!name) return;
-    if (name === "__new__") {
-      name = document.getElementById("award-new-name").value.trim();
-      if (!name) return;
-      addAward(name, actorLabel());
-    }
-    addPersonAward(usssId, name, actorLabel());
-    toast("Kitüntetés hozzárendelve");
-    renderProfile(container, usssId);
-  });
 
   if (prob && prob.active && canAdmin) {
     document.getElementById("lift-prob")?.addEventListener("click", () => {
