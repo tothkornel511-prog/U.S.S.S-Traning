@@ -1,4 +1,4 @@
-import { getPersonnel, getProtocols, getLocations, getOperationRecords, getReadinessState, READINESS_LEVELS, readinessPercent, ref, getExams, examScoreSummary, getExamCategories } from "../store.js?v=81";
+import { getPersonnel, getProtocols, getLocations, getOperationRecords, getReadinessState, READINESS_LEVELS, readinessPercent, ref, getExams, examScoreSummary, getExamCategories } from "../store.js?v=82";
 import { hasRole, currentSession, ROLES } from "../auth.js?v=20";
 import { esc, avatarContent, sealMark, applyBranding } from "../utils.js?v=31";
 import { navigate } from "../router.js?v=20";
@@ -76,7 +76,7 @@ export function renderDashboard(container) {
       </div>
     </div>
 
-    ${criticalOperations.length ? `<div class="card command-alert-panel section"><div class="flex justify-between items-center mb-1"><div><div class="eyebrow">AZONNALI VEZETŐI FIGYELEM</div><h2>Kiemelt kockázatok</h2></div><a href="#/operations/notifications" class="btn btn-sm">Értesítések megnyitása</a></div>${criticalOperations.slice(0, 5).map((record) => `<div class="history-item"><span><strong class="text-hi">${esc(record.title)}</strong><span class="text-low small"> · ${esc(record.id)} · ${esc(record.location || "Helyszín nincs megadva")}</span></span><span class="badge badge-red">${esc(record.priority === "CRITICAL" ? "KRITIKUS" : "MAGAS KOCKÁZAT")}</span></div>`).join("")}</div>` : ""}
+    ${criticalOperations.length ? `<div class="card command-alert-panel section"><div class="flex justify-between items-center mb-1"><div><div class="eyebrow">AZONNALI VEZETŐI FIGYELEM</div><h2>Kiemelt kockázatok</h2></div><a href="#/operations/reports" class="btn btn-sm">Operációs központ megnyitása</a></div>${criticalOperations.slice(0, 5).map((record) => `<div class="history-item"><span><strong class="text-hi">${esc(record.title)}</strong><span class="text-low small"> · ${esc(record.id)} · ${esc(record.location || "Helyszín nincs megadva")}</span></span><span class="badge badge-red">${esc(record.priority === "CRITICAL" ? "KRITIKUS" : "MAGAS KOCKÁZAT")}</span></div>`).join("")}</div>` : ""}
 
     <div class="card command-brief section"><div class="flex justify-between items-center mb-1"><div><div class="eyebrow">AUTOMATIKUS DÖNTÉSTÁMOGATÁS</div><h2>Vezetői helyzetértékelés</h2></div><span class="badge badge-gold">HELYI ELEMZÉS</span></div><p>${esc(commandBrief.summary)}</p><div class="brief-actions">${commandBrief.actions.map((action) => `<div class="brief-action"><span class="brief-index">${action.level}</span><span>${esc(action.text)}</span></div>`).join("")}</div><div class="text-low small mt-1">Az összefoglaló a rendszerben mentett rekordokból készül, külső adatot nem használ.</div></div>
 

@@ -1,10 +1,13 @@
 import {
   OPERATION_TYPES,
+  PROTECTION_LEVELS,
+  getProtectionLevelNotes,
+  setProtectionLevelNote,
   getOperationRecords,
   createOperationRecord,
   updateOperationRecord,
   archiveOperationRecord,
-} from "../store.js?v=81";
+} from "../store.js?v=82";
 import { actorLabel, hasRole } from "../auth.js?v=20";
 import { esc, fmtDate, toast, openModal, closeModal, applyBranding } from "../utils.js?v=31";
 import { navigate } from "../router.js?v=20";
@@ -13,11 +16,27 @@ const STATUS = ["OPEN", "IN REVIEW", "APPROVED", "REJECTED", "COMPLETED"];
 const PRIORITIES = ["LOW", "NORMAL", "HIGH", "CRITICAL"];
 const TEMPLATES = {
   reports: { label: "Általános szolgálati jelentés", description: "Mi történt?\nMikor és hol történt?\nKik voltak jelen?\nMilyen intézkedés történt?\nMi lett az eredmény?", action: "További intézkedés / ajánlás:" },
-  advance: { label: "Advance Report", description: "Megközelítési lehetőségek:\nBejáratok és kijáratok:\nBiztonsági hiányosságok:\nTömeg és környezeti kockázatok:", action: "Javasolt intézkedések:\nEgyüttműködő szervek:" },
-  threats: { label: "Threat Assessment", description: "Fenyegetés forrása:\nÉrintett védett személy vagy esemény:\nLeírás és hitelesség:\nSürgősség:", action: "Kockázatcsökkentő intézkedés:\nFelelős és felülvizsgálat:" },
+};
+/* Advance Work: a generikus leírás/intézkedés két szabad mező helyett
+   tagolt, valódi Advance Report-mezőket kap — ezek mentéskor egyetlen
+   címkézett description/action szövegbe íródnak össze, mert a megosztott
+   operációs rekord-séma (createOperationRecord) nem vesz fel tetszőleges
+   extra mezőt. */
+const ADVANCE_FIELDS = {
+  description: [
+    { key: "approach", label: "Megközelítési lehetőségek" },
+    { key: "entrances", label: "Bejáratok és kijáratok" },
+    { key: "gaps", label: "Biztonsági hiányosságok" },
+    { key: "crowd", label: "Tömeg és környezeti kockázatok" },
+  ],
+  action: [
+    { key: "recommendations", label: "Javasolt intézkedések" },
+    { key: "partners", label: "Együttműködő szervek" },
+  ],
 };
 
 export function renderOperations(container, type = "reports") {
+  if (type === "protection-levels") return renderProtectionLevels(container);
   const meta = OPERATION_TYPES[type] || OPERATION_TYPES.reports;
   const records = getOperationRecords(type);
   const canEdit = hasRole("TRAINING");
@@ -40,7 +59,6 @@ export function renderOperations(container, type = "reports") {
       <select id="operation-priority"><option value="ALL">Minden prioritás</option>${PRIORITIES.map((value) => `<option>${value}</option>`).join("")}</select>
       <label class="filter-check"><input type="checkbox" id="operation-archive" /> Archiváltak</label>
     </div>
-    ${type === "notifications" ? renderNotificationsOverview() : ""}
     <div class="operation-grid" id="operation-list"></div>
   `;
   const render = () => {
@@ -68,9 +86,52 @@ export function renderOperations(container, type = "reports") {
   render();
 }
 
-function renderNotificationsOverview() {
-  const records = getOperationRecords().filter((record) => !record.archived && (record.priority === "CRITICAL" || record.priority === "HIGH" || record.risk === "CRITICAL"));
-  return `<div class="card notification-banner"><div class="eyebrow">AUTOMATIKUS VEZETŐI ÉRTESÍTÉSEK</div><h3>${records.length ? `${records.length} ügy figyelmet igényel` : "Nincs kiemelt nyitott figyelmeztetés"}</h3><p class="text-low small">Az értesítések a mentett operációs rekordok prioritásából és kockázati szintjéből készülnek.</p></div>`;
+/* Védelmi fokozatok — a PROTECTION_LEVELS 4 fix tétele rögzített szabályzati
+   referencia, nem nyitható/zárható, archiválható "ügy" — ezért itt NEM az
+   általános operációs-rekord listát használjuk, hanem egy saját, egyszerű
+   nézetet: a 4 szint leírása + egy admin-szerkeszthető alkalmazási
+   megjegyzés fokozatonként (lásd getProtectionLevelNotes/setProtectionLevelNote). */
+function renderProtectionLevels(container) {
+  const canEdit = hasRole("TRAINING");
+  const meta = OPERATION_TYPES["protection-levels"];
+  const draw = () => {
+    const notes = getProtectionLevelNotes();
+    container.innerHTML = `
+      <div class="page-banner page-banner-command">
+        <div class="page-banner-body">
+          <div class="eyebrow">PARANCSNOKI KÖZPONT</div>
+          <h2>${esc(meta.label)}</h2>
+          <p>Rögzített védelmi szint-rendszer — a besorolás minden védett személyhez, eseményhez vagy helyszínhez vezetői döntéssel rendelhető hozzá.</p>
+        </div>
+      </div>
+      <div class="classification-strip">U.S.S.S. PARANCSNOKI KÖZPONT · ${esc(meta.label)}</div>
+      <div class="grid grid-2" id="protection-level-grid">
+        ${PROTECTION_LEVELS.map((level) => `
+          <div class="card protection-level-card">
+            <div class="flex justify-between items-center mb-1">
+              <span class="badge badge-gold" style="font-family:var(--font-mono)">${esc(level.id)}</span>
+            </div>
+            <div class="card-title">${esc(level.label)}</div>
+            <p class="text-mid">${esc(level.description)}</p>
+            <div class="field mt-1">
+              <label>Alkalmazási megjegyzés</label>
+              ${canEdit
+                ? `<textarea rows="3" data-note="${esc(level.id)}" placeholder="pl. mikor, kikre kell kiosztani ezt a szintet…">${esc(notes[level.id] || "")}</textarea>`
+                : `<div class="record-detail-text">${esc(notes[level.id] || "—")}</div>`}
+            </div>
+            ${canEdit ? `<button class="btn btn-sm mt-1" data-save-note="${esc(level.id)}">Mentés</button>` : ""}
+          </div>`).join("")}
+      </div>
+    `;
+    applyBranding(container.querySelector(".page-banner-command"), "hero-command-ops");
+    container.querySelectorAll("[data-save-note]").forEach((button) => button.addEventListener("click", () => {
+      const levelId = button.getAttribute("data-save-note");
+      const text = container.querySelector(`[data-note="${levelId}"]`).value;
+      setProtectionLevelNote(levelId, text, actorLabel());
+      toast("Megjegyzés mentve");
+    }));
+  };
+  draw();
 }
 
 function exportOperations(records, label) {
@@ -121,15 +182,31 @@ function openRecordView(record, canEdit) {
 }
 
 function openOperationForm(type, meta) {
+  const isAdvance = type === "advance";
   openModal(`<div class="modal-head"><h3>${esc(meta.singular)} rögzítése</h3><button class="modal-close" data-close-modal>×</button></div>
     <form id="operation-form"><div class="field"><label>Megnevezés</label><input id="op-title" required autofocus /></div>
     <div class="grid grid-2"><div class="field"><label>Dátum</label><input id="op-date" type="date" value="${new Date().toISOString().slice(0, 10)}" /></div><div class="field"><label>Felelős</label><input id="op-owner" /></div><div class="field"><label>Helyszín</label><input id="op-location" /></div><div class="field"><label>Védett személy / érintett</label><input id="op-protectee" /></div><div class="field"><label>Státusz</label><select id="op-status">${STATUS.map((value) => `<option>${value}</option>`).join("")}</select></div><div class="field"><label>Prioritás</label><select id="op-priority">${PRIORITIES.map((value) => `<option>${value}</option>`).join("")}</select></div><div class="field"><label>Kockázati szint</label><select id="op-risk">${PRIORITIES.map((value) => `<option>${value}</option>`).join("")}</select></div></div>
-    ${TEMPLATES[type] ? `<div class="field"><label>Sablon</label><select id="op-template"><option value="">Üres rekord</option><option value="default">${esc(TEMPLATES[type].label)}</option></select></div>` : ""}
-    <div class="field"><label>Leírás</label><textarea id="op-description" rows="5" required></textarea></div><div class="field"><label>Intézkedés / eredmény / ajánlás</label><textarea id="op-action" rows="4"></textarea></div>
+    ${isAdvance ? `
+      <div class="card-title mt-1 mb-1">HELYSZÍNFELMÉRÉS</div>
+      ${ADVANCE_FIELDS.description.map((f) => `<div class="field"><label>${esc(f.label)}</label><textarea id="adv-${f.key}" rows="2"></textarea></div>`).join("")}
+      <div class="card-title mt-1 mb-1">INTÉZKEDÉSEK</div>
+      ${ADVANCE_FIELDS.action.map((f) => `<div class="field"><label>${esc(f.label)}</label><textarea id="adv-${f.key}" rows="2"></textarea></div>`).join("")}
+    ` : `
+      ${TEMPLATES[type] ? `<div class="field"><label>Sablon</label><select id="op-template"><option value="">Üres rekord</option><option value="default">${esc(TEMPLATES[type].label)}</option></select></div>` : ""}
+      <div class="field"><label>Leírás</label><textarea id="op-description" rows="5" required></textarea></div><div class="field"><label>Intézkedés / eredmény / ajánlás</label><textarea id="op-action" rows="4"></textarea></div>
+    `}
     <div class="flex justify-between"><button type="button" class="btn" data-close-modal>Mégse</button><button class="btn btn-gold">Mentés és auditálás</button></div></form>`);
   document.getElementById("operation-form").addEventListener("submit", (event) => {
     event.preventDefault();
-    createOperationRecord(type, { title: document.getElementById("op-title").value, date: document.getElementById("op-date").value, owner: document.getElementById("op-owner").value, location: document.getElementById("op-location").value, protectee: document.getElementById("op-protectee").value, status: document.getElementById("op-status").value, priority: document.getElementById("op-priority").value, risk: document.getElementById("op-risk").value, description: document.getElementById("op-description").value, action: document.getElementById("op-action").value }, actorLabel());
+    const base = { title: document.getElementById("op-title").value, date: document.getElementById("op-date").value, owner: document.getElementById("op-owner").value, location: document.getElementById("op-location").value, protectee: document.getElementById("op-protectee").value, status: document.getElementById("op-status").value, priority: document.getElementById("op-priority").value, risk: document.getElementById("op-risk").value };
+    if (isAdvance) {
+      base.description = ADVANCE_FIELDS.description.map((f) => `${f.label}:\n${document.getElementById(`adv-${f.key}`).value.trim()}`).join("\n\n");
+      base.action = ADVANCE_FIELDS.action.map((f) => `${f.label}:\n${document.getElementById(`adv-${f.key}`).value.trim()}`).join("\n\n");
+    } else {
+      base.description = document.getElementById("op-description").value;
+      base.action = document.getElementById("op-action").value;
+    }
+    createOperationRecord(type, base, actorLabel());
     closeModal(); toast("Rekord mentve és auditálva"); renderOperations(document.getElementById("content"), type);
   });
   document.getElementById("op-template")?.addEventListener("change", (event) => {

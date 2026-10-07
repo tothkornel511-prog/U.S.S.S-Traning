@@ -2,12 +2,12 @@
    U.S.S.S. ELITE TRAINING SYSTEM — APP ENTRY
    ========================================================================== */
 
-import { seedIfNeeded, globalSearch, getCustomCss, getOperationRecords, SECTIONS, syncSharedDataFromGithub } from "./store.js?v=81";
+import { seedIfNeeded, globalSearch, getCustomCss, SECTIONS, syncSharedDataFromGithub } from "./store.js?v=82";
 import { isAuthenticated, currentSession, logout, hasSection, isSuperAdmin, ROLES } from "./auth.js?v=23";
 import { registerRoute, resolve, startRouter, navigate, currentPath } from "./router.js?v=20";
 import { esc, sealMark, closeModal, applyBranding } from "./utils.js?v=31";
 import { renderLogin } from "./pages/login.js?v=28";
-import { renderDashboard } from "./pages/dashboard.js?v=46";
+import { renderDashboard } from "./pages/dashboard.js?v=47";
 import { renderPersonnelList } from "./pages/personnel.js?v=22";
 import { renderProfile } from "./pages/profile.js?v=22";
 import { renderMatrix } from "./pages/matrix.js?v=23";
@@ -19,13 +19,12 @@ import { renderMapPage } from "./pages/map.js?v=21";
 import { renderRecruitmentHub, renderApplicantDetail } from "./pages/recruitment.js?v=26";
 import { renderExamList, renderExamDetail } from "./pages/exam.js?v=44";
 import { renderAdmin } from "./pages/admin.js?v=31";
-import { renderOperations } from "./pages/operations.js?v=39";
+import { renderOperations } from "./pages/operations.js?v=40";
 import { renderReadiness } from "./pages/readiness.js?v=32";
 import { renderInvestigationList, renderInvestigationDetail } from "./pages/investigations.js?v=10";
 import { renderCovertOpList, renderCovertOpDetail } from "./pages/covert-ops.js?v=12";
 import { renderChannelsCategories, renderChannelsCategory, renderChannelsDoc } from "./pages/channels.js?v=5";
 import { renderTrainingCenterCategories, renderTrainingCenterCategory } from "./pages/training-center.js?v=3";
-import { renderMedicalList } from "./pages/medical.js?v=1";
 
 seedIfNeeded();
 applyCustomCss();
@@ -175,7 +174,6 @@ function renderSearchResults(results, container) {
 function renderNav() {
   const navRoot = document.getElementById("nav-root");
   const path = currentPath();
-  const alertCount = getOperationRecords().filter((record) => !record.archived && record.status !== "COMPLETED" && (record.priority === "CRITICAL" || record.priority === "HIGH" || record.risk === "CRITICAL")).length;
   navRoot.innerHTML = NAV.map((group) => {
     const items = group.items.filter((i) => hasSection(i.section));
     if (!items.length) return "";
@@ -184,7 +182,7 @@ function renderNav() {
         <div class="nav-group-label">${esc(group.group)}</div>
         ${items.map((i) => `
           <a href="#${i.path}" class="nav-link ${(path === i.path || path.startsWith(i.path + "/")) ? "active" : ""}">
-            <span class="ic">${i.icon}</span>${esc(i.label)}${i.path === "/operations/notifications" && alertCount ? `<span class="nav-alert-count">${alertCount}</span>` : ""}
+            <span class="ic">${i.icon}</span>${esc(i.label)}
           </a>`).join("")}
       </div>`;
   }).join("") + (isSuperAdmin() ? `
@@ -211,7 +209,6 @@ registerRoute("/plans", () => renderTrainingPlansList(document.getElementById("c
 registerRoute("/plans/:id", (p) => renderTrainingPlanDetail(document.getElementById("content"), p.id));
 registerRoute("/recruitment", () => renderRecruitmentHub(document.getElementById("content")));
 registerRoute("/recruitment/:id", (p) => renderApplicantDetail(document.getElementById("content"), p.id));
-registerRoute("/medical", () => renderMedicalList(document.getElementById("content")));
 registerRoute("/exam", () => renderExamList(document.getElementById("content")));
 registerRoute("/exam/:id", (p) => renderExamDetail(document.getElementById("content"), p.id));
 registerRoute("/locations", () => renderLocationsList(document.getElementById("content")));

@@ -10,7 +10,7 @@ import {
   LEVELS, SERVICE_STATUSES, POSITIONS, MODULES, LEVEL_MODULE_ORDER,
   PERSONNEL, ACCESS_CODES, PROTECTED_LOCATIONS, AUDIT_LOG_SEED, MAPS, DISTRICTS,
   RECRUITMENT_QUESTIONS, EXAM_QUESTIONS, EXAM_CATEGORIES, EXAM_CATEGORY_CRITERIA, RANK_ORDER,
-} from "./data.js?v=29";
+} from "./data.js?v=30";
 
 /* v7: Roxwood/Cayo Perico eltávolítva, csak Los Santos térkép maradt. */
 const NS = "usss_ets_v7_";
@@ -113,10 +113,9 @@ const KEYS = {
   channelQuestions: NS + "ch_questions",
   trainingCategories: NS + "tc_categories",
   trainingFiles: NS + "tc_files",
-  medicalRecords: NS + "medical_records",
-  medicalIntervals: NS + "medical_intervals",
   instructors: NS + "instructors",
   moduleInstructors: NS + "module_instructors",
+  protectionLevelNotes: NS + "protection_level_notes",
 };
 
 /* Elméleti vizsgánál ez alatt a százalék alatt a modul nem számít teljesítettnek. */
@@ -512,7 +511,6 @@ const STORAGE_LABELS = {
   audit_log: "Eseménynapló", training_plans: "Kiképzési tervek", recruitment_questions: "Felvételi kérdésbank",
   applicants: "Jelentkezők", exams: "Felvételi vizsgák", operations: "Command Center rekordok",
   readiness: "Készültségi állapot", investigations: "Belső vizsgálatok", covert_ops: "Fedett műveletek",
-  medical_records: "Orvosi bejegyzések", medical_intervals: "Orvosi időközök",
 };
 export function getStorageReport() {
   const all = allOwnKeys().map((key) => {
@@ -549,26 +547,19 @@ export const SECTIONS = [
   { id: "plans", label: "Kiképzési tervek", icon: "✎", group: "Állomány & Képzés" },
   { id: "protocols", label: "Jegyzőkönyvek", icon: "▤", group: "Állomány & Képzés" },
   { id: "recruitment", label: "Felvételi", icon: "✎", group: "Állomány & Képzés" },
-  { id: "medical", label: "Orvosi alkalmasság", icon: "✚", group: "Állomány & Képzés" },
   { id: "locations", label: "Védett helyszínek", icon: "◆", group: "Objektumok" },
   { id: "map", label: "Térkép", icon: "⛶", group: "Objektumok" },
   { id: "readiness", label: "Készültségi rendszer", icon: "◉", group: "Vezetői irányítás" },
   { id: "operations/reports", label: "Jelentések", icon: "▤", group: "Parancsnoki Központ" },
-  { id: "operations/threats", label: "Fenyegetésértékelés", icon: "△", group: "Parancsnoki Központ" },
   { id: "operations/events", label: "Események", icon: "◈", group: "Parancsnoki Központ" },
   { id: "operations/assignments", label: "Feladatok", icon: "▣", group: "Parancsnoki Központ" },
   { id: "operations/protectees", label: "Védett személyek", icon: "◆", group: "Parancsnoki Központ" },
-  { id: "operations/escorts", label: "Kísérések", icon: "↗", group: "Parancsnoki Központ" },
   { id: "operations/advance", label: "Előzetes helyszínfelmérés", icon: "⌖", group: "Parancsnoki Központ" },
   { id: "operations/protection-levels", label: "Védelmi fokozatok", icon: "◉", group: "Parancsnoki Központ" },
-  { id: "operations/protective-plans", label: "Védelmi tervek", icon: "⬡", group: "Parancsnoki Központ" },
-  { id: "operations/intelligence", label: "Védelmi információk", icon: "⌁", group: "Parancsnoki Központ" },
   { id: "investigations", label: "Belső Vizsgálatok", icon: "⚖", group: "Parancsnoki Központ" },
   { id: "covert-ops", label: "Fedett Műveletek", icon: "◐", group: "Parancsnoki Központ" },
-  { id: "operations/government", label: "Kormányzati névjegyzék", icon: "⌂", group: "Parancsnoki Központ" },
   { id: "operations/succession", label: "Elnöki öröklési sorrend", icon: "Ⅰ", group: "Parancsnoki Központ" },
   { id: "operations/calendar", label: "Naptár", icon: "▦", group: "Parancsnoki Központ" },
-  { id: "operations/notifications", label: "Értesítések", icon: "◌", group: "Parancsnoki Központ" },
   { id: "admin", label: "Adminisztráció", icon: "⚙", group: "Rendszer" },
 ];
 
@@ -1278,18 +1269,12 @@ export function getExams() {
 export const OPERATION_TYPES = {
   protectees: { label: "Védett személyek", singular: "Védett személy", icon: "◆" },
   events: { label: "Események", singular: "Esemény", icon: "◈" },
-  escorts: { label: "Kísérések", singular: "Kísérés", icon: "↗" },
   assignments: { label: "Feladatok", singular: "Feladat", icon: "▣" },
   reports: { label: "Jelentések", singular: "Jelentés", icon: "▤" },
-  threats: { label: "Fenyegetésértékelés", singular: "Fenyegetés", icon: "△" },
   advance: { label: "Advance Work", singular: "Advance", icon: "⌖" },
   "protection-levels": { label: "Védelmi fokozatok", singular: "Védelmi fokozat", icon: "◉" },
-  "protective-plans": { label: "Védelmi tervek", singular: "Védelmi terv", icon: "⬡" },
-  intelligence: { label: "Védelmi információk", singular: "Védelmi információ", icon: "⌁" },
-  government: { label: "Kormányzati névjegyzék", singular: "Kormányzati bejegyzés", icon: "⌂" },
   succession: { label: "Elnöki öröklési sorrend", singular: "Öröklési bejegyzés", icon: "Ⅰ" },
   calendar: { label: "Naptár", singular: "Naptári esemény", icon: "▦" },
-  notifications: { label: "Értesítések", singular: "Értesítés", icon: "◌" },
   settings: { label: "Beállítások", singular: "Beállítás", icon: "⚙" },
 };
 export const PROTECTION_LEVELS = [
@@ -1314,6 +1299,21 @@ export function setReadinessState(level, reason, actorLabel) {
   write(KEYS.readiness, state);
   logAudit(actorLabel, "Készültségi szint módosítva", `${READINESS_LEVELS[level].label} — ${state.reason}`);
   return true;
+}
+/* A négy fokozat (PROTECTION_LEVELS) maga állandó, nem admin-szerkeszthető
+   referencia-adat — ehhez csak egy szabadszöveges, fokozatonkénti belső
+   alkalmazási megjegyzés rendelhető (pl. mikor/kire kell az adott szintet
+   kiosztani). Korábban ez tévesen "operációs rekordként" (archiválható,
+   prioritás/kockázat-besorolású incidensként) jelent meg — a fokozatok
+   viszont rögzített szabályzati tételek, nem nyitott/zárt ügyek. */
+export function getProtectionLevelNotes() {
+  return read(KEYS.protectionLevelNotes, {});
+}
+export function setProtectionLevelNote(levelId, text, actorLabel) {
+  const notes = getProtectionLevelNotes();
+  notes[levelId] = (text || "").trim();
+  write(KEYS.protectionLevelNotes, notes);
+  logAudit(actorLabel, "Védelmi fokozat megjegyzés módosítva", levelId);
 }
 export const GOVERNMENT_HIERARCHY = [
   ["President", "Elnök", "Az önkormányzat legfőbb vezetője és végső döntéshozója."],
@@ -1387,11 +1387,6 @@ function applyCommandCenterCatalogSeedPatch() {
     if (existing.has(key)) return;
     records.push({ id: `SUC-${String(order).padStart(3, "0")}`, type: "succession", title, status: "APPROVED", priority: order <= 2 ? "CRITICAL" : "HIGH", risk: "LOW", protectionLevel: order <= 2 ? "LEVEL 4" : "LEVEL 2", owner: "Önkormányzati vezetés", location: "Önkormányzati központ", protectee: "", date: now.slice(0, 10), description: `${position}\nÖröklési sorrend: ${order}. hely`, action: "A sorrend vezetői jóváhagyással és auditált módosítással kezelendő.", recommendation: "A tisztség aktuális betöltőjét és helyettesét rendszeresen felül kell vizsgálni.", tags: "government, succession, protected-office", archived: false, createdAt: now, createdBy: "Rendszer", updatedAt: now, history: [{ at: now, by: "Rendszer", action: "Öröklési sorrend rögzítve" }] });
   });
-  PROTECTION_LEVELS.forEach((level) => {
-    const key = `protection-levels:${level.label}`;
-    if (existing.has(key)) return;
-    records.push({ id: `LVL-${level.id.replace("LEVEL ", "")}`, type: "protection-levels", title: level.label, status: "APPROVED", priority: "HIGH", risk: level.id === "LEVEL 4" ? "CRITICAL" : "LOW", protectionLevel: level.id, owner: "U.S.S.S. Command", location: "U.S.S.S. belső szabályzat", protectee: "", date: now.slice(0, 10), description: level.description, action: "A szint hozzárendelése védett személyhez, eseményhez vagy helyszínhez vezetői felülvizsgálattal történik.", recommendation: "Minden kiemelt esemény előtt a szintet felül kell vizsgálni.", tags: "protection-level, policy", archived: false, createdAt: now, createdBy: "Rendszer", updatedAt: now, history: [{ at: now, by: "Rendszer", action: "Védelmi fokozat rögzítve" }] });
-  });
   write(KEYS.operations, records);
   write(patchKey, true);
 }
@@ -1445,8 +1440,15 @@ function applyProtecteeScopePatch() {
   write(patchKey, true);
 }
 
+/* A típus törölve lett a katalógusból (pl. mert a modult eltávolítottuk) —
+   az ilyen, "árva" rekordokat innentől sehol sem számoljuk/listázzuk, hogy
+   a Vezérlőpult és a Parancsnoki Központ statisztikái ne mutassanak
+   elérhetetlen, régi adatokból származó téves számokat. A rekordok maguk
+   megmaradnak a tárolóban (nem törlődnek), csak nem jelennek meg sehol. */
 export function getOperationRecords(type = "") {
-  return read(KEYS.operations, []).filter((record) => !type || record.type === type);
+  return read(KEYS.operations, [])
+    .filter((record) => OPERATION_TYPES[record.type])
+    .filter((record) => !type || record.type === type);
 }
 
 export function createOperationRecord(type, fields, actorLabel) {
@@ -2419,99 +2421,6 @@ export function deleteInstructor(id, actorLabel) {
   write(KEYS.instructors, read(KEYS.instructors, []).filter((i) => i.id !== id));
   pushInstructorsShared();
   logAudit(actorLabel, "Oktató törölve", instructor?.name || id);
-}
-
-/* ---------- Orvosi alkalmasság --------------------------------------------
-   Fokozatonként admin által beállítható időköz — VAGY hétben, VAGY hónapban
-   (bármelyik fokozatnál külön eldönthető, pl. az alacsonyabb fokozatoknál
-   gyakoribb, hetekben megadott ellenőrzés is értelmes lehet). Amikor
-   valakinél rögzítesz egy elvégzett orvosi vizsgálatot, a rendszer az Ő
-   AKKORI fokozata alapján számolja ki és véglegesen eltárolja a bejegyzésen
-   a következő esedékességet (egy utólagos fokozatváltás nem írja át a már
-   rögzített, korábbi bejegyzések esedékességét — csak a KÖVETKEZŐ vizsgálat
-   rögzítésekor számol az akkor érvényes fokozattal/időközzel). */
-const DEFAULT_MEDICAL_INTERVAL = { amount: 12, unit: "month" };
-export function getMedicalIntervals() {
-  const stored = read(KEYS.medicalIntervals, null);
-  const intervals = {};
-  LEVELS.forEach((l) => {
-    const entry = stored?.[l.id];
-    // Visszamenőleges kompatibilitás: a korábbi verzió sima számot (hónapot)
-    // tárolt objektum helyett — azt itt {amount, unit:"month"} alakra hozzuk.
-    if (typeof entry === "number") intervals[l.id] = { amount: entry, unit: "month" };
-    else if (entry && typeof entry === "object") intervals[l.id] = entry;
-    else intervals[l.id] = { ...DEFAULT_MEDICAL_INTERVAL };
-  });
-  return intervals;
-}
-export function setMedicalInterval(levelId, amount, unit, actorLabel) {
-  const intervals = getMedicalIntervals();
-  const safeUnit = unit === "week" ? "week" : "month";
-  const safeAmount = Math.max(1, Number(amount) || DEFAULT_MEDICAL_INTERVAL.amount);
-  intervals[levelId] = { amount: safeAmount, unit: safeUnit };
-  write(KEYS.medicalIntervals, intervals);
-  logAudit(actorLabel, "Orvosi időköz módosítva", `${levelId} fokozat → ${safeAmount} ${safeUnit === "week" ? "hét" : "hónap"}`);
-}
-
-/* Tisztán UTC-ben számol, hogy elkerülje az "new Date(string)" (UTC-ként
-   értelmezett) és a helyi időzóna szerint módosító setter-ek keverése
-   miatti, időzóna-függő egy napos csúszást a dátumban. */
-function addInterval(dateStr, amount, unit) {
-  const [y, m, d] = dateStr.split("-").map(Number);
-  if (unit === "week") {
-    return new Date(Date.UTC(y, m - 1, d + amount * 7)).toISOString().slice(0, 10);
-  }
-  return new Date(Date.UTC(y, m - 1 + amount, d)).toISOString().slice(0, 10);
-}
-
-function getAllMedicalRecords() {
-  return read(KEYS.medicalRecords, []);
-}
-export function getMedicalRecords(usssId) {
-  return getAllMedicalRecords()
-    .filter((r) => r.usssId === usssId)
-    .sort((a, b) => new Date(b.examDate) - new Date(a.examDate));
-}
-export function getLatestMedicalRecord(usssId) {
-  return getMedicalRecords(usssId)[0] || null;
-}
-export function createMedicalRecord(usssId, data, actorLabel) {
-  const person = getPerson(usssId);
-  if (!person) return null;
-  const examDate = data.examDate || new Date().toISOString().slice(0, 10);
-  const intervals = getMedicalIntervals();
-  const interval = intervals[person.level] || DEFAULT_MEDICAL_INTERVAL;
-  const record = {
-    id: uid("MED"),
-    usssId,
-    examDate,
-    nextDueDate: addInterval(examDate, interval.amount, interval.unit),
-    levelAtExam: person.level,
-    examinedBy: (data.examinedBy || "").trim(),
-    notes: (data.notes || "").trim(),
-    createdBy: actorLabel || "Rendszer",
-    createdAt: new Date().toISOString(),
-  };
-  const list = getAllMedicalRecords();
-  list.push(record);
-  if (!write(KEYS.medicalRecords, list)) return null;
-  logAudit(actorLabel, "Orvosi vizsgálat rögzítve", `${person.name} (${usssId}) — ${examDate}`);
-  return record;
-}
-export function deleteMedicalRecord(id, actorLabel) {
-  const record = getAllMedicalRecords().find((r) => r.id === id);
-  write(KEYS.medicalRecords, getAllMedicalRecords().filter((r) => r.id !== id));
-  logAudit(actorLabel, "Orvosi bejegyzés törölve", record ? `${record.usssId} — ${record.examDate}` : id);
-}
-/* Állapot: "nincs-adat" (soha nem volt rögzítve), "lejart" (a következő
-   esedékesség már elmúlt), "hamarosan" (30 napon belül esedékes), "rendben". */
-export function medicalStatusFor(usssId) {
-  const latest = getLatestMedicalRecord(usssId);
-  if (!latest) return "nincs-adat";
-  const dueInDays = (new Date(latest.nextDueDate) - new Date(new Date().toISOString().slice(0, 10))) / (1000 * 60 * 60 * 24);
-  if (dueInDays < 0) return "lejart";
-  if (dueInDays <= 30) return "hamarosan";
-  return "rendben";
 }
 
 /* ---------- Global search ------------------------------------------------*/
