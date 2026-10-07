@@ -61,7 +61,28 @@
       }
     },
     "levelUpEligible": false,
-    "createdAt": "2026-09-18T10:41:26.497Z"
+    "createdAt": "2026-09-18T10:41:26.497Z",
+    "joinDate": "2025-02-19",
+    "awards": [
+      "Alapítói Érdemérem",
+      "Sebesülési Érem",
+      "Fél Éves Jubileumi Érdemérem",
+      "Technikai Kiválóságért",
+      "Kibervédelmi Érdemjel",
+      "Terrorelhárító Érdemjel",
+      "Hírszerzői Érdemérem",
+      "Nemzetbiztonsági Érdemjel",
+      "Titkos Műveleti Szalag",
+      "Taktikai Kiválóságért",
+      "Nyomozói Kiválóságért",
+      "Veterán Szolgálati Jel",
+      "Hűség Érdemrend",
+      "Tengeri Műveleti Érem",
+      "Légi Műveleti Jelvény",
+      "Hadjárat Érdemérem",
+      "Egyéves Jubileumi Érdemérem",
+      "Másfél Éves Jubileumi Érdemérem"
+    ]
   },
   {
     "usssId": "USSS-80",
@@ -182,7 +203,12 @@
       }
     },
     "levelUpEligible": false,
-    "createdAt": "2026-09-18T10:41:26.498Z"
+    "createdAt": "2026-09-18T10:41:26.498Z",
+    "joinDate": "2026-02-10",
+    "awards": [
+      "Fél Éves Jubileumi Érdemérem",
+      "LSNTA Együttműködési Érem"
+    ]
   },
   {
     "usssId": "USSS-91",
@@ -239,7 +265,14 @@
       }
     },
     "levelUpEligible": false,
-    "createdAt": "2026-09-18T10:41:26.498Z"
+    "createdAt": "2026-09-18T10:41:26.498Z",
+    "joinDate": "2026-01-31",
+    "awards": [
+      "Fél Éves Jubileumi Érdemérem",
+      "Sebesülési Érem",
+      "Weazel News Média Érdem",
+      "Veterán Szolgálati Jel"
+    ]
   },
   {
     "usssId": "USSS-121",
@@ -310,7 +343,9 @@
       }
     },
     "levelUpEligible": false,
-    "createdAt": "2026-09-18T10:41:26.498Z"
+    "createdAt": "2026-09-18T10:41:26.498Z",
+    "joinDate": "2026-08-05",
+    "awards": []
   },
   {
     "usssId": "USSS-112",
@@ -339,7 +374,9 @@
       }
     },
     "levelUpEligible": false,
-    "createdAt": "2026-09-18T10:41:26.498Z"
+    "createdAt": "2026-09-18T10:41:26.498Z",
+    "joinDate": "2026-07-15",
+    "awards": []
   },
   {
     "usssId": "USSS-119",
@@ -508,7 +545,14 @@
       }
     },
     "levelUpEligible": false,
-    "createdAt": "2026-09-18T10:41:26.498Z"
+    "createdAt": "2026-09-18T10:41:26.498Z",
+    "joinDate": "2026-08-05",
+    "awards": [
+      "Egészségügyi Szolgálatért",
+      "Oktatási Kiválóság Érdemjel",
+      "Kiemelkedő Orvoslási Szolgálati Érdemérem",
+      "KADÉT Szint Teljesítési Érdemérem"
+    ]
   },
   {
     "usssId": "USSS-111",
@@ -537,7 +581,9 @@
       }
     },
     "levelUpEligible": false,
-    "createdAt": "2026-09-18T10:41:26.498Z"
+    "createdAt": "2026-09-18T10:41:26.498Z",
+    "joinDate": "2026-07-15",
+    "awards": []
   },
   {
     "usssId": "USSS-124",
@@ -671,7 +717,12 @@
       }
     },
     "levelUpEligible": false,
-    "createdAt": "2026-09-18T10:41:26.498Z"
+    "createdAt": "2026-09-18T10:41:26.498Z",
+    "joinDate": "2026-08-10",
+    "awards": [
+      "Rendvédelmi Szolgálati Érdemérem",
+      "Oktatási Kiválóság Érdemjel"
+    ]
   },
   {
     "usssId": "USSS-107",
@@ -749,7 +800,9 @@
       }
     },
     "levelUpEligible": false,
-    "createdAt": "2026-09-18T10:41:26.498Z"
+    "createdAt": "2026-09-18T10:41:26.498Z",
+    "joinDate": "2026-07-14",
+    "awards": []
   },
   {
     "usssId": "USSS-106",
@@ -932,7 +985,12 @@
       }
     },
     "levelUpEligible": false,
-    "createdAt": "2026-09-18T10:41:26.498Z"
+    "createdAt": "2026-09-18T10:41:26.498Z",
+    "joinDate": "2026-06-27",
+    "awards": [
+      "Különleges Műveleti Érem",
+      "Oktatási Kiválóság Érdemjel"
+    ]
   },
   {
     "usssId": "USSS-123",
@@ -1059,7 +1117,11 @@
       }
     },
     "levelUpEligible": false,
-    "createdAt": "2026-09-18T10:41:26.498Z"
+    "createdAt": "2026-09-18T10:41:26.498Z",
+    "joinDate": "2026-08-10",
+    "awards": [
+      "Oktatási Kiválóság Érdemjel"
+    ]
   },
   {
     "usssId": "USSS-50",
@@ -1088,7 +1150,9 @@
       }
     },
     "levelUpEligible": false,
-    "createdAt": "2026-09-18T10:41:26.498Z"
+    "createdAt": "2026-09-18T10:41:26.498Z",
+    "joinDate": "2025-07-27",
+    "awards": []
   },
   {
     "usssId": "USSS-98",
@@ -1172,7 +1236,15 @@
       }
     },
     "levelUpEligible": false,
-    "createdAt": "2026-09-18T10:41:26.498Z"
+    "createdAt": "2026-09-18T10:41:26.498Z",
+    "joinDate": "2026-04-19",
+    "awards": [
+      "Különleges Műveleti Érem",
+      "Sebesülési Érem",
+      "Veterán Szolgálati Jel",
+      "Oktatási Kiválóság Érdemjel",
+      "KADÉT Szint Teljesítési Érdemérem"
+    ]
   },
   {
     "usssId": "USSS-118",
@@ -1362,7 +1434,13 @@
       }
     },
     "levelUpEligible": false,
-    "createdAt": "2026-09-18T10:41:26.498Z"
+    "createdAt": "2026-09-18T10:41:26.498Z",
+    "joinDate": "2026-07-29",
+    "awards": [
+      "Sebesülési Érem",
+      "Oktatási Kiválóság Érdemjel",
+      "KADÉT Szint Teljesítési Érdemérem"
+    ]
   },
   {
     "usssId": "USSS-96",
@@ -1433,7 +1511,11 @@
       }
     },
     "levelUpEligible": false,
-    "createdAt": "2026-09-18T10:41:26.498Z"
+    "createdAt": "2026-09-18T10:41:26.498Z",
+    "joinDate": "2026-04-16",
+    "awards": [
+      "Egészségügyi Szolgálatért"
+    ]
   },
   {
     "usssId": "USSS-109",
@@ -1546,7 +1628,12 @@
       }
     },
     "levelUpEligible": false,
-    "createdAt": "2026-09-18T10:41:26.498Z"
+    "createdAt": "2026-09-18T10:41:26.498Z",
+    "joinDate": "2026-06-28",
+    "awards": [
+      "Különleges Műveleti Érem",
+      "Egészségügyi Szolgálatért"
+    ]
   },
   {
     "usssId": "USSS-131",
@@ -1560,7 +1647,11 @@
     "notes": "",
     "modules": {},
     "levelUpEligible": false,
-    "createdAt": "2026-09-20T08:03:59.264Z"
+    "createdAt": "2026-09-20T08:03:59.264Z",
+    "joinDate": "2026-08-30",
+    "awards": [
+      "KADÉT Szint Teljesítési Érdemérem"
+    ]
   },
   {
     "usssId": "USSS-126",
@@ -1610,7 +1701,9 @@
       }
     },
     "levelUpEligible": false,
-    "createdAt": "2026-09-20T08:03:59.264Z"
+    "createdAt": "2026-09-20T08:03:59.264Z",
+    "joinDate": "2026-08-26",
+    "awards": []
   },
   {
     "usssId": "USSS-135",
@@ -1624,7 +1717,9 @@
     "notes": "",
     "modules": {},
     "levelUpEligible": false,
-    "createdAt": "2026-09-20T08:03:59.264Z"
+    "createdAt": "2026-09-20T08:03:59.264Z",
+    "joinDate": "2026-09-20",
+    "awards": []
   },
   {
     "usssId": "USSS-130",
@@ -1638,7 +1733,11 @@
     "notes": "",
     "modules": {},
     "levelUpEligible": false,
-    "createdAt": "2026-09-20T08:03:59.264Z"
+    "createdAt": "2026-09-20T08:03:59.264Z",
+    "joinDate": "2026-08-29",
+    "awards": [
+      "Sebesülési Érem"
+    ]
   },
   {
     "usssId": "USSS-129",
@@ -1652,7 +1751,9 @@
     "notes": "",
     "modules": {},
     "levelUpEligible": false,
-    "createdAt": "2026-09-20T08:03:59.264Z"
+    "createdAt": "2026-09-20T08:03:59.264Z",
+    "joinDate": "2026-08-29",
+    "awards": []
   },
   {
     "usssId": "USSS-127",
@@ -1666,7 +1767,9 @@
     "notes": "",
     "modules": {},
     "levelUpEligible": false,
-    "createdAt": "2026-09-20T08:03:59.264Z"
+    "createdAt": "2026-09-20T08:03:59.264Z",
+    "joinDate": "2026-08-26",
+    "awards": []
   },
   {
     "usssId": "USSS-132",
@@ -1680,7 +1783,9 @@
     "notes": "",
     "modules": {},
     "levelUpEligible": false,
-    "createdAt": "2026-09-20T08:03:59.264Z"
+    "createdAt": "2026-09-20T08:03:59.264Z",
+    "joinDate": "2026-08-30",
+    "awards": []
   },
   {
     "usssId": "USSS-128",
@@ -1709,7 +1814,9 @@
       }
     },
     "levelUpEligible": false,
-    "createdAt": "2026-09-20T08:03:59.264Z"
+    "createdAt": "2026-09-20T08:03:59.264Z",
+    "joinDate": "2026-08-26",
+    "awards": []
   },
   {
     "usssId": "USSS-137",
@@ -1723,7 +1830,9 @@
     "notes": "",
     "modules": {},
     "levelUpEligible": false,
-    "createdAt": "2026-10-07T18:23:41.244Z"
+    "createdAt": "2026-10-07T18:23:41.244Z",
+    "joinDate": "2026-10-04",
+    "awards": []
   },
   {
     "usssId": "USSS-136",
@@ -1737,6 +1846,8 @@
     "notes": "",
     "modules": {},
     "levelUpEligible": false,
-    "createdAt": "2026-10-07T18:23:41.244Z"
+    "createdAt": "2026-10-07T18:23:41.244Z",
+    "joinDate": "2026-09-28",
+    "awards": []
   }
 ]

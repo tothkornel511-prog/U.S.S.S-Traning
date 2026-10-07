@@ -1,4 +1,4 @@
-import { getPersonnel, upsertPerson, deletePerson, readinessPercent, ref, probationInfo, getPositions, sortByRank, MAX_PHOTO_BYTES } from "../store.js?v=82";
+import { getPersonnel, upsertPerson, deletePerson, readinessPercent, ref, probationInfo, getPositions, sortByRank, MAX_PHOTO_BYTES } from "../store.js?v=83";
 import { hasRole, actorLabel } from "../auth.js?v=20";
 import { esc, avatarContent, toast, openModal, closeModal } from "../utils.js?v=31";
 import { navigate } from "../router.js?v=20";
@@ -125,6 +125,7 @@ function openPersonForm(person) {
           <select id="pf-level">${ref.LEVELS.map((l) => `<option value="${l.id}" ${person?.level === l.id ? "selected" : ""}>${esc(l.label)}</option>`).join("")}</select>
         </div>
         <div class="field"><label>Próbaidő kezdete</label><input type="date" id="pf-prob" value="${esc(person?.probationStart || "")}" /></div>
+        <div class="field"><label>Csatlakozás az állományhoz</label><input type="date" id="pf-join" value="${esc(person?.joinDate || "")}" /></div>
       </div>
       <div class="field">
         <label>Profilkép</label>
@@ -189,6 +190,7 @@ function openPersonForm(person) {
       status: document.getElementById("pf-status").value,
       level: document.getElementById("pf-level").value,
       probationStart: document.getElementById("pf-prob").value,
+      joinDate: document.getElementById("pf-join").value,
       photo: currentPhoto,
       notes: document.getElementById("pf-notes").value.trim(),
     }, actorLabel());

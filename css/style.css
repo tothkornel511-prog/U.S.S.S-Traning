@@ -447,6 +447,8 @@ button {
 .badge-gray { background: rgba(255,255,255,0.05); color: var(--text-low); border-color: var(--line-soft); }
 .badge-gold { background: rgba(198,166,100,0.14); color: var(--gold-bright); border-color: rgba(198,166,100,0.4); }
 .badge-orange { background: var(--orange-bg); color: var(--orange-bright); border-color: rgba(217,122,53,0.5); box-shadow: 0 0 10px rgba(217,122,53,0.22); }
+.award-remove { background: none; border: none; color: inherit; opacity: 0.6; cursor: pointer; font-size: 11px; line-height: 1; padding: 0; }
+.award-remove:hover { opacity: 1; }
 
 .dot { width: 9px; height: 9px; border-radius: 50%; display: inline-block; }
 .dot-green { background: var(--green); box-shadow: var(--glow-green); }
