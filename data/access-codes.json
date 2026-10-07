@@ -7,7 +7,11 @@
   {
     "usssId": "USSS-98",
     "code": "5PLZ-8XWQ",
-    "role": "TRAINING"
+    "role": "TRAINING",
+    "sections": [
+      "personnel",
+      "matrix"
+    ]
   },
   {
     "usssId": "USSS-125",
