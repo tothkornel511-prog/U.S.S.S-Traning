@@ -3,7 +3,7 @@ import {
   setModuleTheory, setModulePractical, approveLevelUp, nextLevelId, liftProbation,
   levelLabel, moduleByCode, examStats, THEORY_PASS_THRESHOLD, deleteHistoryEntry,
   getAwards, addAward, addPersonAward, removePersonAward,
-} from "../store.js?v=83";
+} from "../store.js?v=84";
 import { hasRole, actorLabel } from "../auth.js?v=20";
 import { esc, avatarContent, fmtDate, fmtDateTime, toast, openModal, closeModal } from "../utils.js?v=31";
 import { navigate } from "../router.js?v=20";

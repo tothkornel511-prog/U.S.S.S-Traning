@@ -212,6 +212,7 @@ export function seedIfNeeded() {
   applyTrainingCenterRankCategoriesPatch();
   applyInstructorsSeedPatch();
   applyPositionCatalogPatch();
+  applyProtectionLevelRecordsCleanupPatch();
 }
 
 /* Célzott, ismételten lefuttatható kiegészítés: az önkormányzati ranglétra
@@ -1443,6 +1444,23 @@ function applyCommandCenterCatalogSeedPatch() {
   });
   write(KEYS.operations, records);
   write(patchKey, true);
+}
+
+/* Célzott, egyszeri takarítás: a Védelmi fokozatok korábban (helytelenül)
+   mint 4 db archiválható "operációs rekord" (LVL-1…LVL-4, saját prioritás/
+   kockázat-besorolással) lett seedelve — ezeket az átdolgozás (lásd
+   operations.js renderProtectionLevels) feleslegessé tette, a nézet most a
+   PROTECTION_LEVELS referencia-adatból épül fel, nem ezekből a rekordokból.
+   A már korábban (ezen a böngészőn) seedelt LVL-x rekordok nélküle örökre
+   "KRITIKUS" szellemtételként maradnának a Vezérlőpult statisztikáiban és a
+   Kiemelt kockázatok panelen — ez a patch egyszer, véglegesen kitörli őket. */
+const PROTECTION_LEVEL_RECORDS_CLEANUP_KEY = NS + "protection_level_records_cleanup_2026_10_07";
+function applyProtectionLevelRecordsCleanupPatch() {
+  if (read(PROTECTION_LEVEL_RECORDS_CLEANUP_KEY, false)) return;
+  const records = read(KEYS.operations, []);
+  const filtered = records.filter((record) => record.type !== "protection-levels");
+  if (filtered.length !== records.length) write(KEYS.operations, filtered);
+  write(PROTECTION_LEVEL_RECORDS_CLEANUP_KEY, true);
 }
 
 function applyCommandCenterSeedPatch() {

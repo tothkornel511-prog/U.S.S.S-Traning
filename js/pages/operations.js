@@ -7,7 +7,7 @@ import {
   createOperationRecord,
   updateOperationRecord,
   archiveOperationRecord,
-} from "../store.js?v=83";
+} from "../store.js?v=84";
 import { actorLabel, hasRole } from "../auth.js?v=20";
 import { esc, fmtDate, toast, openModal, closeModal, applyBranding } from "../utils.js?v=31";
 import { navigate } from "../router.js?v=20";
