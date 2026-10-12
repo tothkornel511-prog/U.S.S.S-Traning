@@ -11,7 +11,7 @@
     "notes": "",
     "modules": {
       "0": {
-        "theory": 80,
+        "theory": 92,
         "history": [
           {
             "date": "2026-08-17T10:00:00.000Z",
@@ -19,55 +19,19 @@
             "theory": 92,
             "result": "pass",
             "examiner": "A rendszer"
-          },
-          {
-            "date": "2026-08-17T00:00:00.000Z",
-            "type": "theory",
-            "theory": 80,
-            "result": "pass",
-            "examiner": "A rendszer"
           }
         ],
         "theoryDate": "2026-08-17",
         "examiner": "A rendszer"
-      },
-      "ADM": {
-        "theory": 95,
-        "history": [
-          {
-            "date": "2026-09-20T08:12:34.023Z",
-            "type": "theory",
-            "theory": 95,
-            "result": "pass",
-            "examiner": "A rendszer"
-          }
-        ],
-        "theoryDate": "2026-09-20",
-        "examiner": "A rendszer"
-      },
-      "A": {
-        "theory": 90,
-        "history": [
-          {
-            "date": "2026-09-20T08:12:45.663Z",
-            "type": "theory",
-            "theory": 90,
-            "result": "pass",
-            "examiner": "A rendszer"
-          }
-        ],
-        "theoryDate": "2026-09-20",
-        "examiner": "A rendszer"
       }
     },
     "levelUpEligible": false,
-    "createdAt": "2026-09-18T10:41:26.497Z",
-    "joinDate": "2025-02-19"
+    "createdAt": "2026-10-12T11:41:32.516Z"
   },
   {
     "usssId": "USSS-80",
     "name": "Oliver Smith",
-    "position": "U.S.S.S Agent",
+    "position": "Secretary of Development",
     "level": "0",
     "status": "Újonc",
     "photo": "",
@@ -84,112 +48,19 @@
             "theory": 88,
             "result": "pass",
             "examiner": "A rendszer"
-          },
-          {
-            "date": "2026-09-20T08:11:35.238Z",
-            "type": "practical",
-            "theory": 88,
-            "result": "pass",
-            "examiner": "Dominic Hayes (Admin)"
           }
         ],
         "theoryDate": "2026-08-17",
-        "examiner": "A rendszer",
-        "practical": "pass",
-        "practicalExaminer": "Dominic Hayes (Admin)"
-      },
-      "ADM": {
-        "theory": 85,
-        "practical": "pass",
-        "history": [
-          {
-            "date": "2026-09-20T08:12:58.438Z",
-            "type": "practical",
-            "theory": null,
-            "result": "pass",
-            "examiner": "Dominic Hayes (Admin)"
-          },
-          {
-            "date": "2026-09-20T08:13:03.775Z",
-            "type": "theory",
-            "theory": 85,
-            "result": "pass",
-            "examiner": "A rendszer"
-          }
-        ],
-        "practicalExaminer": "Dominic Hayes (Admin)",
-        "theoryDate": "2026-09-20",
-        "examiner": "A rendszer"
-      },
-      "LSNTA": {
-        "theory": 100,
-        "history": [
-          {
-            "date": "2026-09-20T08:13:12.982Z",
-            "type": "theory",
-            "theory": 100,
-            "result": "pass",
-            "examiner": "A rendszer"
-          },
-          {
-            "date": "2026-09-20T08:13:14.662Z",
-            "type": "practical",
-            "theory": 100,
-            "result": "pass",
-            "examiner": "Dominic Hayes (Admin)"
-          }
-        ],
-        "theoryDate": "2026-09-20",
-        "examiner": "A rendszer",
-        "practical": "pass",
-        "practicalExaminer": "Dominic Hayes (Admin)"
-      },
-      "A": {
-        "theory": 80,
-        "history": [
-          {
-            "date": "2026-09-20T08:13:29.974Z",
-            "type": "theory",
-            "theory": 80,
-            "result": "pass",
-            "examiner": "A rendszer"
-          },
-          {
-            "date": "2026-09-20T08:13:31.934Z",
-            "type": "practical",
-            "theory": 80,
-            "result": "pass",
-            "examiner": "Dominic Hayes (Admin)"
-          }
-        ],
-        "theoryDate": "2026-09-20",
-        "examiner": "A rendszer",
-        "practical": "pass",
-        "practicalExaminer": "Dominic Hayes (Admin)"
-      },
-      "K": {
-        "theory": 50,
-        "history": [
-          {
-            "date": "2026-09-20T08:13:39.662Z",
-            "type": "theory",
-            "theory": 50,
-            "result": "fail",
-            "examiner": "A rendszer"
-          }
-        ],
-        "theoryDate": "2026-09-20",
         "examiner": "A rendszer"
       }
     },
     "levelUpEligible": false,
-    "createdAt": "2026-09-18T10:41:26.498Z",
-    "joinDate": "2026-02-10"
+    "createdAt": "2026-10-12T11:41:32.517Z"
   },
   {
     "usssId": "USSS-91",
     "name": "Titus Long",
-    "position": "Secretary of Public Relations",
+    "position": "U.S.S.S Agent",
     "level": "0",
     "status": "Újonc",
     "photo": "",
@@ -198,51 +69,22 @@
     "notes": "",
     "modules": {
       "0": {
-        "theory": 90,
-        "theoryDate": "2026-08-19",
-        "examiner": "A rendszer",
+        "theory": 76,
         "history": [
           {
             "date": "2026-08-17T10:00:00.000Z",
             "type": "theory",
-            "theory": 90,
-            "result": "pass",
-            "examiner": "A rendszer"
-          },
-          {
-            "date": "2026-08-18T10:00:00.000Z",
-            "type": "theory",
-            "theory": 90,
-            "result": "pass",
-            "examiner": "A rendszer"
-          },
-          {
-            "date": "2026-08-19T10:00:00.000Z",
-            "type": "theory",
-            "theory": 90,
-            "result": "pass",
+            "theory": 76,
+            "result": "fail",
             "examiner": "A rendszer"
           }
-        ]
-      },
-      "ADM": {
-        "theory": 80,
+        ],
         "theoryDate": "2026-08-17",
-        "examiner": "A rendszer",
-        "history": [
-          {
-            "date": "2026-08-17T10:00:00.000Z",
-            "type": "theory",
-            "theory": 80,
-            "result": "pass",
-            "examiner": "A rendszer"
-          }
-        ]
+        "examiner": "A rendszer"
       }
     },
     "levelUpEligible": false,
-    "createdAt": "2026-09-18T10:41:26.498Z",
-    "joinDate": "2026-01-31"
+    "createdAt": "2026-10-12T11:41:32.517Z"
   },
   {
     "usssId": "USSS-121",
@@ -257,8 +99,6 @@
     "modules": {
       "0": {
         "theory": 95,
-        "theoryDate": "2026-08-17",
-        "examiner": "A rendszer",
         "history": [
           {
             "date": "2026-08-17T10:00:00.000Z",
@@ -267,54 +107,13 @@
             "result": "pass",
             "examiner": "A rendszer"
           }
-        ]
-      },
-      "ADM": {
-        "theory": 100,
+        ],
         "theoryDate": "2026-08-17",
-        "examiner": "A rendszer",
-        "history": [
-          {
-            "date": "2026-08-17T10:00:00.000Z",
-            "type": "theory",
-            "theory": 100,
-            "result": "pass",
-            "examiner": "A rendszer"
-          }
-        ]
-      },
-      "LSNTA": {
-        "theory": 100,
-        "theoryDate": "2026-08-17",
-        "examiner": "A rendszer",
-        "history": [
-          {
-            "date": "2026-08-17T10:00:00.000Z",
-            "type": "theory",
-            "theory": 100,
-            "result": "pass",
-            "examiner": "A rendszer"
-          }
-        ]
-      },
-      "L": {
-        "theory": 90,
-        "theoryDate": "2026-08-17",
-        "examiner": "A rendszer",
-        "history": [
-          {
-            "date": "2026-08-17T10:00:00.000Z",
-            "type": "theory",
-            "theory": 90,
-            "result": "pass",
-            "examiner": "A rendszer"
-          }
-        ]
+        "examiner": "A rendszer"
       }
     },
     "levelUpEligible": false,
-    "createdAt": "2026-09-18T10:41:26.498Z",
-    "joinDate": "2026-08-05"
+    "createdAt": "2026-10-12T11:41:32.517Z"
   },
   {
     "usssId": "USSS-112",
@@ -343,13 +142,12 @@
       }
     },
     "levelUpEligible": false,
-    "createdAt": "2026-09-18T10:41:26.498Z",
-    "joinDate": "2026-07-15"
+    "createdAt": "2026-10-12T11:41:32.517Z"
   },
   {
     "usssId": "USSS-119",
     "name": "Dr. Rick Deckard",
-    "position": "Secretary of Health",
+    "position": "U.S.S.S Agent",
     "level": "0",
     "status": "Újonc",
     "photo": "",
@@ -358,163 +156,22 @@
     "notes": "",
     "modules": {
       "0": {
-        "theory": 95,
-        "theoryDate": "2026-08-17",
-        "examiner": "A rendszer",
+        "theory": 84,
         "history": [
           {
             "date": "2026-08-17T10:00:00.000Z",
             "type": "theory",
-            "theory": 95,
+            "theory": 84,
             "result": "pass",
             "examiner": "A rendszer"
           }
-        ]
-      },
-      "ADM": {
-        "theory": 100,
+        ],
         "theoryDate": "2026-08-17",
-        "examiner": "A rendszer",
-        "history": [
-          {
-            "date": "2026-08-17T10:00:00.000Z",
-            "type": "theory",
-            "theory": 100,
-            "result": "pass",
-            "examiner": "A rendszer"
-          }
-        ]
-      },
-      "LSNTA": {
-        "theory": 95,
-        "theoryDate": "2026-08-17",
-        "examiner": "A rendszer",
-        "history": [
-          {
-            "date": "2026-08-17T10:00:00.000Z",
-            "type": "theory",
-            "theory": 95,
-            "result": "pass",
-            "examiner": "A rendszer"
-          }
-        ]
-      },
-      "A": {
-        "theory": 95,
-        "theoryDate": "2026-08-17",
-        "examiner": "A rendszer",
-        "history": [
-          {
-            "date": "2026-08-17T10:00:00.000Z",
-            "type": "theory",
-            "theory": 95,
-            "result": "pass",
-            "examiner": "A rendszer"
-          }
-        ]
-      },
-      "G1": {
-        "theory": 95,
-        "theoryDate": "2026-08-17",
-        "examiner": "A rendszer",
-        "history": [
-          {
-            "date": "2026-08-17T10:00:00.000Z",
-            "type": "theory",
-            "theory": 95,
-            "result": "pass",
-            "examiner": "A rendszer"
-          }
-        ]
-      },
-      "K": {
-        "theory": 95,
-        "theoryDate": "2026-08-17",
-        "examiner": "A rendszer",
-        "history": [
-          {
-            "date": "2026-08-17T10:00:00.000Z",
-            "type": "theory",
-            "theory": 95,
-            "result": "pass",
-            "examiner": "A rendszer"
-          }
-        ]
-      },
-      "L": {
-        "theory": 95,
-        "theoryDate": "2026-08-17",
-        "examiner": "A rendszer",
-        "history": [
-          {
-            "date": "2026-08-17T10:00:00.000Z",
-            "type": "theory",
-            "theory": 95,
-            "result": "pass",
-            "examiner": "A rendszer"
-          }
-        ]
-      },
-      "R": {
-        "theory": 95,
-        "theoryDate": "2026-08-17",
-        "examiner": "A rendszer",
-        "history": [
-          {
-            "date": "2026-08-17T10:00:00.000Z",
-            "type": "theory",
-            "theory": 95,
-            "result": "pass",
-            "examiner": "A rendszer"
-          }
-        ]
-      },
-      "GSD1": {
-        "theory": 95,
-        "theoryDate": "2026-08-17",
-        "examiner": "A rendszer",
-        "history": [
-          {
-            "date": "2026-08-17T10:00:00.000Z",
-            "type": "theory",
-            "theory": 95,
-            "result": "pass",
-            "examiner": "A rendszer"
-          }
-        ]
-      },
-      "GSD2": {
-        "theory": 100,
-        "theoryDate": "2026-08-17",
-        "examiner": "A rendszer",
-        "history": [
-          {
-            "date": "2026-08-17T10:00:00.000Z",
-            "type": "theory",
-            "theory": 100,
-            "result": "pass",
-            "examiner": "A rendszer"
-          }
-        ]
-      },
-      "GSD3": {
-        "theory": 95,
-        "theoryDate": "2026-08-17",
-        "examiner": "A rendszer",
-        "history": [
-          {
-            "date": "2026-08-17T10:00:00.000Z",
-            "type": "theory",
-            "theory": 95,
-            "result": "pass",
-            "examiner": "A rendszer"
-          }
-        ]
+        "examiner": "A rendszer"
       }
     },
     "levelUpEligible": false,
-    "createdAt": "2026-09-18T10:41:26.498Z",
-    "joinDate": "2026-08-05"
+    "createdAt": "2026-10-12T11:41:32.517Z"
   },
   {
     "usssId": "USSS-111",
@@ -543,8 +200,7 @@
       }
     },
     "levelUpEligible": false,
-    "createdAt": "2026-09-18T10:41:26.498Z",
-    "joinDate": "2026-07-15"
+    "createdAt": "2026-10-12T11:41:32.517Z"
   },
   {
     "usssId": "USSS-124",
@@ -558,128 +214,22 @@
     "notes": "",
     "modules": {
       "0": {
-        "theory": 90,
+        "theory": 87,
+        "history": [
+          {
+            "date": "2026-08-17T10:00:00.000Z",
+            "type": "theory",
+            "theory": 87,
+            "result": "pass",
+            "examiner": "A rendszer"
+          }
+        ],
         "theoryDate": "2026-08-17",
-        "examiner": "A rendszer",
-        "history": [
-          {
-            "date": "2026-08-17T10:00:00.000Z",
-            "type": "theory",
-            "theory": 90,
-            "result": "pass",
-            "examiner": "A rendszer"
-          }
-        ]
-      },
-      "ADM": {
-        "theory": 85,
-        "theoryDate": "2026-08-17",
-        "examiner": "A rendszer",
-        "history": [
-          {
-            "date": "2026-08-17T10:00:00.000Z",
-            "type": "theory",
-            "theory": 85,
-            "result": "pass",
-            "examiner": "A rendszer"
-          }
-        ]
-      },
-      "LSNTA": {
-        "theory": 85,
-        "theoryDate": "2026-08-18",
-        "examiner": "A rendszer",
-        "history": [
-          {
-            "date": "2026-08-17T10:00:00.000Z",
-            "type": "theory",
-            "theory": 85,
-            "result": "pass",
-            "examiner": "A rendszer"
-          },
-          {
-            "date": "2026-08-18T10:00:00.000Z",
-            "type": "theory",
-            "theory": 85,
-            "result": "pass",
-            "examiner": "A rendszer"
-          }
-        ]
-      },
-      "A": {
-        "theory": 80,
-        "theoryDate": "2026-08-17",
-        "examiner": "A rendszer",
-        "history": [
-          {
-            "date": "2026-08-17T10:00:00.000Z",
-            "type": "theory",
-            "theory": 80,
-            "result": "pass",
-            "examiner": "A rendszer"
-          }
-        ]
-      },
-      "G1": {
-        "theory": 80,
-        "theoryDate": "2026-08-17",
-        "examiner": "A rendszer",
-        "history": [
-          {
-            "date": "2026-08-17T10:00:00.000Z",
-            "type": "theory",
-            "theory": 80,
-            "result": "pass",
-            "examiner": "A rendszer"
-          }
-        ]
-      },
-      "K": {
-        "theory": 90,
-        "theoryDate": "2026-08-17",
-        "examiner": "A rendszer",
-        "history": [
-          {
-            "date": "2026-08-17T10:00:00.000Z",
-            "type": "theory",
-            "theory": 90,
-            "result": "pass",
-            "examiner": "A rendszer"
-          }
-        ]
-      },
-      "L": {
-        "theory": 90,
-        "theoryDate": "2026-08-17",
-        "examiner": "A rendszer",
-        "history": [
-          {
-            "date": "2026-08-17T10:00:00.000Z",
-            "type": "theory",
-            "theory": 90,
-            "result": "pass",
-            "examiner": "A rendszer"
-          }
-        ]
-      },
-      "R": {
-        "theory": 90,
-        "theoryDate": "2026-08-17",
-        "examiner": "A rendszer",
-        "history": [
-          {
-            "date": "2026-08-17T10:00:00.000Z",
-            "type": "theory",
-            "theory": 90,
-            "result": "pass",
-            "examiner": "A rendszer"
-          }
-        ]
+        "examiner": "A rendszer"
       }
     },
     "levelUpEligible": false,
-    "createdAt": "2026-09-18T10:41:26.498Z",
-    "joinDate": "2026-08-10"
+    "createdAt": "2026-10-12T11:41:32.517Z"
   },
   {
     "usssId": "USSS-107",
@@ -693,77 +243,27 @@
     "notes": "",
     "modules": {
       "0": {
-        "theory": 55,
-        "theoryDate": "2026-08-20",
-        "examiner": "A rendszer",
+        "theory": 90,
         "history": [
           {
             "date": "2026-08-17T10:00:00.000Z",
             "type": "theory",
-            "theory": 55,
-            "result": "fail",
-            "examiner": "A rendszer"
-          },
-          {
-            "date": "2026-08-18T10:00:00.000Z",
-            "type": "theory",
-            "theory": 55,
-            "result": "fail",
-            "examiner": "A rendszer"
-          },
-          {
-            "date": "2026-08-19T10:00:00.000Z",
-            "type": "theory",
-            "theory": 55,
-            "result": "fail",
-            "examiner": "A rendszer"
-          },
-          {
-            "date": "2026-08-20T10:00:00.000Z",
-            "type": "theory",
-            "theory": 55,
-            "result": "fail",
+            "theory": 90,
+            "result": "pass",
             "examiner": "A rendszer"
           }
-        ]
-      },
-      "ADM": {
-        "theory": 65,
+        ],
         "theoryDate": "2026-08-17",
-        "examiner": "A rendszer",
-        "history": [
-          {
-            "date": "2026-08-17T10:00:00.000Z",
-            "type": "theory",
-            "theory": 65,
-            "result": "fail",
-            "examiner": "A rendszer"
-          }
-        ]
-      },
-      "LSNTA": {
-        "theory": 75,
-        "theoryDate": "2026-08-17",
-        "examiner": "A rendszer",
-        "history": [
-          {
-            "date": "2026-08-17T10:00:00.000Z",
-            "type": "theory",
-            "theory": 75,
-            "result": "fail",
-            "examiner": "A rendszer"
-          }
-        ]
+        "examiner": "A rendszer"
       }
     },
     "levelUpEligible": false,
-    "createdAt": "2026-09-18T10:41:26.498Z",
-    "joinDate": "2026-07-14"
+    "createdAt": "2026-10-12T11:41:32.517Z"
   },
   {
     "usssId": "USSS-106",
     "name": "Michel Smith",
-    "position": "Jogász",
+    "position": "U.S.S.S Agent",
     "level": "0",
     "status": "Újonc",
     "photo": "",
@@ -772,177 +272,22 @@
     "notes": "",
     "modules": {
       "0": {
-        "theory": 80,
-        "theoryDate": "2026-08-19",
-        "examiner": "A rendszer",
+        "theory": 55,
         "history": [
           {
             "date": "2026-08-17T10:00:00.000Z",
             "type": "theory",
-            "theory": 80,
-            "result": "pass",
-            "examiner": "A rendszer"
-          },
-          {
-            "date": "2026-08-18T10:00:00.000Z",
-            "type": "theory",
-            "theory": 80,
-            "result": "pass",
-            "examiner": "A rendszer"
-          },
-          {
-            "date": "2026-08-19T10:00:00.000Z",
-            "type": "theory",
-            "theory": 80,
-            "result": "pass",
+            "theory": 55,
+            "result": "fail",
             "examiner": "A rendszer"
           }
-        ]
-      },
-      "ADM": {
-        "theory": 85,
-        "theoryDate": "2026-08-18",
-        "examiner": "A rendszer",
-        "history": [
-          {
-            "date": "2026-08-17T10:00:00.000Z",
-            "type": "theory",
-            "theory": 85,
-            "result": "pass",
-            "examiner": "A rendszer"
-          },
-          {
-            "date": "2026-08-18T10:00:00.000Z",
-            "type": "theory",
-            "theory": 85,
-            "result": "pass",
-            "examiner": "A rendszer"
-          }
-        ]
-      },
-      "LSNTA": {
-        "theory": 85,
-        "theoryDate": "2026-08-18",
-        "examiner": "A rendszer",
-        "history": [
-          {
-            "date": "2026-08-17T10:00:00.000Z",
-            "type": "theory",
-            "theory": 85,
-            "result": "pass",
-            "examiner": "A rendszer"
-          },
-          {
-            "date": "2026-08-18T10:00:00.000Z",
-            "type": "theory",
-            "theory": 85,
-            "result": "pass",
-            "examiner": "A rendszer"
-          }
-        ]
-      },
-      "A": {
-        "theory": 80,
-        "theoryDate": "2026-08-18",
-        "examiner": "A rendszer",
-        "history": [
-          {
-            "date": "2026-08-17T10:00:00.000Z",
-            "type": "theory",
-            "theory": 80,
-            "result": "pass",
-            "examiner": "A rendszer"
-          },
-          {
-            "date": "2026-08-18T10:00:00.000Z",
-            "type": "theory",
-            "theory": 80,
-            "result": "pass",
-            "examiner": "A rendszer"
-          }
-        ]
-      },
-      "G1": {
-        "theory": 80,
-        "theoryDate": "2026-08-20",
-        "examiner": "A rendszer",
-        "history": [
-          {
-            "date": "2026-08-17T10:00:00.000Z",
-            "type": "theory",
-            "theory": 80,
-            "result": "pass",
-            "examiner": "A rendszer"
-          },
-          {
-            "date": "2026-08-18T10:00:00.000Z",
-            "type": "theory",
-            "theory": 80,
-            "result": "pass",
-            "examiner": "A rendszer"
-          },
-          {
-            "date": "2026-08-19T10:00:00.000Z",
-            "type": "theory",
-            "theory": 80,
-            "result": "pass",
-            "examiner": "A rendszer"
-          },
-          {
-            "date": "2026-08-20T10:00:00.000Z",
-            "type": "theory",
-            "theory": 80,
-            "result": "pass",
-            "examiner": "A rendszer"
-          }
-        ]
-      },
-      "K": {
-        "theory": 95,
+        ],
         "theoryDate": "2026-08-17",
-        "examiner": "A rendszer",
-        "history": [
-          {
-            "date": "2026-08-17T10:00:00.000Z",
-            "type": "theory",
-            "theory": 95,
-            "result": "pass",
-            "examiner": "A rendszer"
-          }
-        ]
-      },
-      "L": {
-        "theory": 80,
-        "theoryDate": "2026-08-17",
-        "examiner": "A rendszer",
-        "history": [
-          {
-            "date": "2026-08-17T10:00:00.000Z",
-            "type": "theory",
-            "theory": 80,
-            "result": "pass",
-            "examiner": "A rendszer"
-          }
-        ]
-      },
-      "R": {
-        "theory": 80,
-        "theoryDate": "2026-08-17",
-        "examiner": "A rendszer",
-        "history": [
-          {
-            "date": "2026-08-17T10:00:00.000Z",
-            "type": "theory",
-            "theory": 80,
-            "result": "pass",
-            "examiner": "A rendszer"
-          }
-        ]
+        "examiner": "A rendszer"
       }
     },
     "levelUpEligible": false,
-    "createdAt": "2026-09-18T10:41:26.498Z",
-    "joinDate": "2026-06-27"
+    "createdAt": "2026-10-12T11:41:32.517Z"
   },
   {
     "usssId": "USSS-123",
@@ -956,121 +301,22 @@
     "notes": "",
     "modules": {
       "0": {
-        "theory": 85,
-        "theoryDate": "2026-08-17",
-        "examiner": "A rendszer",
+        "theory": 93,
         "history": [
           {
             "date": "2026-08-17T10:00:00.000Z",
             "type": "theory",
-            "theory": 85,
+            "theory": 93,
             "result": "pass",
             "examiner": "A rendszer"
           }
-        ]
-      },
-      "ADM": {
-        "theory": 95,
+        ],
         "theoryDate": "2026-08-17",
-        "examiner": "A rendszer",
-        "history": [
-          {
-            "date": "2026-08-17T10:00:00.000Z",
-            "type": "theory",
-            "theory": 95,
-            "result": "pass",
-            "examiner": "A rendszer"
-          }
-        ]
-      },
-      "LSNTA": {
-        "theory": 90,
-        "theoryDate": "2026-08-17",
-        "examiner": "A rendszer",
-        "history": [
-          {
-            "date": "2026-08-17T10:00:00.000Z",
-            "type": "theory",
-            "theory": 90,
-            "result": "pass",
-            "examiner": "A rendszer"
-          }
-        ]
-      },
-      "A": {
-        "theory": 90,
-        "theoryDate": "2026-08-17",
-        "examiner": "A rendszer",
-        "history": [
-          {
-            "date": "2026-08-17T10:00:00.000Z",
-            "type": "theory",
-            "theory": 90,
-            "result": "pass",
-            "examiner": "A rendszer"
-          }
-        ]
-      },
-      "G1": {
-        "theory": 80,
-        "theoryDate": "2026-08-17",
-        "examiner": "A rendszer",
-        "history": [
-          {
-            "date": "2026-08-17T10:00:00.000Z",
-            "type": "theory",
-            "theory": 80,
-            "result": "pass",
-            "examiner": "A rendszer"
-          }
-        ]
-      },
-      "K": {
-        "theory": 85,
-        "theoryDate": "2026-08-17",
-        "examiner": "A rendszer",
-        "history": [
-          {
-            "date": "2026-08-17T10:00:00.000Z",
-            "type": "theory",
-            "theory": 85,
-            "result": "pass",
-            "examiner": "A rendszer"
-          }
-        ]
-      },
-      "L": {
-        "theory": 95,
-        "theoryDate": "2026-08-17",
-        "examiner": "A rendszer",
-        "history": [
-          {
-            "date": "2026-08-17T10:00:00.000Z",
-            "type": "theory",
-            "theory": 95,
-            "result": "pass",
-            "examiner": "A rendszer"
-          }
-        ]
-      },
-      "R": {
-        "theory": 85,
-        "theoryDate": "2026-08-17",
-        "examiner": "A rendszer",
-        "history": [
-          {
-            "date": "2026-08-17T10:00:00.000Z",
-            "type": "theory",
-            "theory": 85,
-            "result": "pass",
-            "examiner": "A rendszer"
-          }
-        ]
+        "examiner": "A rendszer"
       }
     },
     "levelUpEligible": false,
-    "createdAt": "2026-09-18T10:41:26.498Z",
-    "joinDate": "2026-08-10"
+    "createdAt": "2026-10-12T11:41:32.517Z"
   },
   {
     "usssId": "USSS-50",
@@ -1099,8 +345,7 @@
       }
     },
     "levelUpEligible": false,
-    "createdAt": "2026-09-18T10:41:26.498Z",
-    "joinDate": "2025-07-27"
+    "createdAt": "2026-10-12T11:41:32.517Z"
   },
   {
     "usssId": "USSS-98",
@@ -1122,70 +367,14 @@
             "theory": 96,
             "result": "pass",
             "examiner": "A rendszer"
-          },
-          {
-            "date": "2026-09-20T08:27:22.996Z",
-            "type": "practical",
-            "theory": 96,
-            "result": "pass",
-            "examiner": "Dominic Hayes (Admin)"
           }
         ],
         "theoryDate": "2026-08-17",
-        "examiner": "A rendszer",
-        "practical": "pass",
-        "practicalExaminer": "Dominic Hayes (Admin)"
-      },
-      "ADM": {
-        "theory": 80,
-        "practical": "pass",
-        "history": [
-          {
-            "date": "2026-09-20T08:27:35.708Z",
-            "type": "practical",
-            "theory": null,
-            "result": "pass",
-            "examiner": "Dominic Hayes (Admin)"
-          },
-          {
-            "date": "2026-09-20T08:27:39.461Z",
-            "type": "theory",
-            "theory": 80,
-            "result": "pass",
-            "examiner": "A rendszer"
-          }
-        ],
-        "practicalExaminer": "Dominic Hayes (Admin)",
-        "theoryDate": "2026-09-20",
         "examiner": "A rendszer"
-      },
-      "LSNTA": {
-        "theory": 90,
-        "history": [
-          {
-            "date": "2026-09-20T08:28:06.685Z",
-            "type": "theory",
-            "theory": 90,
-            "result": "pass",
-            "examiner": "A rendszer"
-          },
-          {
-            "date": "2026-09-20T08:28:08.060Z",
-            "type": "practical",
-            "theory": 90,
-            "result": "pass",
-            "examiner": "Dominic Hayes (Admin)"
-          }
-        ],
-        "theoryDate": "2026-09-20",
-        "examiner": "A rendszer",
-        "practical": "pass",
-        "practicalExaminer": "Dominic Hayes (Admin)"
       }
     },
     "levelUpEligible": false,
-    "createdAt": "2026-09-18T10:41:26.498Z",
-    "joinDate": "2026-04-19"
+    "createdAt": "2026-10-12T11:41:32.517Z"
   },
   {
     "usssId": "USSS-118",
@@ -1200,8 +389,6 @@
     "modules": {
       "0": {
         "theory": 90,
-        "theoryDate": "2026-08-18",
-        "examiner": "A rendszer",
         "history": [
           {
             "date": "2026-08-17T10:00:00.000Z",
@@ -1209,174 +396,14 @@
             "theory": 90,
             "result": "pass",
             "examiner": "A rendszer"
-          },
-          {
-            "date": "2026-08-18T10:00:00.000Z",
-            "type": "theory",
-            "theory": 90,
-            "result": "pass",
-            "examiner": "A rendszer"
           }
-        ]
-      },
-      "ADM": {
-        "theory": 85,
-        "theoryDate": "2026-08-18",
-        "examiner": "A rendszer",
-        "history": [
-          {
-            "date": "2026-08-17T10:00:00.000Z",
-            "type": "theory",
-            "theory": 85,
-            "result": "pass",
-            "examiner": "A rendszer"
-          },
-          {
-            "date": "2026-08-18T10:00:00.000Z",
-            "type": "theory",
-            "theory": 85,
-            "result": "pass",
-            "examiner": "A rendszer"
-          }
-        ]
-      },
-      "LSNTA": {
-        "theory": 80,
+        ],
         "theoryDate": "2026-08-17",
-        "examiner": "A rendszer",
-        "history": [
-          {
-            "date": "2026-08-17T10:00:00.000Z",
-            "type": "theory",
-            "theory": 80,
-            "result": "pass",
-            "examiner": "A rendszer"
-          }
-        ]
-      },
-      "A": {
-        "theory": 90,
-        "theoryDate": "2026-08-18",
-        "examiner": "A rendszer",
-        "history": [
-          {
-            "date": "2026-08-17T10:00:00.000Z",
-            "type": "theory",
-            "theory": 90,
-            "result": "pass",
-            "examiner": "A rendszer"
-          },
-          {
-            "date": "2026-08-18T10:00:00.000Z",
-            "type": "theory",
-            "theory": 90,
-            "result": "pass",
-            "examiner": "A rendszer"
-          }
-        ]
-      },
-      "G1": {
-        "theory": 85,
-        "theoryDate": "2026-08-17",
-        "examiner": "A rendszer",
-        "history": [
-          {
-            "date": "2026-08-17T10:00:00.000Z",
-            "type": "theory",
-            "theory": 85,
-            "result": "pass",
-            "examiner": "A rendszer"
-          }
-        ]
-      },
-      "K": {
-        "theory": 95,
-        "theoryDate": "2026-08-18",
-        "examiner": "A rendszer",
-        "history": [
-          {
-            "date": "2026-08-17T10:00:00.000Z",
-            "type": "theory",
-            "theory": 95,
-            "result": "pass",
-            "examiner": "A rendszer"
-          },
-          {
-            "date": "2026-08-18T10:00:00.000Z",
-            "type": "theory",
-            "theory": 95,
-            "result": "pass",
-            "examiner": "A rendszer"
-          }
-        ]
-      },
-      "L": {
-        "theory": 95,
-        "theoryDate": "2026-08-18",
-        "examiner": "A rendszer",
-        "history": [
-          {
-            "date": "2026-08-17T10:00:00.000Z",
-            "type": "theory",
-            "theory": 95,
-            "result": "pass",
-            "examiner": "A rendszer"
-          },
-          {
-            "date": "2026-08-18T10:00:00.000Z",
-            "type": "theory",
-            "theory": 95,
-            "result": "pass",
-            "examiner": "A rendszer"
-          }
-        ]
-      },
-      "R": {
-        "theory": 95,
-        "theoryDate": "2026-08-17",
-        "examiner": "A rendszer",
-        "history": [
-          {
-            "date": "2026-08-17T10:00:00.000Z",
-            "type": "theory",
-            "theory": 95,
-            "result": "pass",
-            "examiner": "A rendszer"
-          }
-        ]
-      },
-      "GSD1": {
-        "theory": 100,
-        "theoryDate": "2026-08-17",
-        "examiner": "A rendszer",
-        "history": [
-          {
-            "date": "2026-08-17T10:00:00.000Z",
-            "type": "theory",
-            "theory": 100,
-            "result": "pass",
-            "examiner": "A rendszer"
-          }
-        ]
-      },
-      "GSD2": {
-        "theory": 95,
-        "theoryDate": "2026-08-17",
-        "examiner": "A rendszer",
-        "history": [
-          {
-            "date": "2026-08-17T10:00:00.000Z",
-            "type": "theory",
-            "theory": 95,
-            "result": "pass",
-            "examiner": "A rendszer"
-          }
-        ]
+        "examiner": "A rendszer"
       }
     },
     "levelUpEligible": false,
-    "createdAt": "2026-09-18T10:41:26.498Z",
-    "joinDate": "2026-07-29"
+    "createdAt": "2026-10-12T11:41:32.517Z"
   },
   {
     "usssId": "USSS-96",
@@ -1402,58 +429,15 @@
         ],
         "theoryDate": "2026-08-17",
         "examiner": "A rendszer"
-      },
-      "LSNTA": {
-        "theory": 95,
-        "theoryDate": "2026-08-19",
-        "examiner": "A rendszer",
-        "history": [
-          {
-            "date": "2026-08-17T10:00:00.000Z",
-            "type": "theory",
-            "theory": 95,
-            "result": "pass",
-            "examiner": "A rendszer"
-          },
-          {
-            "date": "2026-08-18T10:00:00.000Z",
-            "type": "theory",
-            "theory": 95,
-            "result": "pass",
-            "examiner": "A rendszer"
-          },
-          {
-            "date": "2026-08-19T10:00:00.000Z",
-            "type": "theory",
-            "theory": 95,
-            "result": "pass",
-            "examiner": "A rendszer"
-          }
-        ]
-      },
-      "A": {
-        "theory": 65,
-        "theoryDate": "2026-08-17",
-        "examiner": "A rendszer",
-        "history": [
-          {
-            "date": "2026-08-17T10:00:00.000Z",
-            "type": "theory",
-            "theory": 65,
-            "result": "fail",
-            "examiner": "A rendszer"
-          }
-        ]
       }
     },
     "levelUpEligible": false,
-    "createdAt": "2026-09-18T10:41:26.498Z",
-    "joinDate": "2026-04-16"
+    "createdAt": "2026-10-12T11:41:32.517Z"
   },
   {
     "usssId": "USSS-109",
     "name": "Dr. Lakatos László",
-    "position": "U.S.S.S Agent",
+    "position": "Secretary of Health",
     "level": "0",
     "status": "Újonc",
     "photo": "",
@@ -1462,307 +446,21 @@
     "notes": "",
     "modules": {
       "0": {
-        "theory": 90,
-        "theoryDate": "2026-08-17",
-        "examiner": "A rendszer",
+        "theory": 79,
         "history": [
           {
             "date": "2026-08-17T10:00:00.000Z",
             "type": "theory",
-            "theory": 90,
-            "result": "pass",
-            "examiner": "A rendszer"
-          }
-        ]
-      },
-      "LSNTA": {
-        "theory": 75,
-        "theoryDate": "2026-08-18",
-        "examiner": "A rendszer",
-        "history": [
-          {
-            "date": "2026-08-17T10:00:00.000Z",
-            "type": "theory",
-            "theory": 75,
-            "result": "fail",
-            "examiner": "A rendszer"
-          },
-          {
-            "date": "2026-08-18T10:00:00.000Z",
-            "type": "theory",
-            "theory": 75,
+            "theory": 79,
             "result": "fail",
             "examiner": "A rendszer"
           }
-        ]
-      },
-      "GSD1": {
-        "theory": 95,
+        ],
         "theoryDate": "2026-08-17",
-        "examiner": "A rendszer",
-        "history": [
-          {
-            "date": "2026-08-17T10:00:00.000Z",
-            "type": "theory",
-            "theory": 95,
-            "result": "pass",
-            "examiner": "A rendszer"
-          }
-        ]
-      },
-      "GSD2": {
-        "theory": 80,
-        "theoryDate": "2026-08-18",
-        "examiner": "A rendszer",
-        "history": [
-          {
-            "date": "2026-08-17T10:00:00.000Z",
-            "type": "theory",
-            "theory": 80,
-            "result": "pass",
-            "examiner": "A rendszer"
-          },
-          {
-            "date": "2026-08-18T10:00:00.000Z",
-            "type": "theory",
-            "theory": 80,
-            "result": "pass",
-            "examiner": "A rendszer"
-          }
-        ]
-      },
-      "GSD3": {
-        "theory": 85,
-        "theoryDate": "2026-08-19",
-        "examiner": "A rendszer",
-        "history": [
-          {
-            "date": "2026-08-17T10:00:00.000Z",
-            "type": "theory",
-            "theory": 85,
-            "result": "pass",
-            "examiner": "A rendszer"
-          },
-          {
-            "date": "2026-08-18T10:00:00.000Z",
-            "type": "theory",
-            "theory": 85,
-            "result": "pass",
-            "examiner": "A rendszer"
-          },
-          {
-            "date": "2026-08-19T10:00:00.000Z",
-            "type": "theory",
-            "theory": 85,
-            "result": "pass",
-            "examiner": "A rendszer"
-          }
-        ]
+        "examiner": "A rendszer"
       }
     },
     "levelUpEligible": false,
-    "createdAt": "2026-09-18T10:41:26.498Z",
-    "joinDate": "2026-06-28"
-  },
-  {
-    "usssId": "USSS-131",
-    "name": "Dr. Harry Sterling",
-    "position": "U.S.S.S Agent",
-    "level": "0",
-    "status": "Újonc",
-    "photo": "",
-    "probationStart": "2026-08-17",
-    "probationLifted": false,
-    "notes": "",
-    "modules": {},
-    "levelUpEligible": false,
-    "createdAt": "2026-09-20T08:03:59.264Z",
-    "joinDate": "2026-08-30"
-  },
-  {
-    "usssId": "USSS-126",
-    "name": "Edward Harisson",
-    "position": "U.S.S.S Agent",
-    "level": "0",
-    "status": "Újonc",
-    "photo": "",
-    "probationStart": "2026-08-17",
-    "probationLifted": false,
-    "notes": "",
-    "modules": {
-      "0": {
-        "theory": 95,
-        "theoryDate": "2026-08-17",
-        "examiner": "A rendszer",
-        "history": [
-          {
-            "date": "2026-08-17T10:00:00.000Z",
-            "type": "theory",
-            "theory": 95,
-            "result": "pass",
-            "examiner": "A rendszer"
-          }
-        ]
-      },
-      "ADM": {
-        "theory": 85,
-        "theoryDate": "2026-08-18",
-        "examiner": "A rendszer",
-        "history": [
-          {
-            "date": "2026-08-17T10:00:00.000Z",
-            "type": "theory",
-            "theory": 85,
-            "result": "pass",
-            "examiner": "A rendszer"
-          },
-          {
-            "date": "2026-08-18T10:00:00.000Z",
-            "type": "theory",
-            "theory": 85,
-            "result": "pass",
-            "examiner": "A rendszer"
-          }
-        ]
-      }
-    },
-    "levelUpEligible": false,
-    "createdAt": "2026-09-20T08:03:59.264Z",
-    "joinDate": "2026-08-26"
-  },
-  {
-    "usssId": "USSS-135",
-    "name": "Sebastian White",
-    "position": "U.S.S.S Agent",
-    "level": "0",
-    "status": "Újonc",
-    "photo": "",
-    "probationStart": "2026-08-17",
-    "probationLifted": false,
-    "notes": "",
-    "modules": {},
-    "levelUpEligible": false,
-    "createdAt": "2026-09-20T08:03:59.264Z",
-    "joinDate": "2026-09-20"
-  },
-  {
-    "usssId": "USSS-130",
-    "name": "Dante",
-    "position": "Terepügynök",
-    "level": "0",
-    "status": "Újonc",
-    "photo": "",
-    "probationStart": "2026-08-17",
-    "probationLifted": false,
-    "notes": "",
-    "modules": {},
-    "levelUpEligible": false,
-    "createdAt": "2026-09-20T08:03:59.264Z",
-    "joinDate": "2026-08-29"
-  },
-  {
-    "usssId": "USSS-129",
-    "name": "David Angel",
-    "position": "Karbantartó",
-    "level": "0",
-    "status": "Újonc",
-    "photo": "",
-    "probationStart": "2026-08-17",
-    "probationLifted": false,
-    "notes": "",
-    "modules": {},
-    "levelUpEligible": false,
-    "createdAt": "2026-09-20T08:03:59.264Z",
-    "joinDate": "2026-08-29"
-  },
-  {
-    "usssId": "USSS-127",
-    "name": "Hank Reynolds",
-    "position": "U.S.S.S Agent",
-    "level": "0",
-    "status": "Újonc",
-    "photo": "",
-    "probationStart": "2026-08-17",
-    "probationLifted": false,
-    "notes": "",
-    "modules": {},
-    "levelUpEligible": false,
-    "createdAt": "2026-09-20T08:03:59.264Z",
-    "joinDate": "2026-08-26"
-  },
-  {
-    "usssId": "USSS-132",
-    "name": "Hunter Maeve O’Neill",
-    "position": "U.S.S.S Agent",
-    "level": "0",
-    "status": "Újonc",
-    "photo": "",
-    "probationStart": "2026-08-17",
-    "probationLifted": false,
-    "notes": "",
-    "modules": {},
-    "levelUpEligible": false,
-    "createdAt": "2026-09-20T08:03:59.264Z",
-    "joinDate": "2026-08-30"
-  },
-  {
-    "usssId": "USSS-128",
-    "name": "Magnum Black",
-    "position": "Secretary of Transportation",
-    "level": "0",
-    "status": "Újonc",
-    "photo": "",
-    "probationStart": "2026-08-17",
-    "probationLifted": false,
-    "notes": "",
-    "modules": {
-      "0": {
-        "theory": 85,
-        "theoryDate": "2026-08-17",
-        "examiner": "A rendszer",
-        "history": [
-          {
-            "date": "2026-08-17T10:00:00.000Z",
-            "type": "theory",
-            "theory": 85,
-            "result": "pass",
-            "examiner": "A rendszer"
-          }
-        ]
-      }
-    },
-    "levelUpEligible": false,
-    "createdAt": "2026-09-20T08:03:59.264Z",
-    "joinDate": "2026-08-26"
-  },
-  {
-    "usssId": "USSS-137",
-    "name": "Daemon Targaryen",
-    "position": "U.S.S.S Agent",
-    "level": "0",
-    "status": "Újonc",
-    "photo": "",
-    "probationStart": "2026-08-17",
-    "probationLifted": false,
-    "notes": "",
-    "modules": {},
-    "levelUpEligible": false,
-    "createdAt": "2026-10-07T18:23:41.244Z",
-    "joinDate": "2026-10-04"
-  },
-  {
-    "usssId": "USSS-136",
-    "name": "Jobb Hunor",
-    "position": "U.S.S.S Agent",
-    "level": "0",
-    "status": "Újonc",
-    "photo": "",
-    "probationStart": "2026-08-17",
-    "probationLifted": false,
-    "notes": "",
-    "modules": {},
-    "levelUpEligible": false,
-    "createdAt": "2026-10-07T18:23:41.244Z",
-    "joinDate": "2026-09-28"
+    "createdAt": "2026-10-12T11:41:32.517Z"
   }
 ]
